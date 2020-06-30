@@ -9,5 +9,5 @@ uint8_t* yamlparser::parse(uint8_t*input, size_t input_size)
 
 std::string yamlparser::normalize(uint8_t* input)
 {
-    return "Hello!";
+    return "Hello from yaml!";
 }
