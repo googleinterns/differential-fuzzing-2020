@@ -3,12 +3,12 @@
 
 #include <string>
 
-#include "parser.cpp"
+#include "parser.h"
 
 class XmlParser : virtual public Parser
 {
-    private:
     public:
+        std::string getName();
         void* parse(uint8_t*, size_t) ;
         void* normalize(void*);
         bool equivalent(void*, void*);

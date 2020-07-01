@@ -3,6 +3,11 @@
 
 #include <iostream>
 
+std::string XmlParser::getName()
+{
+    return "xml";
+}
+
 void* XmlParser::parse(uint8_t* input, size_t input_size)
 {
     return NULL;
@@ -16,8 +21,5 @@ void* XmlParser::normalize(void* input)
 
 bool XmlParser::equivalent(void* thing_one, void* thing_two)
 {
-    std::cout << "xml equivalent" << std::endl;
-    std::cout << "thing one-> "<< *(std::string *)(thing_one) << std::endl;
-    std::cout << "thing two-> "<< *(std::string *)(thing_two) << std::endl;
     return *(std::string *)(thing_one) == *(std::string *)(thing_two);
 }

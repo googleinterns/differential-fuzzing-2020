@@ -5,6 +5,7 @@
 
 #include "xmlparser.h"
 #include "yamlparser.h"
+#include "parser.h"
 
 #include <iostream>
 
@@ -28,84 +29,167 @@ struct Node
 
 
 void DeleteContainers(ParserContainer* delete_me)
-{
-    
-    if(delete_me != NULL)
-    {
-        delete_me = delete_me->next_container;
-    }
-
+{    
     ParserContainer* prev = delete_me;
     
+
     while(delete_me != NULL)
     {
-        delete prev;
-        ParserContainer* prev = delete_me;
+        // std::cerr << "- Delete One Node" << std::endl;
         delete_me = delete_me->next_container;
+
+        // M=Makes deletions
+        delete prev;
+
+        //Move next
+        prev = delete_me;
+        // std::cerr << "- Node deleted" << std::endl;
     }
+    // std::cerr << "--- Out Delete Nodes" << std::endl;
 }
 
-void DeleteNodes(Node delete_me)
+void DeleteNodes(Node* delete_me)
 {
+    // std::cerr << "--- In Delete Nodes" << std::endl;
     
-    // if(delete_me != NULL)
-    // {
-    //     // DeleteContainers(delete_me->container_basket);
-    //     delete_me = delete_me->next;
-    // }
-    // Node* prev = delete_me;
+    Node* prev = delete_me;
+    
 
-    // while(delete_me != NULL)
-    // {
-    //     delete prev;
-    //     // DeleteContainers(delete_me->container_basket);
-    //     delete_me = delete_me->next;
-    // }
+    while(delete_me != NULL)
+    {
+        // std::cerr << "- Delete One Node" << std::endl;
+        delete_me = delete_me->next;
+
+        // M=Makes deletions
+        delete((std::string *)(prev->representative));
+        DeleteContainers(prev->container_basket);
+        delete prev;
+
+        //Move next
+        prev = delete_me;
+        // std::cerr << "- Node deleted" << std::endl;
+    }
+    // std::cerr << "--- Out Delete Nodes" << std::endl;
+
+}
+
+// ---------------------------------------------------------------------------------
+// --------------------------- struc print functions -------------------------------
+// ---------------------------------------------------------------------------------
+
+void PrintParserContainers(ParserContainer* head)
+{
+    ParserContainer* ptr = head;
+    if(ptr!=NULL)
+    {
+        std::cerr << "- ";
+    }
+
+    while(ptr!=NULL)
+    {
+        std::cerr << ptr->data;
+        ptr = ptr->next_container;
+        if(ptr==NULL)
+        {
+            std::cerr << std::endl;
+        }
+        else
+        {
+            std::cerr << std::endl << "- ";
+        }
+        
+    }
+
+}
+
+
+void PrintNodes(Node* head)
+{
+    Node* ptr = head;
+    std::cerr << "--- Printing Results" << std::endl;
+    int counter_for_set_number_printing = 1;
+    while(ptr!=NULL)
+    {
+        std::cerr << "Set #" << counter_for_set_number_printing << ":" << std::endl;
+        counter_for_set_number_printing++;
+        if(ptr->container_basket!=NULL)
+        {
+            PrintParserContainers(ptr->container_basket);
+        }
+        else
+        {
+            std::cerr << "ERROR: basket not selected" << std::endl;
+        }
+        
+        ptr = ptr->next;
+    }
 }
 
 // ---------------------------------------------------------------------------------
 // ------------------------------ struc functions ----------------------------------
 // ---------------------------------------------------------------------------------
 
-bool CheckAndAdd(Parser* parser, Node* head)
+void AddDataToBasket(ParserContainer** head, std::string name)
+{
+    ParserContainer* ptr = *head;
+    // std::cout << "- Add to baskets: "<< name << std::endl;
+    while(ptr!=NULL)
+    {
+        // std::cout << "- Enter Loop" << std::endl;
+
+        // std::cout << ptr->data << std::endl;
+        ptr = ptr->next_container;
+        // std::cout << "- Loop successfully" << std::endl;
+    }
+    // std::cout << "- Add to container: " << std::endl;
+
+    ptr = new ParserContainer;
+    ptr->data = name;
+    ptr->next_container = *head;
+    *head = ptr;
+    // std::cout << "- Successfull addition: " << std::endl;
+
+}
+
+bool CheckAndAdd(Parser* parser, Node** head)
 {
     // Iterator:
-    Node * ptr = head;
+    Node * ptr = *head;
     void* parser_output = parser->normalize(NULL);
 
-    std::cout << "comparison iterator" << std::endl;
+    // std::cout << "comparison iterator" << std::endl;
     while(ptr != NULL)
     {
-        std::cout << "One compariosn" << std::endl;
-        std::cout << "thing one before-> "<< *(std::string *)(ptr->representative) << std::endl;
-        std::cout << "thing two before-> "<< *(std::string *)(parser_output) << std::endl;
+        // std::cout << "One compariosn" << std::endl;
+        // std::cout << "thing one before-> "<< *(std::string *)(ptr->representative) << std::endl;
+        // std::cout << "thing two before-> "<< *(std::string *)(parser_output) << std::endl;
 
-        std::cout << "Two compariosn" << std::endl;
+        // std::cout << "Two compariosn" << std::endl;
 
         if( parser->equivalent(ptr->representative, parser_output))
         {
-            std::cout << "eeps" << std::endl;
+            // std::cout << "Add to container" << std::endl;
             // add to parse basket
-            
+
+            AddDataToBasket(&ptr->container_basket, parser->getName());
+            delete((std::string *)(parser_output));
             // std::cout << *(int*)parser_output <<"(my) vs "<< 
             // *(int*)ptr->representative<< "(other)" << std::endl;
             return true;
         }
 
-        std::cout << "Three compariosn" << std::endl;
-
         ptr = ptr->next;
-        std::cout << "Four compariosn" << std::endl;
 
     }
     ptr = new Node;
     ptr->representative = parser_output;
-    ptr->next = NULL; 
     ptr->container_basket = new ParserContainer;
-    ptr->container_basket->data = parser->name;
+    ptr->container_basket->data = parser->getName();
+    ptr->container_basket->next_container = NULL;
+    ptr->next = *head;
+    *head = ptr;
     // add to parse basket
 
-    std::cout << "oops" << std::endl;
     return false;
 }
 
@@ -121,21 +205,24 @@ void DifferentiallyFuzz(Parser** parser_array, int number_of_parsers)
     // For error reporting
     bool are_all_parsers_equal = true;
 
-    std::cout << "----------outer iterator start ------------" << std::endl;
+    // std::cout << "----------outer iterator start ------------" << std::endl;
 
     //First case:
     head->representative = parser_array[0]->normalize(NULL);
     head->next = NULL;
     head->container_basket = new ParserContainer;
-    head->container_basket->data = parser_array[0]->name;
+    head->container_basket->data = parser_array[0]->getName();
+    head->container_basket->next_container = NULL;
 
     for(int i=1; i<number_of_parsers;i++)
     {
-        std::cout << "----------inner iterator start" << std::endl;
+        // std::cout << "----------inner iterator start" << std::endl;
 
-        are_all_parsers_equal = CheckAndAdd(parser_array[i], head);
+        are_all_parsers_equal = CheckAndAdd(parser_array[i], &head);
     }
-    // DeleteNodes(head);
+    // std::cout << "---------- end iterator  -----------------" << std::endl;
+    // PrintNodes(head);
+    DeleteNodes(head);
     assert(are_all_parsers_equal);
     
     // std::cout << parser_array[0]->normalize(NULL) << std::endl;
@@ -148,8 +235,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
     XmlParser xmlcase;
     YamlParser yamlcase;
     // parser* array_of_parsers[2] = {dynamic_cast<parser*>(&xmlcase), dynamic_cast<parser*>(&yamlcase)};
-    Parser* array_of_parsers[3] = {(Parser*)(&yamlcase), (Parser*)(&xmlcase),(Parser*)(&yamlcase)};
+
+    // Parser* array_of_parsers[3] = {(Parser*)(&yamlcase), (Parser*)(&xmlcase),(Parser*)(&yamlcase)};
+    // DifferentiallyFuzz(array_of_parsers, 3);
+
+    // Parser* array_of_parsers[3] = {(Parser*)(&yamlcase),(Parser*)(&yamlcase), (Parser*)(&xmlcase)};
+    // DifferentiallyFuzz(array_of_parsers, 3);
+
+    Parser* array_of_parsers[3] = {(Parser*)(&yamlcase), (Parser*)(&xmlcase),(Parser*)(&yamlcase),};
     DifferentiallyFuzz(array_of_parsers, 3);
+
     return 0;
 }
 

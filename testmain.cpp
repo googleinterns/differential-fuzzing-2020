@@ -3,7 +3,7 @@
 #include <iostream>
 #include "xmlparser.h"
 #include "yamlparser.h"
-#include "parser.cpp"
+#include "parser.h"
 
 #include "fuzzer.cpp"
 // #include "../libraries/yaml-cpp/build/libyaml-cpp.a"
@@ -16,7 +16,7 @@ int main()
     std::cout << "Welcome to the test suite" << std::endl << std::endl;
     
     ParserContainer* testOne = new ParserContainer();
-    testOne->data = (Parser*)(&xmlcase);
+    // testOne->data = (Parser*)(&xmlcase);
 
     // int t = LLVMFuzzerTestOneInput(NULL, 1);
     return 0;
