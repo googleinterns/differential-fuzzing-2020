@@ -1,13 +1,23 @@
 #include "xmlparser.h"
 #include <string>
 
+#include <iostream>
 
-uint8_t* xmlparser::parse(uint8_t* input, size_t input_size)
+void* XmlParser::parse(uint8_t* input, size_t input_size)
 {
     return NULL;
 }
 
-std::string xmlparser::normalize(uint8_t* input)
+void* XmlParser::normalize(void* input)
 {
-    return "Hello from XML!";
+    std::string * returnMe = new std::string("Hello from xml!");
+    return static_cast<void*>(returnMe);
+}
+
+bool XmlParser::equivalent(void* thing_one, void* thing_two)
+{
+    std::cout << "xml equivalent" << std::endl;
+    std::cout << "thing one-> "<< *(std::string *)(thing_one) << std::endl;
+    std::cout << "thing two-> "<< *(std::string *)(thing_two) << std::endl;
+    return *(std::string *)(thing_one) == *(std::string *)(thing_two);
 }

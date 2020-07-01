@@ -2,28 +2,154 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <openssl/bn.h>
-#include <gcrypt.h>
 
 #include "xmlparser.h"
 #include "yamlparser.h"
 
 #include <iostream>
 
-void DifferentiallyFuzz(parser* parser_array[2], int number_of_parsers)
+struct ParserContainer
 {
-    bool are_all_parsers_equal = false;
-    std::cout << parser_array[0]->normalize(NULL) << std::endl;
-    std::cout << parser_array[1]->normalize(NULL) << std::endl;
-    assert(parser_array[0]->normalize(NULL)==parser_array[1]->normalize(NULL));
+    std::string data;
+    ParserContainer* next_container;
+};
+
+struct Node
+{
+    Node* next;
+    void* representative;
+    ParserContainer* container_basket;
+};
+
+// ---------------------------------------------------------------------------------
+// ----------------------------------- Deleters ------------------------------------
+// ---------------------------------------------------------------------------------
+
+
+
+void DeleteContainers(ParserContainer* delete_me)
+{
+    
+    if(delete_me != NULL)
+    {
+        delete_me = delete_me->next_container;
+    }
+
+    ParserContainer* prev = delete_me;
+    
+    while(delete_me != NULL)
+    {
+        delete prev;
+        ParserContainer* prev = delete_me;
+        delete_me = delete_me->next_container;
+    }
+}
+
+void DeleteNodes(Node delete_me)
+{
+    
+    // if(delete_me != NULL)
+    // {
+    //     // DeleteContainers(delete_me->container_basket);
+    //     delete_me = delete_me->next;
+    // }
+    // Node* prev = delete_me;
+
+    // while(delete_me != NULL)
+    // {
+    //     delete prev;
+    //     // DeleteContainers(delete_me->container_basket);
+    //     delete_me = delete_me->next;
+    // }
+}
+
+// ---------------------------------------------------------------------------------
+// ------------------------------ struc functions ----------------------------------
+// ---------------------------------------------------------------------------------
+
+bool CheckAndAdd(Parser* parser, Node* head)
+{
+    // Iterator:
+    Node * ptr = head;
+    void* parser_output = parser->normalize(NULL);
+
+    std::cout << "comparison iterator" << std::endl;
+    while(ptr != NULL)
+    {
+        std::cout << "One compariosn" << std::endl;
+        std::cout << "thing one before-> "<< *(std::string *)(ptr->representative) << std::endl;
+        std::cout << "thing two before-> "<< *(std::string *)(parser_output) << std::endl;
+
+        std::cout << "Two compariosn" << std::endl;
+
+        if( parser->equivalent(ptr->representative, parser_output))
+        {
+            std::cout << "eeps" << std::endl;
+            // add to parse basket
+            
+            // std::cout << *(int*)parser_output <<"(my) vs "<< 
+            // *(int*)ptr->representative<< "(other)" << std::endl;
+            return true;
+        }
+
+        std::cout << "Three compariosn" << std::endl;
+
+        ptr = ptr->next;
+        std::cout << "Four compariosn" << std::endl;
+
+    }
+    ptr = new Node;
+    ptr->representative = parser_output;
+    ptr->next = NULL; 
+    ptr->container_basket = new ParserContainer;
+    ptr->container_basket->data = parser->name;
+    // add to parse basket
+
+    std::cout << "oops" << std::endl;
+    return false;
+}
+
+// ---------------------------------------------------------------------------------
+// ----------------------------------- Fuzzing -------------------------------------
+// ---------------------------------------------------------------------------------
+
+void DifferentiallyFuzz(Parser** parser_array, int number_of_parsers)
+{
+    //Creates iteration structure
+    Node *head = new Node;
+    
+    // For error reporting
+    bool are_all_parsers_equal = true;
+
+    std::cout << "----------outer iterator start ------------" << std::endl;
+
+    //First case:
+    head->representative = parser_array[0]->normalize(NULL);
+    head->next = NULL;
+    head->container_basket = new ParserContainer;
+    head->container_basket->data = parser_array[0]->name;
+
+    for(int i=1; i<number_of_parsers;i++)
+    {
+        std::cout << "----------inner iterator start" << std::endl;
+
+        are_all_parsers_equal = CheckAndAdd(parser_array[i], head);
+    }
+    // DeleteNodes(head);
+    assert(are_all_parsers_equal);
+    
+    // std::cout << parser_array[0]->normalize(NULL) << std::endl;
+    // std::cout << parser_array[1]->normalize(NULL) << std::endl;
+    // assert(parser_array[0]->normalize(NULL)==parser_array[1]->normalize(NULL));
 }
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) 
 {
-    xmlparser xmlcase;
-    yamlparser yamlcase;
-    parser* array_of_parsers[2] = {dynamic_cast<parser*>(&xmlcase), dynamic_cast<parser*>(&yamlcase)};
-    DifferentiallyFuzz(array_of_parsers, 2);
+    XmlParser xmlcase;
+    YamlParser yamlcase;
+    // parser* array_of_parsers[2] = {dynamic_cast<parser*>(&xmlcase), dynamic_cast<parser*>(&yamlcase)};
+    Parser* array_of_parsers[3] = {(Parser*)(&yamlcase), (Parser*)(&xmlcase),(Parser*)(&yamlcase)};
+    DifferentiallyFuzz(array_of_parsers, 3);
     return 0;
 }
 

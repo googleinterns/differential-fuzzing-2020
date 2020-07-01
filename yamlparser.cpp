@@ -1,13 +1,23 @@
 #include "yamlparser.h"
 #include <string>
 
+#include <iostream>
 
-uint8_t* yamlparser::parse(uint8_t*input, size_t input_size)
+void* YamlParser::parse(uint8_t*input, size_t input_size)
 {
     return NULL;
 }
 
-std::string yamlparser::normalize(uint8_t* input)
+void* YamlParser::normalize(void* input)
 {
-    return "Hello from yaml!";
+    std::string * returnMe = new std::string("Hello from yaml!");
+    return static_cast<void*>(returnMe);
+}
+
+bool YamlParser::equivalent(void* thing_one, void* thing_two)
+{
+    std::cout << "yaml equivalent" << std::endl;
+    std::cout << "thing one-> "<< *(std::string *)(thing_one) << std::endl;
+    std::cout << "thing two-> "<< *(std::string *)(thing_two) << std::endl;
+    return *(std::string *)(thing_one) == *(std::string *)(thing_two);
 }
