@@ -1,11 +1,15 @@
 #ifndef YAMLPARSER_H
 #define YAMLPARSER_H
 
-#include <string>
-
 #include "parser.h"
 
-class YamlParser : virtual public Parser
+#include <string>
+namespace yaml_differential_parser
+{
+    class YamlParser;
+}
+
+class yaml_differential_parser::YamlParser : virtual public differential_parser::Parser
 {
     public:
         std::string getName();

@@ -3,7 +3,12 @@
 
 #include <string>
 
-class Parser
+namespace differential_parser
+{
+    class Parser;
+}
+
+class differential_parser::Parser
 {
     public:
         virtual std::string getName() = 0;

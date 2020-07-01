@@ -5,7 +5,7 @@
 #include "yamlparser.h"
 #include "parser.h"
 
-#include "fuzzer.cpp"
+#include "differentialfuzzer.cpp"
 // #include "../libraries/yaml-cpp/build/libyaml-cpp.a"
 
 // Main used for the purpose of minor testing

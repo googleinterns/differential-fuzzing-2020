@@ -5,7 +5,13 @@
 
 #include "parser.h"
 
-class XmlParser : virtual public Parser
+namespace xaml_differential_parser
+{
+    class XmlParser;
+}
+
+
+class xaml_differential_parser::XmlParser : virtual public differential_parser::Parser
 {
     public:
         std::string getName();
