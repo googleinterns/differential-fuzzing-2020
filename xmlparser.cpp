@@ -16,6 +16,7 @@ void* xaml_differential_parser::XmlParser::parse(uint8_t* input, size_t input_si
 void* xaml_differential_parser::XmlParser::normalize(void* input)
 {
     std::string * returnMe = new std::string("Hello from xml!");
+    
     return static_cast<void*>(returnMe);
 }
 

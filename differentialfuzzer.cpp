@@ -7,55 +7,49 @@
 
 namespace differential_fuzzer
 {
-    struct ParserContainer
+    struct AssociatedParserName
     {
         std::string data;
-        ParserContainer* next_container;
+        AssociatedParserName* next_container;
     };
 
-    struct Node
+    struct EquivalenceParserOutputs
     {
-        Node* next;
+        EquivalenceParserOutputs* next;
         void* representative;
-        ParserContainer* container_basket;
+        AssociatedParserName* container_basket;
     };
 
     // ---------------------------------------------------------------------------------
     // ----------------------------------- Deleters ------------------------------------
     // ---------------------------------------------------------------------------------
 
-
-
-    void DeleteContainers(ParserContainer* delete_me)
+    void DeleteContainers(AssociatedParserName* delete_me)
     {    
-        ParserContainer* prev = delete_me;
-        
+        AssociatedParserName* prev = delete_me;
 
-        while(delete_me != NULL)
+        while (delete_me != NULL)
         {
-            // std::cerr << "- Delete One Node" << std::endl;
+            
             delete_me = delete_me->next_container;
 
-            // M=Makes deletions
+            // Makes deletions
             delete prev;
+            
+            // Move next
 
-            //Move next
             prev = delete_me;
-            // std::cerr << "- Node deleted" << std::endl;
+            
         }
-        // std::cerr << "--- Out Delete Nodes" << std::endl;
+        
     }
 
-    void DeleteNodes(Node* delete_me)
+    void DeleteNodes (EquivalenceParserOutputs* delete_me)
     {
-        // std::cerr << "--- In Delete Nodes" << std::endl;
+        EquivalenceParserOutputs* prev = delete_me;
         
-        Node* prev = delete_me;
-        
-
-        while(delete_me != NULL)
+        while (delete_me != NULL)
         {
-            // std::cerr << "- Delete One Node" << std::endl;
             delete_me = delete_me->next;
 
             // Makes deletions
@@ -65,29 +59,29 @@ namespace differential_fuzzer
 
             //Move next
             prev = delete_me;
-            // std::cerr << "- Node deleted" << std::endl;
-        }
-        // std::cerr << "--- Out Delete Nodes" << std::endl;
 
+        }
     }
 
     // ---------------------------------------------------------------------------------
     // --------------------------- struc print functions -------------------------------
     // ---------------------------------------------------------------------------------
 
-    void PrintParserContainers(ParserContainer* head)
+    void PrintParserContainers(AssociatedParserName* head)
     {
-        ParserContainer* ptr = head;
-        if(ptr!=NULL)
+        AssociatedParserName* ptr = head;
+
+        if (ptr!=NULL)
         {
             std::cerr << "- ";
         }
 
-        while(ptr!=NULL)
+        while (ptr!=NULL)
         {
             std::cerr << ptr->data;
             ptr = ptr->next_container;
-            if(ptr==NULL)
+
+            if (ptr==NULL)
             {
                 std::cerr << std::endl;
             }
@@ -95,22 +89,25 @@ namespace differential_fuzzer
             {
                 std::cerr << std::endl << "- ";
             }
-            
         }
-
     }
 
 
-    void PrintNodes(Node* head)
+    void PrintNodes(EquivalenceParserOutputs* head)
     {
-        Node* ptr = head;
+        EquivalenceParserOutputs* ptr = head;
+
         std::cerr << "--- Printing Results" << std::endl;
-        int counter_for_set_number_printing = 1;
-        while(ptr!=NULL)
+
+        int set_id = 1;
+
+        while (ptr!=NULL)
         {
-            std::cerr << "Set #" << counter_for_set_number_printing << ":" << std::endl;
-            counter_for_set_number_printing++;
-            if(ptr->container_basket!=NULL)
+            std::cerr << "Set #" << set_id << ":" << std::endl;
+            
+            set_id++;
+
+            if (ptr->container_basket!=NULL)
             {
                 PrintParserContainers(ptr->container_basket);
             }
@@ -120,6 +117,7 @@ namespace differential_fuzzer
             }
             
             ptr = ptr->next;
+
         }
     }
 
@@ -127,64 +125,43 @@ namespace differential_fuzzer
     // ------------------------------ struc functions ----------------------------------
     // ---------------------------------------------------------------------------------
 
-    void AddDataToBasket(ParserContainer** head, std::string name)
+    void AddDataToBasket(AssociatedParserName** head, std::string name)
     {
-        ParserContainer* ptr = *head;
-        // std::cout << "- Add to baskets: "<< name << std::endl;
-        while(ptr!=NULL)
-        {
-            // std::cout << "- Enter Loop" << std::endl;
+        AssociatedParserName* ptr =  new AssociatedParserName;
 
-            // std::cout << ptr->data << std::endl;
-            ptr = ptr->next_container;
-            // std::cout << "- Loop successfully" << std::endl;
-        }
-        // std::cout << "- Add to container: " << std::endl;
-
-        ptr = new ParserContainer;
         ptr->data = name;
         ptr->next_container = *head;
-        *head = ptr;
-        // std::cout << "- Successfull addition: " << std::endl;
 
+        *head = ptr;
     }
 
-    bool CheckAndAdd(differential_parser::Parser* parser, Node** head)
+    bool CheckAndAdd(differential_parser::Parser* parser, EquivalenceParserOutputs** head)
     {
         // Iterator:
-        Node * ptr = *head;
+        EquivalenceParserOutputs* ptr = *head;
+
         void* parser_output = parser->normalize(NULL);
 
-        // std::cout << "comparison iterator" << std::endl;
-        while(ptr != NULL)
+        while (ptr != NULL)
         {
-            // std::cout << "One compariosn" << std::endl;
-            // std::cout << "thing one before-> "<< *(std::string *)(ptr->representative) << std::endl;
-            // std::cout << "thing two before-> "<< *(std::string *)(parser_output) << std::endl;
-
-            // std::cout << "Two compariosn" << std::endl;
-
-            if( parser->equivalent(ptr->representative, parser_output))
+            if ( parser->equivalent(ptr->representative, parser_output))
             {
-                // std::cout << "Add to container" << std::endl;
                 // add to parse basket
 
                 AddDataToBasket(&ptr->container_basket, parser->getName());
-                delete((std::string *)(parser_output));     //(placeholder)
-                // std::cout << *(int*)parser_output <<"(my) vs "<< 
-                // *(int*)ptr->representative<< "(other)" << std::endl;
+                delete((std::string *)(parser_output));     // (placeholder)
                 return true;
             }
-
             ptr = ptr->next;
 
         }
-        ptr = new Node;
+        ptr = new EquivalenceParserOutputs;
         ptr->representative = parser_output;
-        ptr->container_basket = new ParserContainer;
+        ptr->container_basket = new AssociatedParserName;
         ptr->container_basket->data = parser->getName();
         ptr->container_basket->next_container = NULL;
         ptr->next = *head;
+
         *head = ptr;
         // add to parse basket
 
@@ -197,35 +174,24 @@ namespace differential_fuzzer
 
     void DifferentiallyFuzz(differential_parser::Parser** parser_array, int number_of_parsers)
     {
-        //Creates iteration structure
-        Node *head = new Node;
+        // Creates iteration structure
+        EquivalenceParserOutputs *head = new EquivalenceParserOutputs;
         
         // For error reporting
         bool are_all_parsers_equal = true;
 
-        // std::cout << "----------outer iterator start ------------" << std::endl;
-
-        //First case:
+        // First case:
         head->representative = parser_array[0]->normalize(NULL);
         head->next = NULL;
-        head->container_basket = new ParserContainer;
+        head->container_basket = new AssociatedParserName;
         head->container_basket->data = parser_array[0]->getName();
         head->container_basket->next_container = NULL;
 
-        for(int i=1; i<number_of_parsers;i++)
+        for (int i=1; i<number_of_parsers;i++)
         {
-            // std::cout << "----------inner iterator start" << std::endl;
-
             are_all_parsers_equal = CheckAndAdd(parser_array[i], &head);
         }
-        // std::cout << "---------- end iterator  -----------------" << std::endl;
-        // PrintNodes(head);
         DeleteNodes(head);
-        assert(are_all_parsers_equal);
-        
-        // std::cout << parser_array[0]->normalize(NULL) << std::endl;
-        // std::cout << parser_array[1]->normalize(NULL) << std::endl;
-        // assert(parser_array[0]->normalize(NULL)==parser_array[1]->normalize(NULL));
     }
 }
 
