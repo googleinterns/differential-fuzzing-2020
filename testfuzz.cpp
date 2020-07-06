@@ -6,7 +6,7 @@
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) 
 {
-    xaml_differential_parser::XmlParser xmlcase;
+    xml_differential_parser::XmlParser xmlcase;
     yaml_differential_parser::YamlParser yamlcase;
 
     differential_parser::Parser* array_of_parsers[3] = {(differential_parser::Parser*)(&yamlcase), 

@@ -20,7 +20,7 @@ namespace differential_fuzzer
     struct EquivalenceParserOutputs
     {
         EquivalenceParserOutputs* next;
-        void* representative;
+        differential_parser::ParserOutput* representative;
         AssociatedParserName* container_basket;
     };
 
@@ -28,7 +28,7 @@ namespace differential_fuzzer
     // ----------------------------------- Deleters ------------------------------------
     // ---------------------------------------------------------------------------------
 
-    void DeleteContainers(AssociatedParserName* delete_me)
+    void DeleteAssociatedParserName(AssociatedParserName* delete_me)
     {    
         AssociatedParserName* prev = delete_me;
 
@@ -48,7 +48,7 @@ namespace differential_fuzzer
         
     }
 
-    void DeleteNodes (EquivalenceParserOutputs* delete_me)
+    void DeleteEquivalenceParserOutputs(EquivalenceParserOutputs* delete_me)
     {
         EquivalenceParserOutputs* prev = delete_me;
         
@@ -57,8 +57,8 @@ namespace differential_fuzzer
             delete_me = delete_me->next;
 
             // Makes deletions
-            delete((std::string *)(prev->representative));//(placeholder)
-            DeleteContainers(prev->container_basket);
+            delete (prev->representative);
+            DeleteAssociatedParserName(prev->container_basket);
             delete prev;
 
             //Move next
@@ -163,17 +163,18 @@ namespace differential_fuzzer
         // Iterator:
         EquivalenceParserOutputs* ptr = *head;
 
-        void* parser_output = parser->normalize(nullptr);
-        
+        differential_parser::ParserOutput* parser_output = 
+            parser->normalize(parser->parse(nullptr, 0));
+
         // Iterate through the different EquivalenceParserOutputs
         while (ptr != nullptr)
         {
-            if ( parser->equivalent(ptr->representative, parser_output))
+            if ( parser_output->equivalent(ptr->representative))
             {
                 // add to parse basket
 
                 AddToAssociatedParserName(&ptr->container_basket, parser->getName());
-                delete((std::string *)(parser_output));     // (placeholder)
+                delete (parser_output);     
                 return true;
             }
             ptr = ptr->next;
@@ -216,7 +217,8 @@ namespace differential_fuzzer
         bool are_all_parsers_equal = true;
 
         // First case:
-        head->representative = parser_array[0]->normalize(nullptr);
+        head->representative = parser_array[0]->normalize(
+            parser_array[0]->parse(nullptr, 0));
         head->next = nullptr;
         head->container_basket = new AssociatedParserName;
         head->container_basket->name = parser_array[0]->getName();
@@ -226,7 +228,8 @@ namespace differential_fuzzer
         {
             are_all_parsers_equal = CheckAndAdd(parser_array[i], &head);
         }
-        DeleteNodes(head);
+
+        DeleteEquivalenceParserOutputs(head);
     }
 }
 

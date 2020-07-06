@@ -3,24 +3,51 @@
 
 #include <iostream>
 
-std::string xaml_differential_parser::XmlParser::getName()
+// ---------------------------------------------------------------------------------
+// ------------------------------ XmlParserOutput ---------------------------------
+// ---------------------------------------------------------------------------------
+
+xml_differential_parser::XmlParserOutput::XmlParserOutput(std::string* info)
+{
+    this->data = info;
+}
+
+xml_differential_parser::XmlParserOutput::~XmlParserOutput()
+{
+    delete this->data;
+}
+
+bool xml_differential_parser::XmlParserOutput::equivalent(ParserOutput* compared_object)
+{
+    return *(std::string*)this->getData() == *(std::string*)compared_object->getData();
+}
+
+void* xml_differential_parser::XmlParserOutput::getData()
+{
+    return static_cast<void*> (this->data);
+}
+
+// ---------------------------------------------------------------------------------
+// ---------------------------------- YamlParser -----------------------------------
+// ---------------------------------------------------------------------------------
+
+std::string xml_differential_parser::XmlParser::getName()
 {
     return "xml";
 }
 
-void* xaml_differential_parser::XmlParser::parse(uint8_t* input, size_t input_size)
+void* xml_differential_parser::XmlParser::parse(uint8_t* input, size_t input_size)
 {
-    return NULL;
+    return nullptr;
 }
 
-void* xaml_differential_parser::XmlParser::normalize(void* input)
+differential_parser::ParserOutput* xml_differential_parser::XmlParser::normalize
+    (void* input)
 {
-    std::string * returnMe = new std::string("Hello from xml!");
+    std::string* output = new std::string("xml!");
+
+    differential_parser::ParserOutput* returnMe = new
+        xml_differential_parser::XmlParserOutput (output);
     
-    return static_cast<void*>(returnMe);
-}
-
-bool xaml_differential_parser::XmlParser::equivalent(void* thing_one, void* thing_two)
-{
-    return *(std::string *)(thing_one) == *(std::string *)(thing_two);
+    return returnMe;
 }
