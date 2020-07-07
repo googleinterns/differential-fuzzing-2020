@@ -1,6 +1,13 @@
 #include <iostream>
+
+// From git file
 #include "./../../libraries/libyaml/include/yaml.h"
-#include "./../../libraries/yaml-cpp/include/yaml-cpp/anchor.h"
+#include "./yaml-cpp/parser.h"
+
+// #include "./../../../libyaml/include/yaml.h"
+// #include <depthguard.h>
+// #include "parser.h"
+// #include "exceptions.h"
 
 // #include "xmlparser.h"
 // #include "yamlparser.h"
@@ -26,6 +33,14 @@ int main()
     {
         std::cout << "Parser recognized!" << std::endl;
     }
+
+    // YAML::Emitter out;
+    // out << YAML::BeginMap;
+    // out << YAML::Key << "name";
+    // out << YAML::Value << "Ryan Braun";
+    // out << YAML::Key << "position";
+    // out << YAML::Value << "LF";
+    // out << YAML::EndMap;
     
     return 0;
 }

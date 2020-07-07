@@ -27,6 +27,21 @@ bool yaml_differential_parser::YamlParserOutput::equivalent(ParserOutput* compar
 
 void* yaml_differential_parser::YamlParserOutput::getData()
 {
+
+    // (Future code)
+    // YAML::Node data = YAML::Load(“file.yaml”);
+    // for (YAML::const_iterator it=data.begin();it!=data.end();++it)
+    // {
+    //     uint_8 thing = it->as<uint_8>()
+    //     /* code */
+    // }
+
+    // /* code */
+
+    // // to output:
+    // std::ofstream output("otherfile.yaml");
+    // fout << thing;
+
     return static_cast<void*> (this->data);
 }
 
