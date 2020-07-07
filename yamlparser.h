@@ -1,7 +1,7 @@
 #ifndef YAMLPARSER_H
 #define YAMLPARSER_H
 
-#include "parser.h"
+#include "baseparser.h"
 
 #include <string>
 namespace yaml_differential_parser

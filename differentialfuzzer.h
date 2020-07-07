@@ -1,7 +1,7 @@
 #ifndef DIFFERENTIALFUZZER_H
 #define DIFFERENTIALFUZZER_H
 
-#include "parser.h"
+#include "baseparser.h"
 
 namespace differential_fuzzer
 {
