@@ -4,17 +4,14 @@
 #include "baseparser.h"
 
 #include <string>
+
 namespace yaml_differential_parser
 {
-    class YamlParser;
-    class YamlParserOutput;
-}
-
 // ---------------------------------------------------------------------------------
 // ------------------------------ YamlParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-class yaml_differential_parser::YamlParserOutput 
+class YamlParserOutput 
     : virtual public differential_parser::ParserOutput
 {
     private:
@@ -30,7 +27,7 @@ class yaml_differential_parser::YamlParserOutput
 // ---------------------------------- YamlParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-class yaml_differential_parser::YamlParser : virtual public differential_parser::Parser
+class YamlParser : virtual public differential_parser::Parser
 {
     
     public:
@@ -38,6 +35,7 @@ class yaml_differential_parser::YamlParser : virtual public differential_parser:
         void* parse(uint8_t*, size_t);
         differential_parser::ParserOutput* normalize(void*);
 };
+} // namespace yaml_differential_parser
 
 
 #endif

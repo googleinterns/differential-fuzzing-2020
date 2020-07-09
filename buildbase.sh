@@ -1,1 +1,1 @@
-clang++ -g -fsanitize=address,fuzzer -c differentialfuzzer.h differentialfuzzer.cpp baseparser.h 
+clang++ -g -fsanitize=address,fuzzer -c differentialfuzzer.cpp

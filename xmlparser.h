@@ -7,15 +7,11 @@
 
 namespace xml_differential_parser
 {
-    class XmlParser;
-    class XmlParserOutput;
-}
-
 // ---------------------------------------------------------------------------------
 // ------------------------------ XmlParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-class xml_differential_parser::XmlParserOutput 
+class XmlParserOutput 
     : virtual public differential_parser::ParserOutput
 {
 
@@ -33,13 +29,14 @@ class xml_differential_parser::XmlParserOutput
 // ---------------------------------- YamlParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-class xml_differential_parser::XmlParser : virtual public differential_parser::Parser
+class XmlParser : virtual public differential_parser::Parser
 {
     public:
         std::string getName();
         void* parse(uint8_t*, size_t) ;
         differential_parser::ParserOutput* normalize(void*);
 };
+} // namespace xml_differential_parser
 
 
 #endif

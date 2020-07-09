@@ -2,71 +2,58 @@
 
 #include <iostream>
 
-
+namespace yaml_differential_parser
+{
 // ---------------------------------------------------------------------------------
 // ------------------------------ YamlParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-yaml_differential_parser::YamlParserOutput::YamlParserOutput(std::string* info)
+YamlParserOutput::YamlParserOutput(std::string* info)
 {
     this->data = info;
 }
 
-yaml_differential_parser::YamlParserOutput::~YamlParserOutput()
+YamlParserOutput::~YamlParserOutput()
 {
-    if(this->data != nullptr)
+    if (this->data != nullptr)
     {
         delete this->data;
     }
 }
 
-bool yaml_differential_parser::YamlParserOutput::equivalent(ParserOutput* compared_object)
+bool YamlParserOutput::equivalent(ParserOutput* compared_object)
 {
     return *(std::string*)this->getData() == *(std::string*)compared_object->getData();
 }
 
-void* yaml_differential_parser::YamlParserOutput::getData()
+void* YamlParserOutput::getData()
 {
-
-    // (Future code)
-    // YAML::Node data = YAML::Load(“file.yaml”);
-    // for (YAML::const_iterator it=data.begin();it!=data.end();++it)
-    // {
-    //     uint_8 thing = it->as<uint_8>()
-    //     /* code */
-    // }
-
-    // /* code */
-
-    // // to output:
-    // std::ofstream output("otherfile.yaml");
-    // fout << thing;
-
-    return static_cast<void*> (this->data);
+    return static_cast<void*>(this->data);
 }
 
 // ---------------------------------------------------------------------------------
 // ---------------------------------- YamlParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string yaml_differential_parser::YamlParser::getName()
+std::string YamlParser::getName()
 {
     return "yaml";
 }
 
 
-void* yaml_differential_parser::YamlParser::parse(uint8_t*input, size_t input_size)
+void* YamlParser::parse(uint8_t*input, size_t input_size)
 {
     return nullptr;
 }
 
-differential_parser::ParserOutput* yaml_differential_parser::YamlParser::normalize
+differential_parser::ParserOutput* YamlParser::normalize
     (void* input)
 {   
     std::string* output = new std::string("yaml!");
 
     differential_parser::ParserOutput* returnMe = new
-        yaml_differential_parser::YamlParserOutput (output);
+        YamlParserOutput (output);
     
     return returnMe;
+}
 }

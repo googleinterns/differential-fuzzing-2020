@@ -152,7 +152,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
     // Iterate through the different EquivalenceParserOutputs
     while (ptr != nullptr)
     {
-        if ( parser_output->equivalent(ptr->representative))
+        if (parser_output->equivalent(ptr->representative))
         {
             // add to parse basket
 
