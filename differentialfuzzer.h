@@ -26,19 +26,19 @@ namespace differential_fuzzer
 
         void DeleteEquivalenceParserOutputs(EquivalenceParserOutputs*);
 
-        void PrintAssociatedParserName(AssociatedParserName* head);
+        void PrintAssociatedParserName(AssociatedParserName*);
 
-        void PrintEquivalenceParserOutputs(EquivalenceParserOutputs* head);
+        void PrintEquivalenceParserOutputs(EquivalenceParserOutputs*);
 
-        void AddToAssociatedParserName(AssociatedParserName** head, std::string name);
+        void AddToAssociatedParserName(AssociatedParserName**, std::string);
 
-        bool CheckAndAdd(differential_parser::Parser* parser, EquivalenceParserOutputs** head);
+        bool CheckAndAdd(differential_parser::Parser*, EquivalenceParserOutputs**, int);
     }
 
     namespace fuzzer
     {
         void DifferentiallyFuzz(differential_parser::Parser** parser_array, 
-            int number_of_parsers);
+            int number_of_parsers, int);
     }
 }
 

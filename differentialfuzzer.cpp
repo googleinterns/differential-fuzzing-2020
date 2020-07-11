@@ -141,7 +141,8 @@ void differential_fuzzer::parser::AddToAssociatedParserName(AssociatedParserName
 // If the parser output has matched a previous representative, the function returns
 // true. If the parser output has not matched a previous representative, the
 // function returns false
-bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parser, EquivalenceParserOutputs** head)
+bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parser, 
+    EquivalenceParserOutputs** head, int size_of_input)
 {
     // Iterator:
     EquivalenceParserOutputs* ptr = *head;
@@ -177,7 +178,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
 }
 
 void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
-    int number_of_parsers)
+    int number_of_parsers, int size_of_input)
 {
     if (number_of_parsers <= 0)
     {
@@ -202,7 +203,7 @@ void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
 
     for (int i=1; i<number_of_parsers;i++)
     {
-        are_all_parsers_equal = CheckAndAdd(parser_array[i], &head);
+        are_all_parsers_equal = CheckAndAdd(parser_array[i], &head, size_of_input);
     }
 
     DeleteEquivalenceParserOutputs(head);

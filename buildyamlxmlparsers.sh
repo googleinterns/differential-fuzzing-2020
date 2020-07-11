@@ -1,1 +1,1 @@
-clang++ -g -fsanitize=address,fuzzer -c xmlparser.cpp yamlparser.cpp differentialfuzzer.o
+clang++ -g -fsanitize=address,fuzzer -c libyamlparser.cpp yamlcppparser.cpp differentialfuzzer.o

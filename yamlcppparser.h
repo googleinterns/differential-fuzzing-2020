@@ -1,33 +1,33 @@
-#ifndef YAMLPARSER_H
-#define YAMLPARSER_H
+#ifndef YAMLCPPPARSER_H
+#define YAMLCPPPARSER_H
 
 #include "baseparser.h"
 
 #include <string>
 
-namespace yaml_differential_parser
+namespace yamlcpp_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ YamlParserOutput ---------------------------------
+// ------------------------------ YamlCppParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-class YamlParserOutput 
+class YamlCppParserOutput 
     : virtual public differential_parser::ParserOutput
 {
     private:
         std::string* data;
     public:
-        YamlParserOutput(std::string*);
-        ~YamlParserOutput();
+        YamlCppParserOutput(std::string*);
+        ~YamlCppParserOutput();
         bool equivalent(ParserOutput*);
         void* getData();
 };
 
 // ---------------------------------------------------------------------------------
-// ---------------------------------- YamlParser -----------------------------------
+// ---------------------------------- YamlCppParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-class YamlParser : virtual public differential_parser::Parser
+class YamlCppParser : virtual public differential_parser::Parser
 {
     
     public:

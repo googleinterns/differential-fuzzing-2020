@@ -1,19 +1,19 @@
-#include "yamlparser.h"
+#include "libyamlparser.h"
 
 #include <iostream>
 
-namespace yaml_differential_parser
+namespace libyaml_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ YamlParserOutput ---------------------------------
+// ------------------------------ LibyamlParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-YamlParserOutput::YamlParserOutput(std::string* info)
+LibyamlParserOutput::LibyamlParserOutput(std::string* info)
 {
     this->data = info;
 }
 
-YamlParserOutput::~YamlParserOutput()
+LibyamlParserOutput::~LibyamlParserOutput()
 {
     if (this->data != nullptr)
     {
@@ -21,38 +21,38 @@ YamlParserOutput::~YamlParserOutput()
     }
 }
 
-bool YamlParserOutput::equivalent(ParserOutput* compared_object)
+bool LibyamlParserOutput::equivalent(ParserOutput* compared_object)
 {
     return *(std::string*)this->getData() == *(std::string*)compared_object->getData();
 }
 
-void* YamlParserOutput::getData()
+void* LibyamlParserOutput::getData()
 {
     return static_cast<void*>(this->data);
 }
 
 // ---------------------------------------------------------------------------------
-// ---------------------------------- YamlParser -----------------------------------
+// ---------------------------------- LibyamlParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string YamlParser::getName()
+std::string LibyamlParser::getName()
 {
     return "yaml";
 }
 
 
-void* YamlParser::parse(uint8_t*input, size_t input_size)
+void* LibyamlParser::parse(uint8_t*input, size_t input_size)
 {
     return nullptr;
 }
 
-differential_parser::ParserOutput* YamlParser::normalize
+differential_parser::ParserOutput* LibyamlParser::normalize
     (void* input)
 {   
     std::string* output = new std::string("yaml!");
 
     differential_parser::ParserOutput* returnMe = new
-        YamlParserOutput (output);
+        LibyamlParserOutput (output);
     
     return returnMe;
 }
