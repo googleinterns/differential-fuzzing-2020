@@ -38,7 +38,7 @@ void* LibyamlParserOutput::getData()
 
 std::string LibyamlParser::getName()
 {
-    return "yaml";
+    return "libyaml";
 }
 
 
@@ -52,14 +52,14 @@ void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
 
     bool done = false;
 
-    if(!yaml_parser_initialize(&parser))
+    if (!yaml_parser_initialize(&parser))
     {
         return 0;
     }
 
     yaml_parser_set_input_string(&parser, (yaml_char_t*)input, input_size /*- 1*/);
 
-    if(!yaml_emitter_initialize(&emitter))
+    if (!yaml_emitter_initialize(&emitter))
     {
         return 0;
     }
@@ -70,11 +70,12 @@ void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
 
     yaml_emitter_set_unicode(&emitter, 1);
 
+    // Parses information, and emits to buffer:
     while (!done)
     {
-
         if (!yaml_parser_parse(&parser, &event)) 
         {
+            std::cout << "ERROR" << std::endl;
             break;
         }
 
@@ -83,7 +84,7 @@ void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
         yaml_emitter_emit(&emitter, &event);
     }
 
-    yaml_event_delete(&event); // may be leaking
+    yaml_event_delete(&event);
     yaml_parser_delete(&parser);
     yaml_emitter_delete(&emitter);
 

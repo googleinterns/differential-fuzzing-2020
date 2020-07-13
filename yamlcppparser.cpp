@@ -38,7 +38,7 @@ void* YamlCppParserOutput::getData()
 
 std::string YamlCppParser::getName()
 {
-    return "yaml";
+    return "yaml-cpp";
 }
 
 
@@ -49,13 +49,22 @@ void* YamlCppParser::parse(const uint8_t*input, size_t input_size)
 
     if(input_size>0)
     {
-        YAML::Node primes = YAML::Load("[woogie, woogie, it, is, the, spookie, boogie]");
-        // YAML::Node primes = YAML::Load("["+std::string((const char*)yaml_cpp_loop_temp, input_size)+"]");
-
-        for (YAML::const_iterator it = primes.begin();it != primes.end(); ++it) 
+        // YAML::Node primes = YAML::Load("[wookgie, woogie, it, is, the, spookie, boogie]");
+        try
         {
-            *yaml_cpp_loop_temp += it->as<std::string>();
+            YAML::Node primes = YAML::Load("["+std::string((const char*)yaml_cpp_loop_temp, input_size)+"]");
+
+            for (YAML::const_iterator it = primes.begin();it != primes.end(); ++it) 
+            {
+                *yaml_cpp_loop_temp += it->as<std::string>();
+            }            
         }
+        catch(const std::exception& e)
+        {
+            // std::cerr << e.what() << '\n';
+        }
+        
+
     }
     return (void*)yaml_cpp_loop_temp;
 }

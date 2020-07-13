@@ -178,7 +178,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
 }
 
 void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
-    int number_of_parsers, const uint8_t *input_data, int size_of_input)
+    int number_of_parsers, const uint8_t *inpclearut_data, int size_of_input)
 {
     if (number_of_parsers <= 0)
     {
@@ -207,6 +207,7 @@ void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
         are_all_parsers_equal = CheckAndAdd(parser_array[i], &head, input_data, size_of_input);
     }
 
+    PrintEquivalenceParserOutputs(head);
     DeleteEquivalenceParserOutputs(head);
 }
 
