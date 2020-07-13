@@ -1,5 +1,6 @@
 #include "yamlcppparser.h"
 
+#include "yaml-cpp/yaml.h"
 #include <iostream>
 
 namespace yamlcpp_differential_parser
@@ -41,18 +42,29 @@ std::string YamlCppParser::getName()
 }
 
 
-void* YamlCppParser::parse(uint8_t*input, size_t input_size)
+void* YamlCppParser::parse(const uint8_t*input, size_t input_size)
 {
-    return nullptr;
+     std::string* yaml_cpp_loop_temp = new std::string;
+
+
+    if(input_size>0)
+    {
+        YAML::Node primes = YAML::Load("[woogie, woogie, it, is, the, spookie, boogie]");
+        // YAML::Node primes = YAML::Load("["+std::string((const char*)yaml_cpp_loop_temp, input_size)+"]");
+
+        for (YAML::const_iterator it = primes.begin();it != primes.end(); ++it) 
+        {
+            *yaml_cpp_loop_temp += it->as<std::string>();
+        }
+    }
+    return (void*)yaml_cpp_loop_temp;
 }
 
 differential_parser::ParserOutput* YamlCppParser::normalize
     (void* input)
 {   
-    std::string* output = new std::string("yaml!");
-
     differential_parser::ParserOutput* returnMe = new
-        YamlCppParserOutput (output);
+        YamlCppParserOutput((std::string*)input);
     
     return returnMe;
 }

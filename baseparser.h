@@ -17,7 +17,7 @@ class Parser
 {
     public:
         virtual std::string getName() = 0;
-        virtual void* parse(uint8_t*, size_t) = 0;
+        virtual void* parse(const uint8_t*, size_t) = 0;
         virtual differential_parser::ParserOutput* normalize(void*) = 0;
 };
 } // namespace differential_parser

@@ -32,13 +32,12 @@ namespace differential_fuzzer
 
         void AddToAssociatedParserName(AssociatedParserName**, std::string);
 
-        bool CheckAndAdd(differential_parser::Parser*, EquivalenceParserOutputs**, int);
+        bool CheckAndAdd(differential_parser::Parser*, EquivalenceParserOutputs**, const uint8_t *, int);
     }
 
     namespace fuzzer
     {
-        void DifferentiallyFuzz(differential_parser::Parser** parser_array, 
-            int number_of_parsers, int);
+        void DifferentiallyFuzz(differential_parser::Parser**, int, const uint8_t *, int);
     }
 }
 

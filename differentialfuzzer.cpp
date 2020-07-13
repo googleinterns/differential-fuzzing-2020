@@ -142,13 +142,13 @@ void differential_fuzzer::parser::AddToAssociatedParserName(AssociatedParserName
 // true. If the parser output has not matched a previous representative, the
 // function returns false
 bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parser, 
-    EquivalenceParserOutputs** head, int size_of_input)
+    EquivalenceParserOutputs** head, const uint8_t * input_data, int size_of_input)
 {
     // Iterator:
     EquivalenceParserOutputs* ptr = *head;
 
     differential_parser::ParserOutput* parser_output = 
-        parser->normalize(parser->parse(nullptr, 0));
+        parser->normalize(parser->parse(input_data, size_of_input));
 
     // Iterate through the different EquivalenceParserOutputs
     while (ptr != nullptr)
@@ -178,7 +178,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
 }
 
 void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
-    int number_of_parsers, int size_of_input)
+    int number_of_parsers, const uint8_t *input_data, int size_of_input)
 {
     if (number_of_parsers <= 0)
     {
@@ -193,9 +193,10 @@ void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
     // For error reporting
     bool are_all_parsers_equal = true;
 
+
     // First case:
     head->representative = parser_array[0]->normalize(
-        parser_array[0]->parse(nullptr, 0));
+        parser_array[0]->parse(input_data, size_of_input));
     head->next = nullptr;
     head->container_basket = new parser::AssociatedParserName;
     head->container_basket->name = parser_array[0]->getName();
@@ -203,7 +204,7 @@ void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
 
     for (int i=1; i<number_of_parsers;i++)
     {
-        are_all_parsers_equal = CheckAndAdd(parser_array[i], &head, size_of_input);
+        are_all_parsers_equal = CheckAndAdd(parser_array[i], &head, input_data, size_of_input);
     }
 
     DeleteEquivalenceParserOutputs(head);

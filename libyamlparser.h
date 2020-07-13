@@ -32,7 +32,7 @@ class LibyamlParser : virtual public differential_parser::Parser
     
     public:
         std::string getName();
-        void* parse(uint8_t*, size_t);
+        void* parse(const uint8_t*, size_t);
         differential_parser::ParserOutput* normalize(void*);
 };
 } // namespace yaml_differential_parser

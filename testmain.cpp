@@ -30,8 +30,8 @@ int main()
     FILE* output_for_emitter = fopen("tempyamloutput.txt","w");
     // FILE* output = fopen("tempyamloutput.txt","r");
 
-    size_t string_size = 17;
-    char start[17] = "\xd0\xbf\xd1\x80\xd0\xbe\xd0\xb2\xd0\xb5\xd1\x80\xd0\xba\xd0\xb0";
+    // size_t string_size = 17;
+    // char start[17] = "\xd0\xbf\xd1\x80\xd0\xbe\xd0\xb2\xd0\xb5\xd1\x80\xd0\xba\xd0\xb0";
 
     // size_t string_size = 6;
     // char start[6] = "\xf7\xbf\xbf\xbf!";
@@ -42,20 +42,18 @@ int main()
     // size_t string_size = 33;
     // char start[33] = "\xc0\xaf|\xe0\x80\xaf|\xf0\x80\x80\xaf|\xf8\x80\x80\x80\xaf|\xfc\x80\x80\x80\x80\xaf!";
 
-    // size_t string_size = 4;
-    // char start[4] = "bob";
-    
-    // size_t string_size = 50;
-    // char start[50] = "hello there\tjust checking some\nidentatio you know";
+    size_t string_size = 4;
+    char start[4] = "bob";
 
-    // size_t string_size = 41;
-    // char start[41] = "hello there \xAjust checking some identati";
+    // size_t string_size = 8;
+    // char start[8] = "1, 2, 3";
 
     // size_t string_size = strlen(start);
     
     // size_t string_size = 300;
 
-    unsigned char buffer[string_size];
+    unsigned char* buffer = new unsigned char[100];
+
     size_t written = 0;
 
     if(!yaml_parser_initialize(&parser))
@@ -109,10 +107,13 @@ int main()
 
     int pos_in_buffer = 0;
 
-    while(buffer[pos_in_buffer]!=NULL)
+    int temp_interator_counter = string_size;
+
+    while(buffer[pos_in_buffer]!=NULL && temp_interator_counter>1)
     {
         std::cout << buffer[pos_in_buffer];
         pos_in_buffer++;
+        temp_interator_counter--;
     }
     std::cout << std::endl;
 
@@ -124,9 +125,12 @@ int main()
     fclose(output);
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
+    const uint8_t input_data[] = {'b', 'e'};
+    int input_data_size = 2;
+    const std::string hello((const char*)input_data, input_data_size);
 
-    YAML::Node primes = YAML::Load("["+std::string(start)+"]");
     // YAML::Node primes = YAML::LoadFile("strings.yaml");
+    YAML::Node primes = YAML::Load("["+ hello +"]");
     // std::cout << primes["folded"] << std::endl;
 
     for (YAML::const_iterator it=primes.begin();it!=primes.end();++it) 
@@ -135,7 +139,7 @@ int main()
 
         std::cout << yaml_cpp_loop_temp << std::endl;
         std::cout << "libyaml == yaml-cpp: " << 
-            (strcmp((char*)parser.raw_buffer.start,(char*)(buffer)) == 0) << std::endl;
+            (strcmp((const char*)yaml_cpp_loop_temp.c_str(),(char*)(buffer)) == 0) << std::endl;
         std::cout << "---" << std::endl;
 
         // parser.raw_buffer.start==yaml_cpp_loop_temp
