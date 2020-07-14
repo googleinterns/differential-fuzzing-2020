@@ -9,9 +9,10 @@ namespace libyaml_differential_parser
 // ------------------------------ LibyamlParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-LibyamlParserOutput::LibyamlParserOutput(std::string* info)
+LibyamlParserOutput::LibyamlParserOutput(std::string* info, std::string* error_code)
 {
     this->data = info;
+    this->error = error_code;
 }
 
 LibyamlParserOutput::~LibyamlParserOutput()
@@ -20,16 +21,33 @@ LibyamlParserOutput::~LibyamlParserOutput()
     {
         delete this->data;
     }
+    delete this->error;
 }
 
 bool LibyamlParserOutput::equivalent(ParserOutput* compared_object)
 {
+    if(*this->getError()!="NA" && *compared_object->getError() != "NA")
+    {
+        if(*this->getError() == *compared_object->getError())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     return *(std::string*)this->getData() == *(std::string*)compared_object->getData();
 }
 
 void* LibyamlParserOutput::getData()
 {
     return static_cast<void*>(this->data);
+}
+
+std::string* LibyamlParserOutput::getError()
+{
+    return this->error;
 }
 
 // ---------------------------------------------------------------------------------
@@ -42,13 +60,13 @@ std::string LibyamlParser::getName()
 }
 
 
-void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
+void* LibyamlParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     yaml_parser_t parser;
     yaml_event_t event;
     yaml_emitter_t emitter;
 
-    unsigned char buffer[input_size];
+    unsigned char buffer[input_size + 1];
 
     bool done = false;
 
@@ -57,7 +75,7 @@ void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
         return 0;
     }
 
-    yaml_parser_set_input_string(&parser, (yaml_char_t*)input, input_size /*- 1*/);
+    yaml_parser_set_input_string(&parser, (yaml_char_t*)input, input_size);
 
     if (!yaml_emitter_initialize(&emitter))
     {
@@ -66,7 +84,7 @@ void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
 
     size_t written = 0;
 
-    yaml_emitter_set_output_string(&emitter, buffer, input_size /*-1*/, &written);
+    yaml_emitter_set_output_string(&emitter, buffer, input_size, &written);
 
     yaml_emitter_set_unicode(&emitter, 1);
 
@@ -75,7 +93,7 @@ void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
     {
         if (!yaml_parser_parse(&parser, &event)) 
         {
-            std::cout << "ERROR" << std::endl;
+            *error_code = "ERROR: libyaml parser fail";
             break;
         }
 
@@ -94,11 +112,10 @@ void* LibyamlParser::parse(const uint8_t* input, size_t input_size)
 }
 
 differential_parser::ParserOutput* LibyamlParser::normalize
-    (void* input)
+    (void* input, std::string* error_code)
 {   
-    //std::string((char*)input)
     differential_parser::ParserOutput* return_me = new
-        LibyamlParserOutput((std::string*)input);
+        LibyamlParserOutput((std::string*)input, error_code);
     return return_me;
 }
 }

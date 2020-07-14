@@ -16,11 +16,13 @@ class LibyamlParserOutput
 {
     private:
         std::string* data;
+        std::string* error;
     public:
-        LibyamlParserOutput(std::string*);
+        LibyamlParserOutput(std::string*, std::string*);
         ~LibyamlParserOutput();
         bool equivalent(ParserOutput*);
         void* getData();
+        std::string* getError();
 };
 
 // ---------------------------------------------------------------------------------
@@ -29,13 +31,12 @@ class LibyamlParserOutput
 
 class LibyamlParser : virtual public differential_parser::Parser
 {
-    
     public:
         std::string getName();
-        void* parse(const uint8_t*, size_t);
-        differential_parser::ParserOutput* normalize(void*);
+        void* parse(const uint8_t*, size_t, std::string*);
+        differential_parser::ParserOutput* normalize(void*, std::string*);
 };
-} // namespace yaml_differential_parser
+} 
 
 
 #endif

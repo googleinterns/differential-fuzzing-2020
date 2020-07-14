@@ -16,11 +16,13 @@ class YamlCppParserOutput
 {
     private:
         std::string* data;
+        std::string* error;
     public:
-        YamlCppParserOutput(std::string*);
+        YamlCppParserOutput(std::string*, std::string*);
         ~YamlCppParserOutput();
         bool equivalent(ParserOutput*);
         void* getData();
+        std::string* getError();
 };
 
 // ---------------------------------------------------------------------------------
@@ -32,8 +34,8 @@ class YamlCppParser : virtual public differential_parser::Parser
     
     public:
         std::string getName();
-        void* parse(const uint8_t*, size_t);
-        differential_parser::ParserOutput* normalize(void*);
+        void* parse(const uint8_t*, size_t, std::string*);
+        differential_parser::ParserOutput* normalize(void*, std::string*);
 };
 } // namespace yaml_differential_parser
 

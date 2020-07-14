@@ -9,9 +9,10 @@ namespace yamlcpp_differential_parser
 // ------------------------------ YamlCppParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-YamlCppParserOutput::YamlCppParserOutput(std::string* info)
+YamlCppParserOutput::YamlCppParserOutput(std::string* info, std::string* error_code)
 {
     this->data = info;
+    this->error = error_code;
 }
 
 YamlCppParserOutput::~YamlCppParserOutput()
@@ -20,16 +21,33 @@ YamlCppParserOutput::~YamlCppParserOutput()
     {
         delete this->data;
     }
+    delete this->error;
 }
 
 bool YamlCppParserOutput::equivalent(ParserOutput* compared_object)
 {
+    if(*this->getError()!="NA" && *compared_object->getError() != "NA")
+    {
+        if(*this->getError() == *compared_object->getError())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     return *(std::string*)this->getData() == *(std::string*)compared_object->getData();
 }
 
 void* YamlCppParserOutput::getData()
 {
     return static_cast<void*>(this->data);
+}
+
+std::string* YamlCppParserOutput::getError()
+{
+    return this->error;
 }
 
 // ---------------------------------------------------------------------------------
@@ -42,26 +60,23 @@ std::string YamlCppParser::getName()
 }
 
 
-void* YamlCppParser::parse(const uint8_t*input, size_t input_size)
+void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
-     std::string* yaml_cpp_loop_temp = new std::string;
-
+    std::string* yaml_cpp_loop_temp = new std::string;
 
     if(input_size>0)
     {
-        // YAML::Node primes = YAML::Load("[wookgie, woogie, it, is, the, spookie, boogie]");
         try
         {
-            YAML::Node primes = YAML::Load("["+std::string((const char*)yaml_cpp_loop_temp, input_size)+"]");
+            YAML::Emitter out;
 
-            for (YAML::const_iterator it = primes.begin();it != primes.end(); ++it) 
-            {
-                *yaml_cpp_loop_temp += it->as<std::string>();
-            }            
+            out << std::string((const char*)input, input_size);
+
+            *yaml_cpp_loop_temp = out.c_str();          
         }
         catch(const std::exception& e)
         {
-            // std::cerr << e.what() << '\n';
+            *error_code = e.what();
         }
         
 
@@ -70,10 +85,10 @@ void* YamlCppParser::parse(const uint8_t*input, size_t input_size)
 }
 
 differential_parser::ParserOutput* YamlCppParser::normalize
-    (void* input)
+    (void* input, std::string* error_code)
 {   
     differential_parser::ParserOutput* returnMe = new
-        YamlCppParserOutput((std::string*)input);
+        YamlCppParserOutput((std::string*)input, error_code);
     
     return returnMe;
 }

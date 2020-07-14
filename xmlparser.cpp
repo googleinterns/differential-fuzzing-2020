@@ -29,7 +29,7 @@ bool XmlParserOutput::equivalent(ParserOutput* compared_object)
 
 void* XmlParserOutput::getData()
 {
-    return static_cast<void*> (this->data);
+    return static_cast<void*>(this->data);
 }
 
 // ---------------------------------------------------------------------------------
