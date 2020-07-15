@@ -26,7 +26,7 @@ YamlCppParserOutput::~YamlCppParserOutput()
 
 bool YamlCppParserOutput::equivalent(ParserOutput* compared_object)
 {
-    if(*this->getError()!="NA" && *compared_object->getError() != "NA")
+    if(!this->getError()->empty() && !compared_object->getError()->empty())
     {
         if(*this->getError() == *compared_object->getError())
         {

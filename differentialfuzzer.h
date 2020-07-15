@@ -22,22 +22,24 @@ namespace differential_fuzzer
             AssociatedParserName* container_basket;
         };
 
-        void DeleteAssociatedParserName(AssociatedParserName*);
+        void DeleteAssociatedParserName(AssociatedParserName* delete_me);
 
-        void DeleteEquivalenceParserOutputs(EquivalenceParserOutputs*);
+        void DeleteEquivalenceParserOutputs(EquivalenceParserOutputs* delete_me);
 
-        void PrintAssociatedParserName(AssociatedParserName*);
+        void PrintAssociatedParserName(AssociatedParserName* head);
 
-        void PrintEquivalenceParserOutputs(EquivalenceParserOutputs*);
+        void PrintEquivalenceParserOutputs(EquivalenceParserOutputs* head);
 
-        void AddToAssociatedParserName(AssociatedParserName**, std::string);
+        void AddToAssociatedParserName(AssociatedParserName** head, std::string name);
 
-        bool CheckAndAdd(differential_parser::Parser*, EquivalenceParserOutputs**, const uint8_t *, int);
+        bool CheckAndAdd(differential_parser::Parser* parser, EquivalenceParserOutputs** head, 
+            const uint8_t* input_data, size_t size_of_input);
     }
 
     namespace fuzzer
     {
-        void DifferentiallyFuzz(differential_parser::Parser**, int, const uint8_t *, int);
+        void DifferentiallyFuzz(differential_parser::Parser** parser_array, int number_of_parsers, 
+            const uint8_t* input_data, size_t size_of_input);
     }
 }
 

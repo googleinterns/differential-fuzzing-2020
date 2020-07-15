@@ -159,6 +159,9 @@ int main()
     yaml_parser_delete(&parser);
     yaml_emitter_delete(&emitter);
 
+    std::string* local_error  = new std::string("bob");
+
+    std::cout << "Bool result: " << local_error->empty() << std::endl;
 
     return 0;
 }

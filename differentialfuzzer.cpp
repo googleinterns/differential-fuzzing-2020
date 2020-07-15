@@ -53,17 +53,18 @@ void differential_fuzzer::parser::PrintAssociatedParserName(AssociatedParserName
 {
     AssociatedParserName* ptr = head;
 
-    if (ptr!=nullptr)
+    if (ptr != nullptr)
     {
         std::cerr << "- ";
     }
 
-    while (ptr!=nullptr)
+    while (ptr != nullptr)
     {
         std::cerr << ptr->name;
+
         ptr = ptr->next_container;
 
-        if (ptr==nullptr)
+        if (ptr == nullptr)
         {
             std::cerr << std::endl;
         }
@@ -90,13 +91,13 @@ void differential_fuzzer::parser::PrintEquivalenceParserOutputs(EquivalenceParse
 
     int set_id = 1;
 
-    while (ptr!=nullptr)
+    while (ptr != nullptr)
     {
         std::cerr << "Set #" << set_id << ":" << std::endl;
         
         set_id++;
 
-        if (ptr->container_basket!=nullptr)
+        if (ptr->container_basket != nullptr)
         {
             PrintAssociatedParserName(ptr->container_basket);
         }
@@ -115,7 +116,8 @@ void differential_fuzzer::parser::PrintEquivalenceParserOutputs(EquivalenceParse
 // ---------------------------------------------------------------------------------
 
 
-void differential_fuzzer::parser::AddToAssociatedParserName(AssociatedParserName** head, std::string name)
+void differential_fuzzer::parser::AddToAssociatedParserName(AssociatedParserName** head, 
+    std::string name)
 {
     AssociatedParserName* ptr =  new AssociatedParserName;
 
@@ -138,12 +140,12 @@ void differential_fuzzer::parser::AddToAssociatedParserName(AssociatedParserName
 // true. If the parser output has not matched a previous representative, the
 // function returns false
 bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parser, 
-    EquivalenceParserOutputs** head, const uint8_t* input_data, int size_of_input)
+    EquivalenceParserOutputs** head, const uint8_t* input_data, size_t size_of_input)
 {
     // Iterator:
     EquivalenceParserOutputs* ptr = *head;
 
-    std::string* local_error  = new std::string("NA");;
+    std::string* local_error = new std::string();;
 
     void* temp_parse_holder = parser->parse(input_data, size_of_input, local_error);
 
@@ -178,7 +180,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
 }
 
 void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
-    int number_of_parsers, const uint8_t* input_data, int size_of_input)
+    int number_of_parsers, const uint8_t* input_data, size_t size_of_input)
 {
     if (number_of_parsers <= 0)
     {
@@ -195,19 +197,20 @@ void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
 
 
     // First case:
-    std::string* local_error  = new std::string("NA");;
+    std::string* local_error  = new std::string();
     void* temp_parse_holder = parser_array[0]->parse(input_data, size_of_input, local_error);
 
-    head->representative = parser_array[0]->normalize(temp_parse_holder,local_error);
+    head->representative = parser_array[0]->normalize(temp_parse_holder, local_error);
     head->next = nullptr;
     head->container_basket = new parser::AssociatedParserName;
     head->container_basket->name = parser_array[0]->getName();
     head->container_basket->next_container = nullptr;
 
-    for (int i=1; i<number_of_parsers;i++)
+    for (int i = 1; i < number_of_parsers; i++)
     {
         are_all_parsers_equal = CheckAndAdd(parser_array[i], &head, input_data, size_of_input);
     }
+
     DeleteEquivalenceParserOutputs(head);
 }
 
