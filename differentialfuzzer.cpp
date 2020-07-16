@@ -202,18 +202,20 @@ bool differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
     head->container_basket->name = parser_array[0]->getName();
     head->container_basket->next_container = nullptr;
 
+    bool all_parser_are_similar = true;
+
     for (int i = 1; i < number_of_parsers; i++)
     {
         if (!CheckAndAdd(parser_array[i], &head, input_data, size_of_input))
         {
-            DeleteEquivalenceParserOutputs(head);
-            return false;
+            
+            all_parser_are_similar = false;
         }
     }
 
     PrintEquivalenceParserOutputs(head);
-
     DeleteEquivalenceParserOutputs(head);
-    return true;
+
+    return all_parser_are_similar;
 }
 

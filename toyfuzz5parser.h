@@ -1,37 +1,36 @@
-#ifndef TOYFUZZ2PARSER_H
-#define TOYFUZZ2PARSER_H
+#ifndef TOYFUZZ5PARSER_H
+#define TOYFUZZ5PARSER_H
 
 #include "baseparser.h"
 
 #include <string>
 
-namespace toy2_differential_parser
+namespace toy5_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ Toy2ParserOutput ---------------------------------
+// ------------------------------ Toy5ParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-class Toy2ParserOutput 
+class Toy5ParserOutput 
     : virtual public differential_parser::ParserOutput
 {
     private:
         std::string* data;
         std::string* error;
     public:
-        Toy2ParserOutput(std::string* info, std::string* error_code);
-        ~Toy2ParserOutput();
+        Toy5ParserOutput(std::string* info, std::string* error_code);
+        ~Toy5ParserOutput();
         bool equivalent(ParserOutput* compared_object);
         void* getData();
         std::string* getError();
 };
 
 // ---------------------------------------------------------------------------------
-// ---------------------------------- Toy2Parser -----------------------------------
+// ---------------------------------- Toy5Parser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-class Toy2Parser : virtual public differential_parser::Parser
+class Toy5Parser : virtual public differential_parser::Parser
 {
-    
     public:
         std::string getName();
         void* parse(const uint8_t* input, size_t input_size, std::string* error_code);

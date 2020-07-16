@@ -63,7 +63,7 @@ void* Toy1Parser::parse(const uint8_t* input, size_t input_size, std::string* er
 {
     std::string* toy_output = new std::string;
 
-    *toy_output = std::string((const char*)input, input_size) + " wears a cool";
+    *toy_output = std::string((const char*)input, input_size) + " wears a cool hat";
 
     return (void*)toy_output;
 }

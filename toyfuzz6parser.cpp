@@ -1,20 +1,20 @@
-#include "toyfuzz4parser.h"
+#include "toyfuzz6parser.h"
 
 #include <iostream>
 
-namespace toy4_differential_parser
+namespace toy6_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ Toy4ParserOutput ---------------------------------
+// ------------------------------ Toy6ParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-Toy4ParserOutput::Toy4ParserOutput(std::string* info, std::string* error_code)
+Toy6ParserOutput::Toy6ParserOutput(std::string* info, std::string* error_code)
 {
     this->data = info;
     this->error = error_code;
 }
 
-Toy4ParserOutput::~Toy4ParserOutput()
+Toy6ParserOutput::~Toy6ParserOutput()
 {
     if (this->data != nullptr)
     {
@@ -23,7 +23,7 @@ Toy4ParserOutput::~Toy4ParserOutput()
     delete this->error;
 }
 
-bool Toy4ParserOutput::equivalent(ParserOutput* compared_object)
+bool Toy6ParserOutput::equivalent(ParserOutput* compared_object)
 {
     if(!this->getError()->empty() && !compared_object->getError()->empty())
     {
@@ -39,42 +39,42 @@ bool Toy4ParserOutput::equivalent(ParserOutput* compared_object)
     return *(std::string*)this->getData() == *(std::string*)compared_object->getData();
 }
 
-void* Toy4ParserOutput::getData()
+void* Toy6ParserOutput::getData()
 {
     return static_cast<void*>(this->data);
 }
 
-std::string* Toy4ParserOutput::getError()
+std::string* Toy6ParserOutput::getError()
 {
     return this->error;
 }
 
 // ---------------------------------------------------------------------------------
-// ---------------------------------- Toy4Parser -----------------------------------
+// ---------------------------------- Toy6Parser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string Toy4Parser::getName()
+std::string Toy6Parser::getName()
 {
-    return "toy-4";
+    return "toy-6";
 }
 
 
-void* Toy4Parser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
+void* Toy6Parser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     std::string* toy_output = new std::string;
 
-    *toy_output = std::string((const char*)input, input_size) + " wears a hot hat";
+    *toy_output = std::string((const char*)input, input_size) + " wears a floatty hat";
 
-    *error_code = "ERROR: warm hat";
+    *error_code = "ERROR: hat too hot";
 
     return (void*)toy_output;
 }
 
-differential_parser::ParserOutput* Toy4Parser::normalize
+differential_parser::ParserOutput* Toy6Parser::normalize
     (void* input, std::string* error_code)
 {   
     differential_parser::ParserOutput* returnMe = new
-        Toy4ParserOutput((std::string*)input, error_code);
+        Toy6ParserOutput((std::string*)input, error_code);
     
     return returnMe;
 }
