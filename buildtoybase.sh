@@ -1,1 +1,0 @@
-clang++ -c differentialfuzzer.cpp
