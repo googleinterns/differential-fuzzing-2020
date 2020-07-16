@@ -63,7 +63,7 @@ void* Toy2Parser::parse(const uint8_t* input, size_t input_size, std::string* er
 {
     std::string* toy_output = new std::string;
 
-    *toy_output = std::string((const char*)input, input_size) + " wears a hot hat";
+    *toy_output = std::string((const char*)input, input_size) + " wears a hot ";
 
     return (void*)toy_output;
 }
@@ -71,6 +71,7 @@ void* Toy2Parser::parse(const uint8_t* input, size_t input_size, std::string* er
 differential_parser::ParserOutput* Toy2Parser::normalize
     (void* input, std::string* error_code)
 {   
+    *(std::string*)input = *(std::string*)input + "hat";
     differential_parser::ParserOutput* returnMe = new
         Toy2ParserOutput((std::string*)input, error_code);
     
