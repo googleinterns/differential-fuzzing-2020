@@ -38,7 +38,7 @@ namespace differential_fuzzer
 
     namespace fuzzer
     {
-        void DifferentiallyFuzz(differential_parser::Parser** parser_array, int number_of_parsers, 
+        bool DifferentiallyFuzz(differential_parser::Parser** parser_array, int number_of_parsers, 
             const uint8_t* input_data, size_t size_of_input);
     }
 }

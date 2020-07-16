@@ -42,11 +42,11 @@ int main()
     // size_t string_size = 33;
     // char start[33] = "\xc0\xaf|\xe0\x80\xaf|\xf0\x80\x80\xaf|\xf8\x80\x80\x80\xaf|\xfc\x80\x80\x80\x80\xaf!";
 
-    size_t string_size = 2;
-    char start[2] = "o";
+    // size_t string_size = 2;
+    // char start[2] = "o";
 
-    // size_t string_size = 8;
-    // char start[8] = "1, 2, 3";
+    size_t string_size = 8;
+    char start[8] = "1e ]e \t";
 
     // size_t string_size = strlen(start);
     
@@ -125,43 +125,39 @@ int main()
     fclose(output);
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
-    // const uint8_t input_data[] = {'b', 'e'};
-    // int input_data_size = 2;
-    // const std::string hello((const char*)input_data, input_data_size);
-    // try
-    // {   
-    //     // YAML::Node primes = YAML::LoadFile("strings.yaml");
-    //     YAML::Node primes = YAML::Load("["+ std::string(start) +"]");
-    //     // YAML::Node primes = YAML::Load("["+ hello +"]");
-    //     // std::cout << primes["folded"] << std::endl;
+    const uint8_t input_data[] = {'b', 'e'};
+    int input_data_size = 2;
+    const std::string hello((const char*)input_data, input_data_size);
+    try
+    {   
+        YAML::Node primes = YAML::LoadFile("strings.yaml");
+        // YAML::Node primes = YAML::Load("["+ std::string(start) +"]");
+        // YAML::Node primes = YAML::Load("["+ hello +"]");
+        std::cout << primes["literal-block"] << std::endl;
 
-    //     for (YAML::const_iterator it=primes.begin();it!=primes.end();++it) 
-    //     {
-    //         std::string yaml_cpp_loop_temp = it->as<std::string>();
+        // for (YAML::const_iterator it=primes.begin();it!=primes.end();++it) 
+        // {
+        //     std::string yaml_cpp_loop_temp = it->as<std::string>();
             
-    //         std::cout << yaml_cpp_loop_temp << std::endl;
-    //         std::cout << "libyaml == yaml-cpp: " << 
-    //             (strcmp((const char*)yaml_cpp_loop_temp.c_str(),(char*)(buffer)) == 0) << std::endl;
-    //         std::cout << "---" << std::endl;
+        //     std::cout << yaml_cpp_loop_temp << std::endl;
+        //     std::cout << "libyaml == yaml-cpp: " << 
+        //         (strcmp((const char*)yaml_cpp_loop_temp.c_str(),(char*)(buffer)) == 0) << std::endl;
+        //     std::cout << "---" << std::endl;
 
-    //         // parser.raw_buffer.start==yaml_cpp_loop_temp
-    //     }
-    // }
-    // catch(const std::exception& err)
-    // {
-    //     std::cout << "ERROR" << std::endl;
-    // }
+        //     // parser.raw_buffer.start==yaml_cpp_loop_temp
+        // }
+    }
+    catch(const std::exception& err)
+    {
+        std::cout << err.what() << std::endl;
+    }
 
-    YAML::Emitter out;
-    out << std::string(start);
-    std::cout << out.c_str() << std::endl;
+    // YAML::Emitter out;
+    // out << std::string(start);
+    // std::cout << out.c_str() << std::endl;
 
-    yaml_parser_delete(&parser);
-    yaml_emitter_delete(&emitter);
-
-    std::string* local_error  = new std::string("bob");
-
-    std::cout << "Bool result: " << local_error->empty() << std::endl;
+    // yaml_parser_delete(&parser);
+    // yaml_emitter_delete(&emitter);
 
     return 0;
 }

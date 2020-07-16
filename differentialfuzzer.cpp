@@ -179,22 +179,18 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
     return false;
 }
 
-void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
+bool differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
     int number_of_parsers, const uint8_t* input_data, size_t size_of_input)
 {
     if (number_of_parsers <= 0)
     {
         std::cerr << "ERROR: No parsers passed to 'DifferentiallyFuzz' function" 
             << std::endl;
-        return;
+        return false;
     }
 
     // Creates iteration structure
     parser::EquivalenceParserOutputs* head = new parser::EquivalenceParserOutputs;
-    
-    // For error reporting
-    bool are_all_parsers_equal = true;
-
 
     // First case:
     std::string* local_error  = new std::string();
@@ -208,9 +204,16 @@ void differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
 
     for (int i = 1; i < number_of_parsers; i++)
     {
-        are_all_parsers_equal = CheckAndAdd(parser_array[i], &head, input_data, size_of_input);
+        if (!CheckAndAdd(parser_array[i], &head, input_data, size_of_input))
+        {
+            DeleteEquivalenceParserOutputs(head);
+            return false;
+        }
     }
 
+    PrintEquivalenceParserOutputs(head);
+
     DeleteEquivalenceParserOutputs(head);
+    return true;
 }
 
