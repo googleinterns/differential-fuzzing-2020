@@ -25,7 +25,7 @@ Toy7ParserOutput::~Toy7ParserOutput()
 
 bool Toy7ParserOutput::equivalent(ParserOutput* compared_object)
 {
-    if(!this->getError()->empty() && !compared_object->getError()->empty())
+    if (!this->getError()->empty() && !compared_object->getError()->empty())
     {
         if(*this->getError() == *compared_object->getError())
         {
@@ -35,8 +35,11 @@ bool Toy7ParserOutput::equivalent(ParserOutput* compared_object)
         {
             return false;
         }
+    }else if (!this->getError()->empty() || !compared_object->getError()->empty())
+    {
+        return false;
     }
-    return *(int*)this->getData() == *(int*)compared_object->getData();
+    return *(std::string*)this->getData() == *(std::string*)compared_object->getData();
 }
 
 void* Toy7ParserOutput::getData()

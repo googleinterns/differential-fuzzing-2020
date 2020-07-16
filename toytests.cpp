@@ -47,7 +47,8 @@
 void assess(bool result)
 {
     std::cout << "------ Result: ";
-    if(result)
+
+    if (result)
     {
         std::cout << "PASS" << std::endl;
     }
@@ -71,6 +72,7 @@ void runTest1()
         (differential_parser::Parser*)(&toyl_case)};
     
     const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+
     size_t size = 3;
     
     std::cout << "------ TEST 1: Equal Data, No Error Case " << std::endl << "(1 and 1)" << std::endl;
@@ -154,7 +156,7 @@ void runTest6()
     
     std::cout << "------ TEST 6: Same Data, One Error " << std::endl <<"(2 == 4; 4 has error)" << std::endl;
     
-    assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
+    assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
 void runTest7()
@@ -170,7 +172,7 @@ void runTest7()
     
     std::cout << "------ TEST 7: Different Data, Same Errors " << std::endl <<"(4 != 5)" << std::endl;
     
-    assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
+    assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
 void runTest8()
@@ -186,7 +188,7 @@ void runTest8()
     
     std::cout << "------ TEST 8: Same Data, Different Errors " << std::endl <<"(5 != 6; err same)" << std::endl;
     
-    assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
+    assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
 void runTest9()
