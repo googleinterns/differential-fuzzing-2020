@@ -31,7 +31,7 @@ int main()
     memset(&emitter, 0, sizeof(emitter));
     int done = 0;
 
-    // global-tag.yaml(yaml-cpp error)  mapping.yaml  strings.yaml
+    // global-tag.yaml(yaml-cpp error)  mapping.yaml mappingother.yaml  strings.yaml
     std::string path_to_test_file = "examples/strings.yaml";
 
     FILE* output = fopen(path_to_test_file.c_str(),"r");
@@ -61,12 +61,14 @@ int main()
     // size_t string_size = 140;
     // char start[140] = "folded: >\n    This entire block of text will be the value of 'folded', but this\n    time, all newlines will be replaced with a single space";
 
-    size_t string_size = 74;
-    char start[74] = "base: &base\n name: Everyone has same name\n\n foo: &foo\n <<: *base\n age: 10";
+    // size_t string_size = 74;
+    // char start[74] = "base: &base\n name: Everyone has same name\n\n foo: &foo\n <<: *base\n age: 10";
     
-    // size_t string_size = 1000;
-    // char start[22] = "{\"key\": [\"value\", 3]}";
-    const std::string temp = std::string(start, string_size-1);
+    size_t string_size = 135;
+    // char start[135] = "characterType :\n type1 :\n  attribute1 : something\n  attribute2 : something\n type2 :\n  attribute1 : something\n  attribute2 : something\n";
+
+    string_size = 1000;
+    // const std::string temp = std::string(start, string_size-1);
 
     // size_t string_size = strlen(start);
     
@@ -86,8 +88,8 @@ int main()
         return 0;
     }
     
-    yaml_parser_set_input_string(&parser, (yaml_char_t*)start, string_size - 1);
-    // yaml_parser_set_input_file(&parser,output);
+    // yaml_parser_set_input_string(&parser, (yaml_char_t*)start, string_size - 1);
+    yaml_parser_set_input_file(&parser,output);
     
     // yaml_emitter_set_output_file(&emitter,output_for_emitter); //output_for_emitter
     // yaml_emitter_set_output_file(&emitter,stdout); //output_for_emitter
@@ -95,7 +97,7 @@ int main()
 
     yaml_emitter_set_unicode(&emitter, 1);
 
-    // yaml_emitter_set_canonical(kk&emitter, 1);
+    // yaml_emitter_set_canonical(&emitter, 1);
 
     while (!done)
     {
@@ -134,23 +136,30 @@ int main()
                     fprintf(stderr, "Internal error\n");
                     break;
             }
+            std::cout << std::string((char*)event.data.scalar.value) << std::endl;
         }
+        
         // std::cout << "- Output from emitter: "<< buffer << std::endl;
     }
 
     std::cout << "- Print again not knowing size " << std::endl;
 
-    std::cout << buffer << std::endl;
+    // std::cout << buffer << std::endl;
     int pos_in_buffer = 0;
 
     int temp_interator_counter = string_size;
 
-    // while(buffer[pos_in_buffer]!=NULL && temp_interator_counter>1)
-    // {
-    //     std::cout << buffer[pos_in_buffer];
-    //     pos_in_buffer++;
-    //     temp_interator_counter--;
-    // }
+    while(buffer[pos_in_buffer]!=NULL)
+    {
+        if(buffer[pos_in_buffer] == '\n')
+        {
+            std::cout << "(x)";
+        }
+        std::cout << buffer[pos_in_buffer];
+
+        pos_in_buffer++;
+        temp_interator_counter--;
+    }
     std::cout <<  "----" << std::endl;
 
     yaml_event_delete(&event); // may be leaking
@@ -168,70 +177,98 @@ int main()
     std::string yamlcpp_final_output;
     try
     {   
-        // YAML::Node node = YAML::LoadFile(path_to_test_file);
-        YAML::Node node = YAML::Load("[2, 3]");
+        YAML::Node node = YAML::LoadFile(path_to_test_file);
+        // YAML::Node node = YAML::Load("[2, 3]");
         // YAML::Node node = YAML::Load(temp);
         // YAML::Node node = YAML::Load("Hello World");
         std::cout << "Node type: " << node.Type() << std::endl;
+        // YAML::NodeType::Null;
+        // YAML::NodeType::Scalar
+        // YAML::NodeType::Sequence
+        switch (node.Type())
+        {
+            case (YAML::NodeType::Null):
+                yamlcpp_final_output = "- Null case\n";
+
+                break;
+            case (YAML::NodeType::Scalar):
+                yamlcpp_final_output = node.Scalar();
+
+                break;
+            case (YAML::NodeType::Sequence):
+                std::cout << "Sequence" << std::endl;
+                for (std::size_t i=0;i<node.size();i++) 
+                {
+                    std::cout << "loop" << std::endl;
+                    yamlcpp_final_output += "- " + std::string(node[i].as<char>(),1) + "\n";
+                }
+                break;
+            case (YAML::NodeType::Map):
+                std::cout << "map" << std::endl;
+                for (YAML::const_iterator it=node.begin();it!=node.end();++it) 
+                {
+                    yamlcpp_final_output += "- " + it->first.as<std::string>() + "\n";
+
+                    yamlcpp_final_output += node[it->first.as<std::string>()].as<std::string>() + "\n";
+
+                    // std::cout << "- "<< it->first.as<std::string>() << std::endl;
+
+                    // std::cout << node[it->first.as<std::string>()].as<std::string>() << std::endl;
+                }
+                break;
+            case (YAML::NodeType::Undefined):
+                yamlcpp_final_output = "Undef\n";
+
+                break;
+            default:
+                yamlcpp_final_output = "ERROR: Unknown Input Type \n";
+        }
+
+        std::cout << "Output:" << std::endl;
+        std::cout << yamlcpp_final_output << std::endl;
+        std::cout << "--------:" << std::endl;
 
         // Makes selection of how to parse node
-        if (node.Type() == 1) // NULL
-        {
-            yamlcpp_final_output = "- Null case";
-        }
-        else if (node.Type() == 2) // Scalar
-        {
-            yamlcpp_final_output = node.Scalar();
-        }
-        else if (node.Type() == 3) // Sequence
-        {
-            for (std::size_t i=0;i<node.size();i++) 
-            {
-                yamlcpp_final_output += "- " + node[i].as<std::string>() +"\n";
-            }
-        }
-        else if (node.Type() == 4) // Dictionary
-        {
-            std::cout << "----- Before looping: " << std::endl;
+        // if (node.Type() == 1) // NULL
+        // {
+        //     yamlcpp_final_output = "- Null case";
+        // }
+        // else if (node.Type() == 2) // Scalar
+        // {
+        //     yamlcpp_final_output = node.Scalar();
+        // }
+        // else if (node.Type() == 3) // Sequence
+        // {
+        //     for (std::size_t i=0;i<node.size();i++) 
+        //     {
+        //         yamlcpp_final_output += "- " + node[i].as<std::string>() +"\n";
+        //     }
+        // }
+        // else if (node.Type() == 4) // Dictionary
+        // {
+        //     std::cout << "----- Before looping: " << std::endl;
 
-            for (YAML::const_iterator it=node.begin();it!=node.end();++it) 
-            {
-                std::cout << "- "<< it->first.as<std::string>() << std::endl;
+        //     for (YAML::const_iterator it=node.begin();it!=node.end();++it) 
+        //     {
+        //         std::cout << "- "<< it->first.as<std::string>() << std::endl;
 
-                std::cout << node[it->first.as<std::string>()].as<std::string>() << std::endl;
-            }
-            std::cout << "----- After looping" << std::endl;
-        }
-        else if (node.Type() == 5) // Map (only for special cases, so it may never be called)
-        {
-            std::cout << "I am a map!" << std::endl;
-        }
-        else // Unknown
-        {
-            std::cerr << "ERROR: Unknown Input Type" << std::endl;
-        }
-
-
-        // std::cout << yamlcpp_output.str() << std::endl;
-        
-        // YAML::Node node = YAML::Load("{theng: boeeee, thang: boaaaa, list: [3,2], listother: {list321: keep}, empty}");
-        // YAML::Node node = YAML::Load("start: [1, 3, 0], second: booeee");
-        
-        // YAML::Node node = YAML::Load("["+ std::string(start) +"]");
-        // YAML::Node node = YAML::Load("["+ hello +"]");
-
-        // std::cout << node["literal-block"] << std::endl;
+        //         std::cout << node[it->first.as<std::string>()].as<std::string>() << std::endl;
+        //     }
+        //     std::cout << "----- After looping" << std::endl;
+        // }
+        // else if (node.Type() == 5) // Map (only for special cases, so it may never be called)
+        // {
+        //     std::cout << "I am a map!" << std::endl;
+        // }
+        // else // Unknown
+        // {
+        //     std::cerr << "ERROR: Unknown Input Type" << std::endl;
+        // }
     }
     catch(const std::exception& err)
     {
         std::cout << err.what() << std::endl;
     }
-
-    std::cout << "Final output: " << std::endl << yamlcpp_final_output << std::endl;
-
-    // YAML::Emitter out;
-    // out << std::string(start);
-    // std::cout << out.c_str() << std::endl;
 
     // yaml_parser_delete(&parser);
     // yaml_emitter_delete(&emitter);
