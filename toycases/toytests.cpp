@@ -3,14 +3,9 @@
 
 #include "baseparser.h"
 #include "differentialfuzzer.h"
-#include "toyfuzz1parser.h"
-#include "toyfuzz2parser.h"
-#include "toyfuzz3parser.h"
-#include "toyfuzz4parser.h"
-#include "toyfuzz5parser.h"
-#include "toyfuzz6parser.h"
 #include "toyfuzz7parser.h"
-#include "toyfuzz8parser.h"
+#include "toyfuzz9parser.h"
+#include "toyfuzzstringoutputbase.h"
 
 // Key to toy case:
 // --- toy-1:
@@ -44,20 +39,26 @@
 // ------------------------------- Helper Methods ----------------------------------
 // ---------------------------------------------------------------------------------
 
-void assess(bool result)
+bool assess(bool result)
 {
     std::cout << "------ Result: ";
+    
+    bool returnMe;
 
     if (result)
     {
         std::cout << "PASS" << std::endl;
+        returnMe = true;
     }
     else
     {
         std::cout << "FAIL" << std::endl;
+        returnMe = false;
     }    
 
     std::cout << std::endl;
+
+    return returnMe;
 }
 
 // ---------------------------------------------------------------------------------
@@ -66,10 +67,10 @@ void assess(bool result)
 
 void runTest1()
 {
-    toy1_differential_parser::Toy1Parser toyl_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
 
-    differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toyl_case), 
-        (differential_parser::Parser*)(&toyl_case)};
+    differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy1_case), 
+        (differential_parser::Parser*)(&toy1_case)};
     
     const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
 
@@ -82,7 +83,7 @@ void runTest1()
 
 void runTest2()
 {
-    toy1_differential_parser::Toy1Parser toyl_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
 
     differential_parser::Parser* array_of_parsers[0] = {};
     
@@ -96,9 +97,9 @@ void runTest2()
 
 void runTest3()
 {
-    toy1_differential_parser::Toy1Parser toyl_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
 
-    differential_parser::Parser* array_of_parsers[1] = {(differential_parser::Parser*)(&toyl_case)};
+    differential_parser::Parser* array_of_parsers[1] = {(differential_parser::Parser*)(&toy1_case)};
     
     const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
     size_t size = 3;
@@ -110,10 +111,10 @@ void runTest3()
 
 void runTest4()
 {
-    toy1_differential_parser::Toy1Parser toyl_case;
-    toy2_differential_parser::Toy2Parser toy2_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy2_case(" wears a hot ", "hat", "toy-2", "");
 
-    differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toyl_case), 
+    differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy1_case), 
         (differential_parser::Parser*)(&toy2_case)};
     
     const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
@@ -126,12 +127,12 @@ void runTest4()
 
 void runTest5()
 {
-    toy1_differential_parser::Toy1Parser toyl_case;
-    toy2_differential_parser::Toy2Parser toy2_case;
-    toy3_differential_parser::Toy3Parser toy3_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy2_case(" wears a hot ", "hat", "toy-2", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy3_case(" wears a hot hat", "", "toy-3", "");
 
 
-    differential_parser::Parser* array_of_parsers[3] = {(differential_parser::Parser*)(&toyl_case), 
+    differential_parser::Parser* array_of_parsers[3] = {(differential_parser::Parser*)(&toy1_case), 
         (differential_parser::Parser*)(&toy2_case), (differential_parser::Parser*)(&toy3_case)};
     
     const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
@@ -144,8 +145,8 @@ void runTest5()
 
 void runTest6()
 {
-    toy2_differential_parser::Toy2Parser toy2_case;
-    toy4_differential_parser::Toy4Parser toy4_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy2_case(" wears a hot ", "hat", "toy-2", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy4_case(" wears a hot hat", "", "toy-4", "ERROR: warm hat");
 
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy2_case),
@@ -161,8 +162,8 @@ void runTest6()
 
 void runTest7()
 {
-    toy4_differential_parser::Toy4Parser toy4_case;
-    toy5_differential_parser::Toy5Parser toy5_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy4_case(" wears a hot hat", "", "toy-4", "ERROR: warm hat");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy5_case(" wears a floatty ", "hat", "toy-5", "ERROR: warm hat");
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy5_case),
         (differential_parser::Parser*)(&toy4_case)};
@@ -177,8 +178,8 @@ void runTest7()
 
 void runTest8()
 {
-    toy5_differential_parser::Toy5Parser toy5_case;
-    toy6_differential_parser::Toy6Parser toy6_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy5_case(" wears a floatty ", "hat", "toy-5", "ERROR: warm hat");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy6_case(" wears a floatty hat", "", "toy-6", "ERROR: hat too hot");
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy5_case),
         (differential_parser::Parser*)(&toy6_case)};
@@ -193,7 +194,7 @@ void runTest8()
 
 void runTest9()
 {
-    toy1_differential_parser::Toy1Parser toy1_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
     toy7_differential_parser::Toy7Parser toy7_case;
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy1_case),
@@ -209,7 +210,7 @@ void runTest9()
 
 void runTest10()
 {
-    toy1_differential_parser::Toy1Parser toy1_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
     toy7_differential_parser::Toy7Parser toy7_case;
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy7_case),
@@ -225,8 +226,8 @@ void runTest10()
 
 void runTest11()
 {
-    toy1_differential_parser::Toy1Parser toy1_case;
-    toy8_differential_parser::Toy8Parser toy8_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy8_case(" wears a hot ", "pair of glasses", "toy-8", "");
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy8_case),
         (differential_parser::Parser*)(&toy1_case)};
@@ -239,18 +240,45 @@ void runTest11()
     assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
+void runTest12()
+{
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy8_case(" wears a hot ", "pair of glasses", "toy-8", "");
+    toy9_differential_parser::Toy9Parser toy9_case;
+
+    differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy9_case),
+        (differential_parser::Parser*)(&toy8_case)};
+    
+    const uint8_t *DataOne = (uint8_t*)(std::string("1bob").c_str());
+    size_t size = 4;
+    
+    std::cout << "------ TEST 12: Tests Uncertain Case" << std::endl << "8 vs 9" << std::endl;
+    
+    std::cout << "--- Local Test 1:" << std::endl;
+
+    bool finalAssessment = assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, DataOne, size));
+
+    const uint8_t *DataZero = (uint8_t*)(std::string("0bob").c_str());
+
+    std::cout << "--- Local Test 2:" << std::endl;
+
+    finalAssessment = finalAssessment && assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, DataZero, size));
+
+    std::cout << "--- Conclusion:" << std::endl;
+    assess(finalAssessment);
+}
+
 void runTestAll1()
 {
-    toy1_differential_parser::Toy1Parser toyl_case;
-    toy2_differential_parser::Toy2Parser toy2_case;
-    toy3_differential_parser::Toy3Parser toy3_case;
-    toy4_differential_parser::Toy4Parser toy4_case;
-    toy5_differential_parser::Toy5Parser toy5_case;
-    toy6_differential_parser::Toy6Parser toy6_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy2_case(" wears a hot ", "hat", "toy-2", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy3_case(" wears a hot hat", "", "toy-3", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy4_case(" wears a hot hat", "", "toy-4", "ERROR: warm hat");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy5_case(" wears a floatty ", "hat", "toy-5", "ERROR: warm hat");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy6_case(" wears a floatty hat", "", "toy-6", "ERROR: hat too hot");
     toy7_differential_parser::Toy7Parser toy7_case;
-    toy8_differential_parser::Toy8Parser toy8_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy8_case(" wears a hot ", "pair of glasses", "toy-8", "");
 
-    differential_parser::Parser* array_of_parsers[8] = {(differential_parser::Parser*)(&toyl_case),
+    differential_parser::Parser* array_of_parsers[8] = {(differential_parser::Parser*)(&toy1_case),
         (differential_parser::Parser*)(&toy2_case), (differential_parser::Parser*)(&toy3_case), 
         (differential_parser::Parser*)(&toy4_case), (differential_parser::Parser*)(&toy5_case), 
         (differential_parser::Parser*)(&toy6_case), (differential_parser::Parser*)(&toy7_case),
@@ -266,16 +294,16 @@ void runTestAll1()
 
 void runTestAll2()
 {
-    toy1_differential_parser::Toy1Parser toyl_case;
-    toy2_differential_parser::Toy2Parser toy2_case;
-    toy3_differential_parser::Toy3Parser toy3_case;
-    toy4_differential_parser::Toy4Parser toy4_case;
-    toy5_differential_parser::Toy5Parser toy5_case;
-    toy6_differential_parser::Toy6Parser toy6_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy1_case(" wears a cool hat", "", "toy-1", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy2_case(" wears a hot ", "hat", "toy-2", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy3_case(" wears a hot hat", "", "toy-3", "");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy4_case(" wears a hot hat", "", "toy-4", "ERROR: warm hat");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy5_case(" wears a floatty ", "hat", "toy-5", "ERROR: warm hat");
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy6_case(" wears a floatty hat", "", "toy-6", "ERROR: hat too hot");
     toy7_differential_parser::Toy7Parser toy7_case;
-    toy8_differential_parser::Toy8Parser toy8_case;
+    toy_generic_string_helper::ToyFuzzGenericStringParser toy8_case(" wears a hot ", "pair of glasses", "toy-8", "");
 
-    differential_parser::Parser* array_of_parsers[8] = {(differential_parser::Parser*)(&toyl_case),
+    differential_parser::Parser* array_of_parsers[8] = {(differential_parser::Parser*)(&toy1_case),
         (differential_parser::Parser*)(&toy2_case), (differential_parser::Parser*)(&toy3_case), 
         (differential_parser::Parser*)(&toy4_case), (differential_parser::Parser*)(&toy5_case), 
         (differential_parser::Parser*)(&toy6_case), (differential_parser::Parser*)(&toy7_case),
@@ -307,6 +335,7 @@ int main()
     runTest9();
     runTest10();
     runTest11();
+    runTest12();
 
     runTestAll1();
     runTestAll2();
