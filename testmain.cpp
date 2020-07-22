@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <assert.h>
 #include <fstream>
 
 // From git file
@@ -29,146 +30,189 @@ void printBuffer(char* buffer)
     }
 }
 
+void print_escaped(yaml_char_t * str, size_t length)
+{
+    int i;
+    char c;
+
+    for (i = 0; i < length; i++) {
+        c = *(str + i);
+        if (c == '\\')
+            printf("\\\\");
+        else if (c == '\0')
+            printf("\\0");
+        else if (c == '\b')
+            printf("\\b");
+        else if (c == '\n')
+            printf("\\n");
+        else if (c == '\r')
+            printf("\\r");
+        else if (c == '\t')
+            printf("\\t");
+        else
+            printf("%c", c);
+    }
+}
+
+int usage(int ret) {
+    fprintf(stderr, "Usage: libyaml-parser [--flow (on|off|keep)] [<input-file>]\n");
+    return ret;
+}
+
+int doYamlExample(std::string name_of_file)
+{
+    FILE *input;
+    yaml_parser_t parser;
+    yaml_event_t event;
+    int flow = -1; /** default no flow style collections */
+    int i = 0;
+    int foundfile = 0;
+
+    input = fopen(name_of_file.c_str(), "rb");
+    foundfile = 1;
+
+    if (!foundfile) {
+        input = stdin;
+    }
+    assert(input);
+
+    if (!yaml_parser_initialize(&parser)) {
+        fprintf(stderr, "Could not initialize the parser object\n");
+        return 1;
+    }
+    yaml_parser_set_input_file(&parser, input);
+
+    while (1) {
+        yaml_event_type_t type;
+        if (!yaml_parser_parse(&parser, &event)) {
+            if ( parser.problem_mark.line || parser.problem_mark.column ) {
+                fprintf(stderr, "Parse error: %s\nLine: %lu Column: %lu\n",
+                    parser.problem,
+                    (unsigned long)parser.problem_mark.line + 1,
+                    (unsigned long)parser.problem_mark.column + 1);
+            }
+            else {
+                fprintf(stderr, "Parse error: %s\n", parser.problem);
+            }
+            return 1;
+        }
+        type = event.type;
+
+        if (type == YAML_NO_EVENT)
+            printf("???\n");
+        else if (type == YAML_STREAM_START_EVENT)
+            printf("+STR\n");
+        else if (type == YAML_STREAM_END_EVENT)
+            printf("-STR\n");
+        else if (type == YAML_DOCUMENT_START_EVENT) {
+            printf("+DOC");
+            if (!event.data.document_start.implicit)
+                printf(" ---");
+            printf("\n");
+        }
+        else if (type == YAML_DOCUMENT_END_EVENT) {
+            printf("-DOC");
+            if (!event.data.document_end.implicit)
+                printf(" ...");
+            printf("\n");
+        }
+        else if (type == YAML_MAPPING_START_EVENT) {
+            printf("+MAP");
+            if (flow == 0 && event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
+                printf(" {}");
+            else if (flow == 1)
+                printf(" {}");
+            if (event.data.mapping_start.anchor)
+                printf(" &%s", event.data.mapping_start.anchor);
+            if (event.data.mapping_start.tag)
+                printf(" <%s>", event.data.mapping_start.tag);
+            printf("\n");
+        }
+        else if (type == YAML_MAPPING_END_EVENT)
+            printf("-MAP\n");
+        else if (type == YAML_SEQUENCE_START_EVENT) {
+            printf("+SEQ");
+            if (flow == 0 && event.data.sequence_start.style == YAML_FLOW_SEQUENCE_STYLE)
+                printf(" []");
+            else if (flow == 1)
+                printf(" []");
+            if (event.data.sequence_start.anchor)
+                printf(" &%s", event.data.sequence_start.anchor);
+            if (event.data.sequence_start.tag)
+                printf(" <%s>", event.data.sequence_start.tag);
+            printf("\n");
+        }
+        else if (type == YAML_SEQUENCE_END_EVENT)
+            printf("-SEQ\n");
+        else if (type == YAML_SCALAR_EVENT) {
+            printf("=VAL");
+            if (event.data.scalar.anchor)
+                printf(" &%s", event.data.scalar.anchor);
+            if (event.data.scalar.tag)
+                printf(" <%s>", event.data.scalar.tag);
+            switch (event.data.scalar.style) {
+            case YAML_PLAIN_SCALAR_STYLE:
+                printf(" :");
+                break;
+            case YAML_SINGLE_QUOTED_SCALAR_STYLE:
+                printf(" '");
+                break;
+            case YAML_DOUBLE_QUOTED_SCALAR_STYLE:
+                printf(" \"");
+                break;
+            case YAML_LITERAL_SCALAR_STYLE:
+                printf(" |");
+                break;
+            case YAML_FOLDED_SCALAR_STYLE:
+                printf(" >");
+                break;
+            case YAML_ANY_SCALAR_STYLE:
+                abort();
+            }
+            print_escaped(event.data.scalar.value, event.data.scalar.length);
+            printf("\n");
+        }
+        else if (type == YAML_ALIAS_EVENT)
+            printf("=ALI *%s\n", event.data.alias.anchor);
+        else
+            abort();
+
+        yaml_event_delete(&event);
+
+        if (type == YAML_STREAM_END_EVENT)
+            break;
+    }
+
+    assert(!fclose(input));
+    yaml_parser_delete(&parser);
+    fflush(stdout);
+
+    return 0;
+}
+
 // Main used for the purpose of minor testing
 int main()
 {
     std::cout << "Do thing!" << std::endl;
     
     std::cout << "----------- libyaml tests -----------" << std::endl;
-
-    yaml_parser_t parser;
-    memset(&parser, 0, sizeof(parser));
-
-    yaml_document_t document;
-
-    yaml_document_t document_list[3];
-    memset(document_list, 0, 3*sizeof(yaml_document_t));
-    // memset(&document, 0, sizeof(document));
-
-    // yaml_token_t token;
-    // memset(&token, 0, sizeof(token));
-
-    yaml_emitter_t emitter;
-    memset(&emitter, 0, sizeof(emitter));
-
-    // yaml_event_t event;
-    // memset(&event, 0, sizeof(event));
     
-    int done = 0;
+    // anchors.yaml(wrong_? 4)  array.yaml  global-tag.yaml(wrong_err 3)  json.yaml(wrong_inc 4)  
+    // mapping.yaml  numbers.yaml  
+    // strings.yaml  tags.yaml  yaml-version.yaml
+    std::string path_to_test_file = "examples/global-tag.yaml";
 
-    // global-tag.yaml(yaml-cpp error)  mapping.yaml mappingother.yaml  strings.yaml
-    std::string path_to_test_file = "examples/strings.yaml";
-
-    FILE* output = fopen(path_to_test_file.c_str(),"r");
+    doYamlExample(path_to_test_file);
+    FILE* output = fopen(path_to_test_file.c_str(),"rb");
     FILE* output_for_emitter = fopen("tempyamloutput.txt","w");
 
-    // size_t string_size = 74;
-    // char start[74] = "base: &base\n name: Everyone has same name\n\n foo: &foo\n <<: *base\n age: 10";
-    
-    // size_t string_size = 135;
-    // char start[135] = "characterType :\n type1 :\n  attribute1 : something\n  attribute2 : something\n type2 :\n  attribute1 : something\n  attribute2 : something\n";
-
-    size_t string_size = 1000;
-    // const std::string temp = std::string(start, string_size-1);
-
-    unsigned char* buffer = new unsigned char[1000];
-
-    size_t written = 0;
-
-    if(!yaml_parser_initialize(&parser))
-    {
-        return 0;
-    }
-    
-    yaml_emitter_initialize(&emitter);
-    
-    // yaml_parser_set_input_string(&parser, (yaml_char_t*)start, string_size - 1);
-    yaml_parser_set_input_file(&parser,output);
-    yaml_emitter_set_unicode(&emitter, 1);
-
-    // yaml_emitter_set_output_file(&emitter,output_for_emitter); //output_for_emitter
-    // yaml_emitter_set_output_file(&emitter,stdout); //output_for_emitter
-
-    yaml_emitter_set_output_string(&emitter, buffer, string_size + 1, &written);
-    yaml_emitter_open(&emitter);
-
-    int count = 0;
-
-    while (!done)
-    {
-        std::cout << "- Loop" << std::endl;
-        
-        if (!yaml_parser_load(&parser, &document)) 
-        {
-            std::cout << "----BAD PARSER----" << std::endl;
-
-            break;
-        }
-
-        done = (!yaml_document_get_root_node(&document));
-
-        yaml_document_delete(&document);
-
-        if (!done)  
-        {
-            //add more stuff here
-            count ++;
-        }
-        // tk = (char*)token.data.scalar.value;
-        
-        
-
-        // yaml_event_delete(&event);
-
-        // if(!yaml_emitter_emit(&emitter, &event))
-        // {
-        //     std::cout << "----BAD EMITTER----" << std::endl;
-
-        //     switch (emitter.error)
-        //     {
-        //         case YAML_MEMORY_ERROR:
-        //             fprintf(stderr, "Memory error: Not enough memory for emitting\n");
-        //             break;
-
-        //         case YAML_WRITER_ERROR:
-        //             fprintf(stderr, "Writer error: %s\n", emitter.problem);
-        //             break;
-
-        //         case YAML_EMITTER_ERROR:
-        //             fprintf(stderr, "Emitter error: %s\n", emitter.problem);
-        //             break;
-
-        //         default:
-        //             /* Couldn't happen. */
-        //             fprintf(stderr, "Internal error\n");
-        //             break;
-        //     }
-        //     std::cout << std::string((char*)event.data.scalar.value) << std::endl;
-        // }
-        
-        // std::cout << "- Output from emitter: "<< buffer << std::endl;
-        
-        // std::cout << (char*)token.data.scalar.value << std::endl;
-    }
-
-    yaml_parser_delete(&parser);
-    fclose(output);
-    yaml_emitter_close(&emitter);
-    yaml_emitter_delete(&emitter);
-
-    // std::cout << "Nodes: "<< count<< std::endl;
-    // std::cout <<  "----" << std::endl;
-
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
-    const uint8_t input_data[] = {'b', 'e'};
-    int input_data_size = 2;
-    const std::string hello((const char*)input_data, input_data_size);
 
     std::string yamlcpp_final_output;
     try
     {   
         YAML::Node node = YAML::LoadFile(path_to_test_file);
-        // YAML::Node node = YAML::Load(temp);
+        // YAML::Node node = YAML::Load("[1, 2, 3]");
         std::cout << "Node type: " << node.Type() << std::endl;
 
         switch (node.Type())
@@ -186,16 +230,32 @@ int main()
                 for (std::size_t i=0;i<node.size();i++) 
                 {
                     std::cout << "loop" << std::endl;
-                    yamlcpp_final_output += "- " + std::string(node[i].as<char>(),1) + "\n";
+                    std::cout << "- First node info: " << std::endl;
+                    std::cout << node[i].IsScalar() << std::endl;
+                    std::cout << node[i].IsMap() << std::endl;
+                    std::cout << node[i].begin()->first.as<std::string>() << std::endl;
+                    std::cout << node[i].IsSequence() << std::endl;
+                    std::cout << node[i].IsNull() << std::endl;
+                    std::cout << node[i].as<std::string>() << std::endl;
                 }
                 break;
             case (YAML::NodeType::Map):
                 std::cout << "map" << std::endl;
                 for (YAML::const_iterator it=node.begin();it!=node.end();++it) 
                 {
-                    yamlcpp_final_output += "- " + it->first.as<std::string>() + "\n";
-
-                    yamlcpp_final_output += node[it->first.as<std::string>()].as<std::string>() + "\n";
+                    std::cout << "- First node info: " << std::endl;
+                    std::cout << it->first.IsScalar() << std::endl;
+                    std::cout << it->first.IsMap() << std::endl;
+                    std::cout << it->first.IsSequence() << std::endl;
+                    std::cout << it->first.IsNull() << std::endl;
+                    std::cout << it->first.as<std::string>() << std::endl;
+                    
+                    std::cout << "- Second node info: " << std::endl;
+                    std::cout << node[it->first.as<std::string>()].IsMap() << std::endl;
+                    std::cout << node[it->first.as<std::string>()].IsSequence() << std::endl;
+                    std::cout << node[it->first.as<std::string>()].IsScalar() << std::endl;
+                    std::cout << node[it->first.as<std::string>()].IsNull() << std::endl;
+                    
                 }
                 break;
             case (YAML::NodeType::Undefined):
@@ -206,14 +266,16 @@ int main()
                 yamlcpp_final_output = "ERROR: Unknown Input Type \n";
         }
 
-        std::cout << "Output:" << std::endl;
-        std::cout << yamlcpp_final_output << std::endl;
-        std::cout << "--------:" << std::endl;
     }
     catch(const std::exception& err)
     {
         std::cout << err.what() << std::endl;
     }
+
+    std::cout << "Output:" << std::endl;
+    std::cout << yamlcpp_final_output << std::endl;
+    std::cout << "--------:" << std::endl;
+
     return 0;
 }
 
