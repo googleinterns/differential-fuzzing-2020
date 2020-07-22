@@ -1,35 +1,35 @@
-#ifndef TOYFUZZ7PARSER_H
-#define TOYFUZZ7PARSER_H
+#ifndef TOYFUZZINTPARSER_H
+#define TOYFUZZINTPARSER_H
 
 #include "baseparser.h"
 
 #include <string>
 
-namespace toy7_differential_parser
+namespace toy_int_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ Toy7ParserOutput ---------------------------------
+// ------------------------------ ToyIntParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-class Toy7ParserOutput 
+class ToyIntParserOutput 
     : virtual public differential_parser::ParserOutput
 {
     private:
         int* data;
         std::string* error;
     public:
-        Toy7ParserOutput(int* info, std::string* error_code);
-        ~Toy7ParserOutput();
+        ToyIntParserOutput(int* info, std::string* error_code);
+        ~ToyIntParserOutput();
         bool equivalent(ParserOutput* compared_object);
         void* getData();
         std::string* getError();
 };
 
 // ---------------------------------------------------------------------------------
-// ---------------------------------- Toy7Parser -----------------------------------
+// ---------------------------------- ToyIntParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-class Toy7Parser : virtual public differential_parser::Parser
+class ToyIntParser : virtual public differential_parser::Parser
 {
     public:
         std::string getName();

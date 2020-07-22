@@ -1,20 +1,20 @@
-#include "toyfuzz7parser.h"
+#include "toyfuzzintparser.h"
 
 #include <iostream>
 
-namespace toy7_differential_parser
+namespace toy_int_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ Toy7ParserOutput ---------------------------------
+// ------------------------------ ToyIntParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-Toy7ParserOutput::Toy7ParserOutput(int* info, std::string* error_code)
+ToyIntParserOutput::ToyIntParserOutput(int* info, std::string* error_code)
 {
     this->data = info;
     this->error = error_code;
 }
 
-Toy7ParserOutput::~Toy7ParserOutput()
+ToyIntParserOutput::~ToyIntParserOutput()
 {
     if (this->data != nullptr)
     {
@@ -23,7 +23,7 @@ Toy7ParserOutput::~Toy7ParserOutput()
     delete this->error;
 }
 
-bool Toy7ParserOutput::equivalent(ParserOutput* compared_object)
+bool ToyIntParserOutput::equivalent(ParserOutput* compared_object)
 {
     if (!this->getError()->empty() && !compared_object->getError()->empty())
     {
@@ -43,27 +43,27 @@ bool Toy7ParserOutput::equivalent(ParserOutput* compared_object)
     return *(int*)this->getData() == *(int*)compared_object->getData();
 }
 
-void* Toy7ParserOutput::getData()
+void* ToyIntParserOutput::getData()
 {
     return static_cast<void*>(this->data);
 }
 
-std::string* Toy7ParserOutput::getError()
+std::string* ToyIntParserOutput::getError()
 {
     return this->error;
 }
 
 // ---------------------------------------------------------------------------------
-// ---------------------------------- Toy7Parser -----------------------------------
+// ---------------------------------- ToyIntParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string Toy7Parser::getName()
+std::string ToyIntParser::getName()
 {
-    return "toy-7";
+    return "toy-Int";
 }
 
 
-void* Toy7Parser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
+void* ToyIntParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     int* toy_output = new int;
 
@@ -72,11 +72,11 @@ void* Toy7Parser::parse(const uint8_t* input, size_t input_size, std::string* er
     return (void*)toy_output;
 }
 
-differential_parser::ParserOutput* Toy7Parser::normalize
+differential_parser::ParserOutput* ToyIntParser::normalize
     (void* input, std::string* error_code)
 {   
     differential_parser::ParserOutput* returnMe = new
-        Toy7ParserOutput((int*)input, error_code);
+        ToyIntParserOutput((int*)input, error_code);
     
     return returnMe;
 }

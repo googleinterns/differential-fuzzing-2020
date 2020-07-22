@@ -1,17 +1,17 @@
-#ifndef TOYFUZZ9PARSER_H
-#define TOYFUZZ9PARSER_H
+#ifndef TOYFUZZSWITCHPARSER_H
+#define TOYFUZZSWITCHPARSER_H
 
 #include "baseparser.h"
 
 #include <string>
 
-namespace toy9_differential_parser
+namespace toy_switch_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ---------------------------------- Toy9Parser -----------------------------------
+// ---------------------------------- ToySwitchParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-class Toy9Parser : virtual public differential_parser::Parser
+class ToySwitchParser : virtual public differential_parser::Parser
 {
     
     public:

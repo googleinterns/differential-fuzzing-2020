@@ -200,11 +200,11 @@ int main()
     // anchors.yaml(wrong_? 4)  array.yaml  global-tag.yaml(wrong_err 3)  json.yaml(wrong_inc 4)  
     // mapping.yaml  numbers.yaml  
     // strings.yaml  tags.yaml  yaml-version.yaml
-    std::string path_to_test_file = "examples/global-tag.yaml";
+    std::string path_to_test_file = "examples/anchors.yaml";
 
     doYamlExample(path_to_test_file);
+
     FILE* output = fopen(path_to_test_file.c_str(),"rb");
-    FILE* output_for_emitter = fopen("tempyamloutput.txt","w");
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
 
@@ -267,7 +267,7 @@ int main()
         }
 
     }
-    catch(const std::exception& err)
+    catch (const std::exception& err)
     {
         std::cout << err.what() << std::endl;
     }

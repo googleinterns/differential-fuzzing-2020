@@ -2,5 +2,5 @@ rm *.o testexecutable *.h.gch
 bash buildtoybase.sh 
 bash buildtoyfuzzparsers.sh
 
-clang++ differentialfuzzer.o toyfuzzstringoutputbase.o toyfuzz7parser.o toyfuzz9parser.o toytests.cpp \
+clang++ differentialfuzzer.o toyfuzzstringoutputbase.o toyfuzzintparser.o toyfuzzswitchparser.o toytests.cpp \
 -o toytestexecutable -I ../

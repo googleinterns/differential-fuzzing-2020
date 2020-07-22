@@ -1,21 +1,21 @@
-#include "toyfuzz9parser.h"
+#include "toyfuzzswitchparser.h"
 #include "toyfuzzstringoutputbase.h"
 
 #include <iostream>
 
-namespace toy9_differential_parser
+namespace toy_switch_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ---------------------------------- Toy9Parser -----------------------------------
+// ---------------------------------- ToySwitchParser -----------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string Toy9Parser::getName()
+std::string ToySwitchParser::getName()
 {
-    return "toy-9";
+    return "toy-Switch";
 }
 
 
-void* Toy9Parser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
+void* ToySwitchParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     char deciding_factor = input[0];
     std::string* toy_output = new std::string;
@@ -32,14 +32,12 @@ void* Toy9Parser::parse(const uint8_t* input, size_t input_size, std::string* er
     return (void*)toy_output;
 }
 
-differential_parser::ParserOutput* Toy9Parser::normalize
+differential_parser::ParserOutput* ToySwitchParser::normalize
     (void* input, std::string* error_code)
 {   
     *(std::string*)input = *(std::string*)input + "pair of glasses";
     differential_parser::ParserOutput* returnMe = new
         toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, error_code);
-    
-    std::cerr << *(std::string*)input << std::endl;
 
     return returnMe;
 }
