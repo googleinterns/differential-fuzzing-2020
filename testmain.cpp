@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stack>
+#include <queue>
 #include <assert.h>
 #include <fstream>
 
@@ -190,52 +191,62 @@ int doYamlExample(std::string name_of_file)
 // ------------------------------ yaml-cpp test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string parseYamlCppNode(YAML::Node head)
+std::string parseYamlCppNode(YAML::Node& head)
 {
-    std::cout << "---- In parser" <<std::endl;
-    std::stack <YAML::Node> iteration_list;
-    iteration_list.push(head);
+    std::stack <YAML::Node> iteration_list_stack;
+    iteration_list_stack.push(head);
 
     std::string yamlcpp_final_output = "";
 
-    while(!iteration_list.empty())
+    while(!iteration_list_stack.empty())
     {
-        YAML::Node base_iterator = iteration_list.top();
-        iteration_list.pop();
+        YAML::Node base_iterator = iteration_list_stack.top();
+        iteration_list_stack.pop();
 
-        std::cout << "- Switch time" <<std::endl;
-        switch (base_iterator.Type())
+        YAML::NodeType::value comparison_var = base_iterator.Type();
+        if (comparison_var == YAML::NodeType::Null)
         {
-            case (YAML::NodeType::Null):
-                yamlcpp_final_output += "- Null case";
+            yamlcpp_final_output += "- Null case";
+        }
+        else if (comparison_var == YAML::NodeType::Scalar)
+        {
+            yamlcpp_final_output += "- " + base_iterator.as<std::string>() + "\n";
+        }
+        else if (comparison_var == YAML::NodeType::Sequence)
+        {
+            for (int i = base_iterator.size() - 1; i >= 0; i--) 
+            {
+                iteration_list_stack.push(base_iterator[i]);
+            }
+        }
+        else if (comparison_var == YAML::NodeType::Map)
+        {
+            std::stack <YAML::iterator> loca_iterators_temp_stack;
 
-                break;
-            case (YAML::NodeType::Scalar):
-                std::cout << "-scalar-" << std::endl;
-                yamlcpp_final_output += "- " + base_iterator.as<std::string>() + "\n";
-                std::cout << yamlcpp_final_output << std::endl;
-                break;
+            for (YAML::iterator it = base_iterator.begin(); it != base_iterator.end(); ++it) 
+            {
+                loca_iterators_temp_stack.push(it);
+            }
 
-            case (YAML::NodeType::Sequence):
-                std::cout << "-seq-" << std::endl;
-                for (int i = base_iterator.size() - 1; i >= 0; i--) 
-                {
-                    std::cout << i << std::endl;
-                    iteration_list.push(base_iterator[i]);
-                }
-                break;
-            case (YAML::NodeType::Map):
-                std::cout << "-map-" << std::endl;
-                iteration_list.push(base_iterator.begin()->second);
-                iteration_list.push(base_iterator.begin()->first);
-                break;
-            case (YAML::NodeType::Undefined):
-                break;
-            default:
-                yamlcpp_final_output += "ERROR: Unknown Input Type \n";
-        }    
+            while(!loca_iterators_temp_stack.empty())
+            {
+                YAML::iterator it = loca_iterators_temp_stack.top();
+                loca_iterators_temp_stack.pop();
+
+                iteration_list_stack.push(it->second);
+                iteration_list_stack.push(it->first);
+            }
+
+        }
+        else if (comparison_var == YAML::NodeType::Undefined)
+        {
+            yamlcpp_final_output += "- Undef \n";
+        }
+        else
+        {
+            yamlcpp_final_output += "- ERROR: Unknown Input Type \n";
+        }
     }
-
     return yamlcpp_final_output;
 }
 
@@ -248,11 +259,11 @@ int main()
     
     std::cout << "----------- libyaml tests -----------" << std::endl;
     
-    // anchors.yaml(wrong_? 4)  array.yaml  global-tag.yaml(wrong_err 3)  json.yaml  
-    // mapping.yaml  numbers.yaml
-    // strings.yaml  tags.yaml  yaml-version.yaml
+    // anchors.yaml  global-tag.yaml  
+    // mapping.yaml  numbers.yaml array.yaml json.yaml  yaml-version.yaml
+    // strings.yaml  tags.yaml
     // NEW: multimap.yaml multisequence.yaml
-    std::string path_to_test_file = "examples/multisequence.yaml";
+    std::string path_to_test_file = "examples/global-tag.yaml";
 
     doYamlExample(path_to_test_file);
 
@@ -267,42 +278,7 @@ int main()
         // YAML::Node node = YAML::Load("[1, 2, 3]");
         std::cout << "Node type: " << node.Type() << std::endl;
 
-
-        switch (node.Type())
-        {
-            case (YAML::NodeType::Null):
-                yamlcpp_final_output += "- Null case\n";
-
-                break;
-            case (YAML::NodeType::Scalar):
-                yamlcpp_final_output += node.Scalar() + "\n";
-                break;
-
-            case (YAML::NodeType::Sequence):
-                std::cout << "Sequence" << std::endl;
-                for (std::size_t i=0;i<node.size();i++) 
-                {
-                    yamlcpp_final_output += parseYamlCppNode(node[i]);
-                }
-                break;
-
-            case (YAML::NodeType::Map):
-                std::cout << "map start" << std::endl;
-                for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) 
-                {
-                    yamlcpp_final_output += parseYamlCppNode(it->first);
-                    yamlcpp_final_output += parseYamlCppNode(it->second);
-                }
-                break;
-
-            case (YAML::NodeType::Undefined):
-                yamlcpp_final_output = "Undef\n";
-
-                break;
-            default:
-                yamlcpp_final_output = "ERROR: Unknown Input Type \n";
-        }    
-        
+        yamlcpp_final_output = parseYamlCppNode(node);
     }
     catch (const std::exception& err)
     {

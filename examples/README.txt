@@ -8,3 +8,5 @@ Directory contains testing files. Those contain:
 - numbers.yaml: Sequence of numbers (output similar to array.yaml)
 - strings.yaml: Sequence with differently formated strings
 - yaml-version.yaml: Sequence and map with yaml version
+- multimap.yaml: Example for multiple maps
+- multisequence.yaml: Example for multiple sequences inside a sequence
