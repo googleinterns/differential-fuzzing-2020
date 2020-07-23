@@ -194,11 +194,12 @@ int doYamlExample(std::string name_of_file)
 std::string parseYamlCppNode(YAML::Node& head)
 {
     std::stack <YAML::Node> iteration_list_stack;
+    
     iteration_list_stack.push(head);
 
     std::string yamlcpp_final_output = "";
 
-    while(!iteration_list_stack.empty())
+    while (!iteration_list_stack.empty())
     {
         YAML::Node base_iterator = iteration_list_stack.top();
         iteration_list_stack.pop();
@@ -228,7 +229,7 @@ std::string parseYamlCppNode(YAML::Node& head)
                 loca_iterators_temp_stack.push(it);
             }
 
-            while(!loca_iterators_temp_stack.empty())
+            while (!loca_iterators_temp_stack.empty())
             {
                 YAML::iterator it = loca_iterators_temp_stack.top();
                 loca_iterators_temp_stack.pop();
