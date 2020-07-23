@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <stack>
 #include <assert.h>
 #include <fstream>
 
@@ -7,14 +8,9 @@
 #include "include/yaml.h"
 #include "yaml-cpp/yaml.h"
 
-// #include "differentialfuzzer.h"
-
-struct thing
-{
-    char* t1;
-    char* t2;
-    char* t3;
-};
+// ---------------------------------------------------------------------------------
+// ------------------------------- libyaml test code -------------------------------
+// ---------------------------------------------------------------------------------
 
 void printBuffer(char* buffer)
 {
@@ -190,17 +186,73 @@ int doYamlExample(std::string name_of_file)
     return 0;
 }
 
-// Main used for the purpose of minor testing
+// ---------------------------------------------------------------------------------
+// ------------------------------ yaml-cpp test code -------------------------------
+// ---------------------------------------------------------------------------------
+
+std::string parseYamlCppNode(YAML::Node head)
+{
+    std::cout << "---- In parser" <<std::endl;
+    std::stack <YAML::Node> iteration_list;
+    iteration_list.push(head);
+
+    std::string yamlcpp_final_output = "";
+
+    while(!iteration_list.empty())
+    {
+        YAML::Node base_iterator = iteration_list.top();
+        iteration_list.pop();
+
+        std::cout << "- Switch time" <<std::endl;
+        switch (base_iterator.Type())
+        {
+            case (YAML::NodeType::Null):
+                yamlcpp_final_output += "- Null case";
+
+                break;
+            case (YAML::NodeType::Scalar):
+                std::cout << "-scalar-" << std::endl;
+                yamlcpp_final_output += "- " + base_iterator.as<std::string>() + "\n";
+                std::cout << yamlcpp_final_output << std::endl;
+                break;
+
+            case (YAML::NodeType::Sequence):
+                std::cout << "-seq-" << std::endl;
+                for (int i = base_iterator.size() - 1; i >= 0; i--) 
+                {
+                    std::cout << i << std::endl;
+                    iteration_list.push(base_iterator[i]);
+                }
+                break;
+            case (YAML::NodeType::Map):
+                std::cout << "-map-" << std::endl;
+                iteration_list.push(base_iterator.begin()->second);
+                iteration_list.push(base_iterator.begin()->first);
+                break;
+            case (YAML::NodeType::Undefined):
+                break;
+            default:
+                yamlcpp_final_output += "ERROR: Unknown Input Type \n";
+        }    
+    }
+
+    return yamlcpp_final_output;
+}
+
+// ---------------------------------------------------------------------------------
+// -------------------------------------- main -------------------------------------
+// ---------------------------------------------------------------------------------
 int main()
 {
     std::cout << "Do thing!" << std::endl;
     
     std::cout << "----------- libyaml tests -----------" << std::endl;
     
-    // anchors.yaml(wrong_? 4)  array.yaml  global-tag.yaml(wrong_err 3)  json.yaml(wrong_inc 4)  
-    // mapping.yaml  numbers.yaml  
+    // anchors.yaml(wrong_? 4)  array.yaml  global-tag.yaml(wrong_err 3)  json.yaml  
+    // mapping.yaml  numbers.yaml
     // strings.yaml  tags.yaml  yaml-version.yaml
-    std::string path_to_test_file = "examples/anchors.yaml";
+    // NEW: multimap.yaml multisequence.yaml
+    std::string path_to_test_file = "examples/multisequence.yaml";
 
     doYamlExample(path_to_test_file);
 
@@ -215,66 +267,51 @@ int main()
         // YAML::Node node = YAML::Load("[1, 2, 3]");
         std::cout << "Node type: " << node.Type() << std::endl;
 
+
         switch (node.Type())
         {
             case (YAML::NodeType::Null):
-                yamlcpp_final_output = "- Null case\n";
+                yamlcpp_final_output += "- Null case\n";
 
                 break;
             case (YAML::NodeType::Scalar):
-                yamlcpp_final_output = node.Scalar();
-
+                yamlcpp_final_output += node.Scalar() + "\n";
                 break;
+
             case (YAML::NodeType::Sequence):
                 std::cout << "Sequence" << std::endl;
                 for (std::size_t i=0;i<node.size();i++) 
                 {
-                    std::cout << "loop" << std::endl;
-                    std::cout << "- First node info: " << std::endl;
-                    std::cout << node[i].IsScalar() << std::endl;
-                    std::cout << node[i].IsMap() << std::endl;
-                    std::cout << node[i].begin()->first.as<std::string>() << std::endl;
-                    std::cout << node[i].IsSequence() << std::endl;
-                    std::cout << node[i].IsNull() << std::endl;
-                    std::cout << node[i].as<std::string>() << std::endl;
+                    yamlcpp_final_output += parseYamlCppNode(node[i]);
                 }
                 break;
+
             case (YAML::NodeType::Map):
-                std::cout << "map" << std::endl;
-                for (YAML::const_iterator it=node.begin();it!=node.end();++it) 
+                std::cout << "map start" << std::endl;
+                for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) 
                 {
-                    std::cout << "- First node info: " << std::endl;
-                    std::cout << it->first.IsScalar() << std::endl;
-                    std::cout << it->first.IsMap() << std::endl;
-                    std::cout << it->first.IsSequence() << std::endl;
-                    std::cout << it->first.IsNull() << std::endl;
-                    std::cout << it->first.as<std::string>() << std::endl;
-                    
-                    std::cout << "- Second node info: " << std::endl;
-                    std::cout << node[it->first.as<std::string>()].IsMap() << std::endl;
-                    std::cout << node[it->first.as<std::string>()].IsSequence() << std::endl;
-                    std::cout << node[it->first.as<std::string>()].IsScalar() << std::endl;
-                    std::cout << node[it->first.as<std::string>()].IsNull() << std::endl;
-                    
+                    yamlcpp_final_output += parseYamlCppNode(it->first);
+                    yamlcpp_final_output += parseYamlCppNode(it->second);
                 }
                 break;
+
             case (YAML::NodeType::Undefined):
                 yamlcpp_final_output = "Undef\n";
 
                 break;
             default:
                 yamlcpp_final_output = "ERROR: Unknown Input Type \n";
-        }
-
+        }    
+        
     }
     catch (const std::exception& err)
     {
         std::cout << err.what() << std::endl;
     }
 
-    std::cout << "Output:" << std::endl;
+    std::cout << "--------yaml-cpp Output:" << std::endl;
     std::cout << yamlcpp_final_output << std::endl;
-    std::cout << "--------:" << std::endl;
+    std::cout << "--------" << std::endl;
 
     return 0;
 }
