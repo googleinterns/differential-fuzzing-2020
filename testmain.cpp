@@ -76,7 +76,11 @@ std::string doYamlExample(std::string name_of_file)
 
     while (1) 
     {
+
+        std::string local_event_output = "";
+        
         yaml_event_type_t type;
+
         if (!yaml_parser_parse(&parser, &event)) 
         {
             if ( parser.problem_mark.line || parser.problem_mark.column ) 
@@ -93,121 +97,165 @@ std::string doYamlExample(std::string name_of_file)
         }
         type = event.type;
 
-        if (type == YAML_NO_EVENT)
-            libyaml_final_output += ("???\n");
-        else if (type == YAML_STREAM_START_EVENT)
-            libyaml_final_output += ("+STR\n");
-        else if (type == YAML_STREAM_END_EVENT)
-            libyaml_final_output += ("-STR\n");
-        else if (type == YAML_DOCUMENT_START_EVENT) 
+        switch(type)
         {
-            libyaml_final_output += ("+DOC");
-            if (!event.data.document_start.implicit)
-                libyaml_final_output += (" ---");
-            libyaml_final_output += ("\n");
-        }
-        else if (type == YAML_DOCUMENT_END_EVENT) 
-        {
-            libyaml_final_output += ("-DOC");
-            if (!event.data.document_end.implicit)
-                libyaml_final_output += (" ...");
-            libyaml_final_output += ("\n");
-        }
-        else if (type == YAML_MAPPING_START_EVENT) 
-        {
-            libyaml_final_output += ("+MAP");
-            if (flow == 0 && event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
-                libyaml_final_output += (" {}");
-            else if (flow == 1)
-                libyaml_final_output += (" {}");
-            if (event.data.mapping_start.anchor)
+            case YAML_NO_EVENT:
+                local_event_output += ("???\n");
+
+                break;
+            case YAML_STREAM_START_EVENT:
+                local_event_output += ("+STR\n");
+
+                break;
+            case YAML_STREAM_END_EVENT:
+                local_event_output += ("-STR\n");
+
+                break;
+            case YAML_DOCUMENT_START_EVENT:
+                local_event_output += ("+DOC");
+
+                if (!event.data.document_start.implicit)
+                    local_event_output += (" ---");
+
+                local_event_output += ("\n");
+
+                break;
+            case YAML_DOCUMENT_END_EVENT:
+                local_event_output += ("-DOC");
+
+                if (!event.data.document_end.implicit)
+                    local_event_output += (" ...");
+
+                local_event_output += ("\n");
+
+                break;
+            case YAML_MAPPING_START_EVENT:
+                local_event_output += ("+MAP");
+
+                if (flow == 0 && event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
+                    local_event_output += (" {}");
+
+                else if (flow == 1)
+                    local_event_output += (" {}");
+
+                if (event.data.mapping_start.anchor)
+                {
+                    std::string temp_translator = ((char*)event.data.mapping_start.anchor);
+
+                    local_event_output += " &" + temp_translator + "";
+                }       
+                if (event.data.mapping_start.tag)
+                {
+                    std::string temp_translator = ((char*)event.data.mapping_start.tag);
+
+                    local_event_output += " <&" + temp_translator + ">";
+                }                
+                local_event_output += ("\n");
+
+                break;
+            case YAML_MAPPING_END_EVENT:
+                local_event_output += ("-MAP\n");
+
+                break;
+            case YAML_SEQUENCE_START_EVENT:
+                local_event_output += ("+SEQ");
+
+                if (flow == 0 && event.data.sequence_start.style == YAML_FLOW_SEQUENCE_STYLE)
+                    local_event_output += (" []");
+                else if (flow == 1)
+                    local_event_output += (" []");
+
+                if (event.data.sequence_start.anchor)
+                if (event.data.scalar.anchor)
+                {
+                    std::string temp_translator = ((char*)event.data.sequence_start.anchor);
+
+                    local_event_output += " &" + temp_translator;
+                }
+                if (event.data.sequence_start.tag) 
+                {
+                    std::string temp_translator = ((char*)event.data.sequence_start.tag);
+
+                    local_event_output += (" <"+ temp_translator + ">");
+                }
+                local_event_output += ("\n");
+
+                break;
+            case YAML_SEQUENCE_END_EVENT:
+                local_event_output += ("-SEQ\n");
+
+                break;
+            case YAML_SCALAR_EVENT:
+                local_event_output += ("=VAL");
+
+                if (event.data.scalar.anchor)
+                {
+                    std::string temp_translator = ((char*)event.data.scalar.anchor);
+
+                    local_event_output += " &" + temp_translator;
+                }
+                if (event.data.scalar.tag)
+                {
+                    std::string temp_translator = ((char*)event.data.scalar.tag);
+
+                    local_event_output += " <"+temp_translator + ">";
+                }
+                switch (event.data.scalar.style) 
+                {
+                    case YAML_PLAIN_SCALAR_STYLE:
+                        local_event_output += (" :");
+
+                        break;
+                    case YAML_SINGLE_QUOTED_SCALAR_STYLE:
+                        local_event_output += (" '");
+
+                        break;
+                    case YAML_DOUBLE_QUOTED_SCALAR_STYLE:
+                        local_event_output += (" \"");
+
+                        break;
+                    case YAML_LITERAL_SCALAR_STYLE:
+                        local_event_output += (" |");
+
+                        break;
+                    case YAML_FOLDED_SCALAR_STYLE:
+                        local_event_output += (" >");
+
+                        break;
+                    case YAML_ANY_SCALAR_STYLE:
+                        abort();
+                }
+                local_event_output += 
+                    parse_escaped(event.data.scalar.value, event.data.scalar.length);
+                
+                local_event_output += ("\n");
+                break;
+            case YAML_ALIAS_EVENT:
             {
-                std::string temp_translator = ((char*)event.data.mapping_start.anchor);
-                libyaml_final_output += " &" + temp_translator + "";
-            }       
-            if (event.data.mapping_start.tag)
-            {
-                std::string temp_translator = ((char*)event.data.mapping_start.tag);
-                libyaml_final_output += " <&" + temp_translator + ">";
-            }                
-            libyaml_final_output += ("\n");
-        }
-        else if (type == YAML_MAPPING_END_EVENT)
-            libyaml_final_output += ("-MAP\n");
-        else if (type == YAML_SEQUENCE_START_EVENT) 
-        {
-            libyaml_final_output += ("+SEQ");
-            if (flow == 0 && event.data.sequence_start.style == YAML_FLOW_SEQUENCE_STYLE)
-                libyaml_final_output += (" []");
-            else if (flow == 1)
-                libyaml_final_output += (" []");
-            if (event.data.sequence_start.anchor)
-            if (event.data.scalar.anchor)
-            {
-                std::string temp_translator = ((char*)event.data.sequence_start.anchor);
-                libyaml_final_output += " &" + temp_translator;
+                std::string temp_translator = ((char*) event.data.alias.anchor);
+
+                local_event_output += "=ALI "+temp_translator + "\n";
+
+                local_event_output += 
+                parse_escaped(event.data.scalar.value, event.data.scalar.length);
+                break;
             }
-            if (event.data.sequence_start.tag) 
-            {
-                std::string temp_translator = ((char*)event.data.sequence_start.tag);
-                libyaml_final_output += (" <"+ temp_translator + ">");
-            }
-            libyaml_final_output += ("\n");
-        }
-        else if (type == YAML_SEQUENCE_END_EVENT)
-            libyaml_final_output += ("-SEQ\n");
-        else if (type == YAML_SCALAR_EVENT) 
-        {
-            libyaml_final_output += ("=VAL");
-            if (event.data.scalar.anchor)
-            {
-                std::string temp_translator = ((char*)event.data.scalar.anchor);
-                libyaml_final_output += " &" + temp_translator;
-            }
-            if (event.data.scalar.tag)
-            {
-                std::string temp_translator = ((char*)event.data.scalar.tag);
-                libyaml_final_output += " <"+temp_translator + ">";
-            }
-            switch (event.data.scalar.style) 
-            {
-            case YAML_PLAIN_SCALAR_STYLE:
-                libyaml_final_output += (" :");
-                break;
-            case YAML_SINGLE_QUOTED_SCALAR_STYLE:
-                libyaml_final_output += (" '");
-                break;
-            case YAML_DOUBLE_QUOTED_SCALAR_STYLE:
-                libyaml_final_output += (" \"");
-                break;
-            case YAML_LITERAL_SCALAR_STYLE:
-                libyaml_final_output += (" |");
-                break;
-            case YAML_FOLDED_SCALAR_STYLE:
-                libyaml_final_output += (" >");
-                break;
-            case YAML_ANY_SCALAR_STYLE:
+            default:
                 abort();
-            }
-            libyaml_final_output += parse_escaped(event.data.scalar.value, event.data.scalar.length);
-            libyaml_final_output += ("\n");
         }
-        else if (type == YAML_ALIAS_EVENT)
-        {
-            std::string temp_translator = ((char*) event.data.alias.anchor);
-            libyaml_final_output += "=ALI "+temp_translator + "\n";
-        }
-        else
-            abort();
 
         yaml_event_delete(&event);
 
         if (type == YAML_STREAM_END_EVENT)
             break;
+
+        libyaml_final_output += local_event_output;
     }
 
     assert(!fclose(input));
+
     yaml_parser_delete(&parser);
+
     fflush(stdout);
 
     return libyaml_final_output;
