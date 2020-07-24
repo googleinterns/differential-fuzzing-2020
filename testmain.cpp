@@ -171,6 +171,8 @@ int doYamlExample(std::string name_of_file)
         }
         else if (type == YAML_ALIAS_EVENT)
             printf("=ALI *%s\n", event.data.alias.anchor);
+            
+
         else
             abort();
 
@@ -194,10 +196,18 @@ int doYamlExample(std::string name_of_file)
 std::string parseYamlCppNode(YAML::Node& head)
 {
     std::stack <YAML::Node> iteration_list_stack;
-    
+
     iteration_list_stack.push(head);
 
     std::string yamlcpp_final_output = "";
+
+    switch(1)
+    {
+        case 1:
+            std::stack <YAML::const_iterator> loca_iterators_temp_stack;
+            break;
+        default
+    }
 
     while (!iteration_list_stack.empty())
     {
@@ -217,21 +227,22 @@ std::string parseYamlCppNode(YAML::Node& head)
         {
             for (int i = base_iterator.size() - 1; i >= 0; i--) 
             {
+                std::cout << base_iterator[i].Tag() << std::endl;
                 iteration_list_stack.push(base_iterator[i]);
             }
         }
         else if (comparison_var == YAML::NodeType::Map)
         {
-            std::stack <YAML::iterator> loca_iterators_temp_stack;
+            std::stack <YAML::const_iterator> loca_iterators_temp_stack;
 
-            for (YAML::iterator it = base_iterator.begin(); it != base_iterator.end(); ++it) 
+            for (YAML::const_iterator it = base_iterator.begin(); it != base_iterator.end(); ++it) 
             {
                 loca_iterators_temp_stack.push(it);
             }
 
             while (!loca_iterators_temp_stack.empty())
             {
-                YAML::iterator it = loca_iterators_temp_stack.top();
+                YAML::const_iterator it = loca_iterators_temp_stack.top();
                 loca_iterators_temp_stack.pop();
 
                 iteration_list_stack.push(it->second);
@@ -263,7 +274,7 @@ int main()
     // anchors.yaml  global-tag.yaml  
     // mapping.yaml  numbers.yaml array.yaml json.yaml  yaml-version.yaml
     // strings.yaml  tags.yaml
-    // NEW: multimap.yaml multisequence.yaml
+    // NEW: multimap.yaml multisequence.yaml startpage.yaml
     std::string path_to_test_file = "examples/global-tag.yaml";
 
     doYamlExample(path_to_test_file);
