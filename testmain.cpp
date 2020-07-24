@@ -13,76 +13,74 @@
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-void printBuffer(char* buffer)
-{
-    std::cout << "- Print again not knowing size " << std::endl;
-
-    int pos_in_buffer = 0;
-
-    while(buffer[pos_in_buffer]!=NULL)
-    {
-        std::cout << buffer[pos_in_buffer];
-
-        pos_in_buffer++;
-    }
-}
-
-void print_escaped(yaml_char_t * str, size_t length)
+std::string parse_escaped(yaml_char_t * str, size_t length)
 {
     int i;
     char c;
 
-    for (i = 0; i < length; i++) {
+    std::string escaped_parsed_final;
+
+    for (i = 0; i < length; i++) 
+    {
         c = *(str + i);
         if (c == '\\')
-            printf("\\\\");
+            escaped_parsed_final += ("\\\\");
         else if (c == '\0')
-            printf("\\0");
+            escaped_parsed_final += ("\\0");
         else if (c == '\b')
-            printf("\\b");
+            escaped_parsed_final += ("\\b");
         else if (c == '\n')
-            printf("\\n");
+            escaped_parsed_final += ("\\n");
         else if (c == '\r')
-            printf("\\r");
+            escaped_parsed_final += ("\\r");
         else if (c == '\t')
-            printf("\\t");
+            escaped_parsed_final += ("\\t");
         else
-            printf("%c", c);
+        escaped_parsed_final += c;
     }
+    return escaped_parsed_final;
 }
 
-int usage(int ret) {
+int usage(int ret) 
+{
     fprintf(stderr, "Usage: libyaml-parser [--flow (on|off|keep)] [<input-file>]\n");
     return ret;
 }
 
-int doYamlExample(std::string name_of_file)
+std::string doYamlExample(std::string name_of_file)
 {
     FILE *input;
     yaml_parser_t parser;
     yaml_event_t event;
-    int flow = -1; /** default no flow style collections */
+    
+    int flow = -1; 
     int i = 0;
     int foundfile = 0;
+
+    std::string libyaml_final_output = "";
 
     input = fopen(name_of_file.c_str(), "rb");
     foundfile = 1;
 
-    if (!foundfile) {
+    if (!foundfile) 
+    {
         input = stdin;
     }
     assert(input);
 
-    if (!yaml_parser_initialize(&parser)) {
-        fprintf(stderr, "Could not initialize the parser object\n");
-        return 1;
+    if (!yaml_parser_initialize(&parser)) 
+    {
+        return "ERROR: Could not initialize the parser object\n";
     }
     yaml_parser_set_input_file(&parser, input);
 
-    while (1) {
+    while (1) 
+    {
         yaml_event_type_t type;
-        if (!yaml_parser_parse(&parser, &event)) {
-            if ( parser.problem_mark.line || parser.problem_mark.column ) {
+        if (!yaml_parser_parse(&parser, &event)) 
+        {
+            if ( parser.problem_mark.line || parser.problem_mark.column ) 
+            {
                 fprintf(stderr, "Parse error: %s\nLine: %lu Column: %lu\n",
                     parser.problem,
                     (unsigned long)parser.problem_mark.line + 1,
@@ -91,88 +89,114 @@ int doYamlExample(std::string name_of_file)
             else {
                 fprintf(stderr, "Parse error: %s\n", parser.problem);
             }
-            return 1;
+            return "ERROR: Bad parsing";
         }
         type = event.type;
 
         if (type == YAML_NO_EVENT)
-            printf("???\n");
+            libyaml_final_output += ("???\n");
         else if (type == YAML_STREAM_START_EVENT)
-            printf("+STR\n");
+            libyaml_final_output += ("+STR\n");
         else if (type == YAML_STREAM_END_EVENT)
-            printf("-STR\n");
-        else if (type == YAML_DOCUMENT_START_EVENT) {
-            printf("+DOC");
+            libyaml_final_output += ("-STR\n");
+        else if (type == YAML_DOCUMENT_START_EVENT) 
+        {
+            libyaml_final_output += ("+DOC");
             if (!event.data.document_start.implicit)
-                printf(" ---");
-            printf("\n");
+                libyaml_final_output += (" ---");
+            libyaml_final_output += ("\n");
         }
-        else if (type == YAML_DOCUMENT_END_EVENT) {
-            printf("-DOC");
+        else if (type == YAML_DOCUMENT_END_EVENT) 
+        {
+            libyaml_final_output += ("-DOC");
             if (!event.data.document_end.implicit)
-                printf(" ...");
-            printf("\n");
+                libyaml_final_output += (" ...");
+            libyaml_final_output += ("\n");
         }
-        else if (type == YAML_MAPPING_START_EVENT) {
-            printf("+MAP");
+        else if (type == YAML_MAPPING_START_EVENT) 
+        {
+            libyaml_final_output += ("+MAP");
             if (flow == 0 && event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
-                printf(" {}");
+                libyaml_final_output += (" {}");
             else if (flow == 1)
-                printf(" {}");
+                libyaml_final_output += (" {}");
             if (event.data.mapping_start.anchor)
-                printf(" &%s", event.data.mapping_start.anchor);
+            {
+                std::string temp_translator = ((char*)event.data.mapping_start.anchor);
+                libyaml_final_output += " &" + temp_translator + "";
+            }       
             if (event.data.mapping_start.tag)
-                printf(" <%s>", event.data.mapping_start.tag);
-            printf("\n");
+            {
+                std::string temp_translator = ((char*)event.data.mapping_start.tag);
+                libyaml_final_output += " <&" + temp_translator + ">";
+            }                
+            libyaml_final_output += ("\n");
         }
         else if (type == YAML_MAPPING_END_EVENT)
-            printf("-MAP\n");
-        else if (type == YAML_SEQUENCE_START_EVENT) {
-            printf("+SEQ");
+            libyaml_final_output += ("-MAP\n");
+        else if (type == YAML_SEQUENCE_START_EVENT) 
+        {
+            libyaml_final_output += ("+SEQ");
             if (flow == 0 && event.data.sequence_start.style == YAML_FLOW_SEQUENCE_STYLE)
-                printf(" []");
+                libyaml_final_output += (" []");
             else if (flow == 1)
-                printf(" []");
+                libyaml_final_output += (" []");
             if (event.data.sequence_start.anchor)
-                printf(" &%s", event.data.sequence_start.anchor);
-            if (event.data.sequence_start.tag)
-                printf(" <%s>", event.data.sequence_start.tag);
-            printf("\n");
+            if (event.data.scalar.anchor)
+            {
+                std::string temp_translator = ((char*)event.data.sequence_start.anchor);
+                libyaml_final_output += " &" + temp_translator;
+            }
+            if (event.data.sequence_start.tag) 
+            {
+                std::string temp_translator = ((char*)event.data.sequence_start.tag);
+                libyaml_final_output += (" <"+ temp_translator + ">");
+            }
+            libyaml_final_output += ("\n");
         }
         else if (type == YAML_SEQUENCE_END_EVENT)
-            printf("-SEQ\n");
-        else if (type == YAML_SCALAR_EVENT) {
-            printf("=VAL");
+            libyaml_final_output += ("-SEQ\n");
+        else if (type == YAML_SCALAR_EVENT) 
+        {
+            libyaml_final_output += ("=VAL");
             if (event.data.scalar.anchor)
-                printf(" &%s", event.data.scalar.anchor);
+            {
+                std::string temp_translator = ((char*)event.data.scalar.anchor);
+                libyaml_final_output += " &" + temp_translator;
+            }
             if (event.data.scalar.tag)
-                printf(" <%s>", event.data.scalar.tag);
-            switch (event.data.scalar.style) {
+            {
+                std::string temp_translator = ((char*)event.data.scalar.tag);
+                libyaml_final_output += " <"+temp_translator + ">";
+            }
+            switch (event.data.scalar.style) 
+            {
             case YAML_PLAIN_SCALAR_STYLE:
-                printf(" :");
+                libyaml_final_output += (" :");
                 break;
             case YAML_SINGLE_QUOTED_SCALAR_STYLE:
-                printf(" '");
+                libyaml_final_output += (" '");
                 break;
             case YAML_DOUBLE_QUOTED_SCALAR_STYLE:
-                printf(" \"");
+                libyaml_final_output += (" \"");
                 break;
             case YAML_LITERAL_SCALAR_STYLE:
-                printf(" |");
+                libyaml_final_output += (" |");
                 break;
             case YAML_FOLDED_SCALAR_STYLE:
-                printf(" >");
+                libyaml_final_output += (" >");
                 break;
             case YAML_ANY_SCALAR_STYLE:
                 abort();
             }
-            print_escaped(event.data.scalar.value, event.data.scalar.length);
-            printf("\n");
+            libyaml_final_output += parse_escaped(event.data.scalar.value, event.data.scalar.length);
+            libyaml_final_output += ("\n");
         }
         else if (type == YAML_ALIAS_EVENT)
-            printf("=ALI *%s\n", event.data.alias.anchor);
-            
-
+        {
+            std::string temp_translator = ((char*) event.data.alias.anchor);
+            libyaml_final_output += "=ALI "+temp_translator + "\n";
+        }
         else
             abort();
 
@@ -186,7 +210,7 @@ int doYamlExample(std::string name_of_file)
     yaml_parser_delete(&parser);
     fflush(stdout);
 
-    return 0;
+    return libyaml_final_output;
 }
 
 // ---------------------------------------------------------------------------------
@@ -201,62 +225,62 @@ std::string parseYamlCppNode(YAML::Node& head)
 
     std::string yamlcpp_final_output = "";
 
-    switch(1)
-    {
-        case 1:
-            std::stack <YAML::const_iterator> loca_iterators_temp_stack;
-            break;
-        default
-    }
+
 
     while (!iteration_list_stack.empty())
     {
         YAML::Node base_iterator = iteration_list_stack.top();
         iteration_list_stack.pop();
 
-        YAML::NodeType::value comparison_var = base_iterator.Type();
-        if (comparison_var == YAML::NodeType::Null)
+        switch(base_iterator.Type())
         {
-            yamlcpp_final_output += "- Null case";
-        }
-        else if (comparison_var == YAML::NodeType::Scalar)
-        {
-            yamlcpp_final_output += "- " + base_iterator.as<std::string>() + "\n";
-        }
-        else if (comparison_var == YAML::NodeType::Sequence)
-        {
-            for (int i = base_iterator.size() - 1; i >= 0; i--) 
+            case YAML::NodeType::Null:
             {
-                std::cout << base_iterator[i].Tag() << std::endl;
-                iteration_list_stack.push(base_iterator[i]);
+                yamlcpp_final_output += "- Null case";
+                break;
             }
-        }
-        else if (comparison_var == YAML::NodeType::Map)
-        {
-            std::stack <YAML::const_iterator> loca_iterators_temp_stack;
-
-            for (YAML::const_iterator it = base_iterator.begin(); it != base_iterator.end(); ++it) 
+            case YAML::NodeType::Scalar:
             {
-                loca_iterators_temp_stack.push(it);
+                yamlcpp_final_output += "- " + base_iterator.as<std::string>() + "\n";
+                break;
             }
-
-            while (!loca_iterators_temp_stack.empty())
+            case YAML::NodeType::Sequence:
             {
-                YAML::const_iterator it = loca_iterators_temp_stack.top();
-                loca_iterators_temp_stack.pop();
-
-                iteration_list_stack.push(it->second);
-                iteration_list_stack.push(it->first);
+                for (int i = base_iterator.size() - 1; i >= 0; i--) 
+                {
+                    std::cout << base_iterator[i].Tag() << std::endl;
+                    iteration_list_stack.push(base_iterator[i]);
+                }                
+                break;
             }
+            case YAML::NodeType::Map:
+            {
+                std::stack <YAML::const_iterator> loca_iterators_temp_stack;
 
-        }
-        else if (comparison_var == YAML::NodeType::Undefined)
-        {
-            yamlcpp_final_output += "- Undef \n";
-        }
-        else
-        {
-            yamlcpp_final_output += "- ERROR: Unknown Input Type \n";
+                for (YAML::const_iterator it = base_iterator.begin(); it != base_iterator.end(); ++it) 
+                {
+                    loca_iterators_temp_stack.push(it);
+                }
+
+                while (!loca_iterators_temp_stack.empty())
+                {
+                    YAML::const_iterator it = loca_iterators_temp_stack.top();
+                    loca_iterators_temp_stack.pop();
+
+                    iteration_list_stack.push(it->second);
+                    iteration_list_stack.push(it->first);
+                }                
+                break;
+            }
+            case YAML::NodeType::Undefined:
+            {
+                yamlcpp_final_output += "- Undef \n";
+                break;
+            }
+            default:
+            {
+                yamlcpp_final_output += "- ERROR: Unknown Input Type \n";
+            }
         }
     }
     return yamlcpp_final_output;
@@ -265,28 +289,21 @@ std::string parseYamlCppNode(YAML::Node& head)
 // ---------------------------------------------------------------------------------
 // -------------------------------------- main -------------------------------------
 // ---------------------------------------------------------------------------------
-int main()
+int main(int argc, char* args[])
 {
-    std::cout << "Do thing!" << std::endl;
-    
     std::cout << "----------- libyaml tests -----------" << std::endl;
-    
-    // anchors.yaml  global-tag.yaml  
-    // mapping.yaml  numbers.yaml array.yaml json.yaml  yaml-version.yaml
-    // strings.yaml  tags.yaml
-    // NEW: multimap.yaml multisequence.yaml startpage.yaml
-    std::string path_to_test_file = "examples/global-tag.yaml";
 
-    doYamlExample(path_to_test_file);
+    // doYamlExample(args[1]);
 
-    FILE* output = fopen(path_to_test_file.c_str(),"rb");
+    std::string libyaml_final_output = doYamlExample(args[1]);
+    std::cout << libyaml_final_output << std::endl;
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
 
     std::string yamlcpp_final_output;
     try
     {   
-        YAML::Node node = YAML::LoadFile(path_to_test_file);
+        YAML::Node node = YAML::LoadFile(args[1]);
         // YAML::Node node = YAML::Load("[1, 2, 3]");
         std::cout << "Node type: " << node.Type() << std::endl;
 

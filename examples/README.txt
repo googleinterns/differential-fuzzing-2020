@@ -10,3 +10,4 @@ Directory contains testing files. Those contain:
 - yaml-version.yaml: Sequence and map with yaml version
 - multimap.yaml: Example for multiple maps
 - multisequence.yaml: Example for multiple sequences inside a sequence
+
