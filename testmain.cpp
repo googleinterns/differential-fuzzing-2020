@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stack>
-#include <queue>
+#include <map>
 #include <assert.h>
 #include <fstream>
 
@@ -12,6 +12,12 @@
 // ---------------------------------------------------------------------------------
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
+
+// struct
+// {
+//     std::string* anchor;
+//     std::string* anchor_data;
+// }anchor_info;
 
 std::string parse_escaped(yaml_char_t * str, size_t length)
 {
@@ -25,26 +31,35 @@ std::string parse_escaped(yaml_char_t * str, size_t length)
         c = *(str + i);
         if (c == '\\')
             escaped_parsed_final += ("\\\\");
+
         else if (c == '\0')
             escaped_parsed_final += ("\\0");
+
         else if (c == '\b')
             escaped_parsed_final += ("\\b");
+
         else if (c == '\n')
             escaped_parsed_final += ("\\n");
+
         else if (c == '\r')
             escaped_parsed_final += ("\\r");
+
         else if (c == '\t')
             escaped_parsed_final += ("\\t");
+
         else
         escaped_parsed_final += c;
     }
     return escaped_parsed_final;
 }
 
-int usage(int ret) 
+void addToMap(std::map<std::string, std::string> & anchor_list, 
+    std::string& anchor, std::string& anchor_data)
 {
-    fprintf(stderr, "Usage: libyaml-parser [--flow (on|off|keep)] [<input-file>]\n");
-    return ret;
+    if(!anchor.empty())
+    {
+        anchor_list.insert({anchor, anchor_data});
+    }
 }
 
 std::string doYamlExample(std::string name_of_file)
@@ -59,6 +74,16 @@ std::string doYamlExample(std::string name_of_file)
 
     std::string libyaml_final_output = "";
 
+    std::map<std::string, std::string> anchor_list;
+    
+    std::string anchor;
+
+    std::string anchor_data;
+
+    int anchor_level = -1;
+
+    int total_level = 0;
+    
     input = fopen(name_of_file.c_str(), "rb");
     foundfile = 1;
 
@@ -76,9 +101,8 @@ std::string doYamlExample(std::string name_of_file)
 
     while (1) 
     {
-
         std::string local_event_output = "";
-        
+
         yaml_event_type_t type;
 
         if (!yaml_parser_parse(&parser, &event)) 
@@ -97,6 +121,8 @@ std::string doYamlExample(std::string name_of_file)
         }
         type = event.type;
 
+        std::cout << total_level << std::endl;
+
         switch(type)
         {
             case YAML_NO_EVENT:
@@ -106,13 +132,21 @@ std::string doYamlExample(std::string name_of_file)
             case YAML_STREAM_START_EVENT:
                 local_event_output += ("+STR\n");
 
+                total_level++;
+
                 break;
             case YAML_STREAM_END_EVENT:
                 local_event_output += ("-STR\n");
 
+                total_level--;
+
+                addToMap(anchor_list, anchor, anchor_data);
+
                 break;
             case YAML_DOCUMENT_START_EVENT:
                 local_event_output += ("+DOC");
+
+                total_level++;
 
                 if (!event.data.document_start.implicit)
                     local_event_output += (" ---");
@@ -123,14 +157,20 @@ std::string doYamlExample(std::string name_of_file)
             case YAML_DOCUMENT_END_EVENT:
                 local_event_output += ("-DOC");
 
+                total_level--;
+
                 if (!event.data.document_end.implicit)
                     local_event_output += (" ...");
 
                 local_event_output += ("\n");
 
+                addToMap(anchor_list, anchor, anchor_data);
+
                 break;
             case YAML_MAPPING_START_EVENT:
                 local_event_output += ("+MAP");
+                
+                total_level++;
 
                 if (flow == 0 && event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
                     local_event_output += (" {}");
@@ -143,6 +183,10 @@ std::string doYamlExample(std::string name_of_file)
                     std::string temp_translator = ((char*)event.data.mapping_start.anchor);
 
                     local_event_output += " &" + temp_translator + "";
+
+                    anchor = temp_translator;
+
+                    std::cout << "anchor map: " << anchor << std::endl;
                 }       
                 if (event.data.mapping_start.tag)
                 {
@@ -156,9 +200,15 @@ std::string doYamlExample(std::string name_of_file)
             case YAML_MAPPING_END_EVENT:
                 local_event_output += ("-MAP\n");
 
+                total_level--;
+
+                addToMap(anchor_list, anchor, anchor_data);
+
                 break;
             case YAML_SEQUENCE_START_EVENT:
                 local_event_output += ("+SEQ");
+
+                total_level++;
 
                 if (flow == 0 && event.data.sequence_start.style == YAML_FLOW_SEQUENCE_STYLE)
                     local_event_output += (" []");
@@ -171,12 +221,16 @@ std::string doYamlExample(std::string name_of_file)
                     std::string temp_translator = ((char*)event.data.sequence_start.anchor);
 
                     local_event_output += " &" + temp_translator;
+
+                    anchor = temp_translator;
+
+                    std::cout << "anchor sequence: " << anchor << std::endl;
                 }
                 if (event.data.sequence_start.tag) 
                 {
                     std::string temp_translator = ((char*)event.data.sequence_start.tag);
 
-                    local_event_output += (" <"+ temp_translator + ">");
+                    local_event_output += (" <" + temp_translator + ">");
                 }
                 local_event_output += ("\n");
 
@@ -184,21 +238,29 @@ std::string doYamlExample(std::string name_of_file)
             case YAML_SEQUENCE_END_EVENT:
                 local_event_output += ("-SEQ\n");
 
+                total_level--;
+
+                addToMap(anchor_list, anchor, anchor_data);
+
                 break;
             case YAML_SCALAR_EVENT:
                 local_event_output += ("=VAL");
 
-                if (event.data.scalar.anchor)
+                if (event.data.scalar.anchor) //how do we get here
                 {
                     std::string temp_translator = ((char*)event.data.scalar.anchor);
 
                     local_event_output += " &" + temp_translator;
+
+                    anchor = temp_translator;
+
+                    std::cout << "anchor scalar: " << anchor << std::endl;
                 }
                 if (event.data.scalar.tag)
                 {
                     std::string temp_translator = ((char*)event.data.scalar.tag);
 
-                    local_event_output += " <"+temp_translator + ">";
+                    local_event_output += " <" +temp_translator + ">";
                 }
                 switch (event.data.scalar.style) 
                 {
@@ -229,19 +291,21 @@ std::string doYamlExample(std::string name_of_file)
                     parse_escaped(event.data.scalar.value, event.data.scalar.length);
                 
                 local_event_output += ("\n");
+
                 break;
             case YAML_ALIAS_EVENT:
             {
                 std::string temp_translator = ((char*) event.data.alias.anchor);
 
-                local_event_output += "=ALI "+temp_translator + "\n";
+                local_event_output += "=ALI " + temp_translator + "\n";
 
                 local_event_output += 
-                parse_escaped(event.data.scalar.value, event.data.scalar.length);
+                    parse_escaped(event.data.scalar.value, event.data.scalar.length);
                 break;
             }
             default:
                 abort();
+            
         }
 
         yaml_event_delete(&event);
@@ -251,6 +315,9 @@ std::string doYamlExample(std::string name_of_file)
 
         libyaml_final_output += local_event_output;
     }
+
+    std::cout << total_level << std::endl;
+
 
     assert(!fclose(input));
 
