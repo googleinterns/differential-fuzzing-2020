@@ -1,5 +1,7 @@
 Directory contains testing files. Those contain:
 - anchors.yaml: contains use of aliases with anchors
+- anchors2.yaml: anchors with an alias without an ancho
+- anchorscomplex.yaml: more complex cases with multi-level anchors
 - global-tag.yaml: test the use of a global tag
 - mapping.yaml: test use of maps
 - tags.yaml: test the use of tags

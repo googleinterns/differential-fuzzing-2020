@@ -16,9 +16,9 @@ bar: &bar
     <<: *base
     age: 30
 
-base: &base
+basebig: &basebig
     oneup: &oneup
-        <<: *base
+        <<: *bar
         age: [30, 40, 50]
     <<: *foo
     age: 30
