@@ -66,7 +66,7 @@ void addToMap(std::map<std::string, std::string> & anchor_map,
 void addInfoToDataStack(std::stack<std::string>& anchor_data, 
     std::string info)
 {
-    if(!anchor_data.empty())
+    if (!anchor_data.empty())
     {
         std::string& temp = anchor_data.top();
         temp += info;
@@ -138,7 +138,7 @@ std::string doYamlExample(std::string name_of_file)
         }
         type = event.type;
 
-        switch(type)
+        switch (type)
         {
             case YAML_NO_EVENT:
                 local_event_output += ("???\n");
@@ -155,7 +155,7 @@ std::string doYamlExample(std::string name_of_file)
 
                 total_level--;
 
-                if(!anchor_save_stack.empty())
+                if (!anchor_save_stack.empty())
                 {
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
@@ -184,7 +184,7 @@ std::string doYamlExample(std::string name_of_file)
 
                 local_event_output += ("\n");
 
-                if(!anchor_save_stack.empty())
+                if (!anchor_save_stack.empty())
                 {
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
@@ -227,7 +227,7 @@ std::string doYamlExample(std::string name_of_file)
 
                 total_level--;
 
-                if(!anchor_save_stack.empty())
+                if (!anchor_save_stack.empty())
                 {
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
@@ -269,7 +269,7 @@ std::string doYamlExample(std::string name_of_file)
 
                 total_level--;
 
-                if(!anchor_save_stack.empty())
+                if (!anchor_save_stack.empty())
                 {
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
@@ -380,7 +380,7 @@ std::string parseYamlCppNode(YAML::Node& head)
         YAML::Node base_iterator = iteration_list_stack.top();
         iteration_list_stack.pop();
 
-        switch(base_iterator.Type())
+        switch (base_iterator.Type())
         {
             case YAML::NodeType::Null:
             {
