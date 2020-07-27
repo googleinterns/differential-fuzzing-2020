@@ -357,17 +357,27 @@ std::string parseYamlCppNode(YAML::Node& head)
 {
     std::stack <YAML::Node> iteration_list_stack;
 
+    std::stack <std::string> additional_info_stack;
+
+    bool map_mode = false;
+
     iteration_list_stack.push(head);
+    additional_info_stack.push("");
 
     std::string yamlcpp_final_output = "";
 
-
+    int key_counter = 1;
 
     while (!iteration_list_stack.empty())
     {
         YAML::Node base_iterator = iteration_list_stack.top();
         iteration_list_stack.pop();
 
+        yamlcpp_final_output += additional_info_stack.top() + ": ";
+        additional_info_stack.pop();
+
+
+        // Processes tags:
         const std::string& tag_holder = base_iterator.Tag();
 
         if(tag_holder != "?" && tag_holder != "!")
@@ -376,7 +386,7 @@ std::string parseYamlCppNode(YAML::Node& head)
         }
 
         switch (base_iterator.Type())
-        {
+        {    
             case YAML::NodeType::Null:
             {
                 yamlcpp_final_output += "- Null case";
@@ -384,24 +394,52 @@ std::string parseYamlCppNode(YAML::Node& head)
             }
             case YAML::NodeType::Scalar:
             {
+                // if(map_mode)
+                // {
+                //     if(key_counter%2)
+                //     {
+                //         yamlcpp_final_output += "K";
+                //     }
+                //     else
+                //     {
+                //         yamlcpp_final_output += "V";
+                        
+                //     }
+                // }
+                // else
+                // {
+                //     yamlcpp_final_output += "V";
+                // }
+                
+                // key_counter--;
+
                 yamlcpp_final_output +=  "- " + base_iterator.as<std::string>() + "\n";
                 break;
             }
             case YAML::NodeType::Sequence:
             {
+                yamlcpp_final_output += "\n";
                 for (int i = base_iterator.size() - 1; i >= 0; i--) 
                 {
                     iteration_list_stack.push(base_iterator[i]);
+                    additional_info_stack.push("L");
                 }                
+
+                map_mode = false;   
+
                 break;
             }
             case YAML::NodeType::Map:
             {
+                yamlcpp_final_output += "\n";
                 std::stack <YAML::const_iterator> loca_iterators_temp_stack;
+                
+                // key_counter = 0;
 
                 for (YAML::const_iterator it = base_iterator.begin(); it != base_iterator.end(); ++it) 
                 {
                     loca_iterators_temp_stack.push(it);
+                    // key_counter++;
                 }
 
                 while (!loca_iterators_temp_stack.empty())
@@ -410,17 +448,25 @@ std::string parseYamlCppNode(YAML::Node& head)
                     loca_iterators_temp_stack.pop();
 
                     iteration_list_stack.push(it->second);
+                    additional_info_stack.push("V");
                     iteration_list_stack.push(it->first);
-                }                
+                    additional_info_stack.push("K");
+                }   
+                // map_mode = true;       
                 break;
             }
             case YAML::NodeType::Undefined:
             {
+                // map_mode = false;   
+
                 yamlcpp_final_output += "- Undef \n";
+
                 break;
             }
             default:
             {
+                map_mode = false;   
+
                 yamlcpp_final_output += "- ERROR: Unknown Input Type \n";
             }
         }
