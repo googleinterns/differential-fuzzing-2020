@@ -13,38 +13,29 @@
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string parse_escaped(yaml_char_t * str, size_t length)
+std::string positionAnalysis(char reference_character, bool map_mode)
 {
-    int i;
-    char c;
-
-    std::string escaped_parsed_final;
-
-    for (i = 0; i < length; i++) 
+    if (reference_character == 'M')
     {
-        c = *(str + i);
-        if (c == '\\')
-            escaped_parsed_final += ("\\\\");
-
-        else if (c == '\0')
-            escaped_parsed_final += ("\\0");
-
-        else if (c == '\b')
-            escaped_parsed_final += ("\\b");
-
-        else if (c == '\n')
-            escaped_parsed_final += ("\\n");
-
-        else if (c == '\r')
-            escaped_parsed_final += ("\\r");
-
-        else if (c == '\t')
-            escaped_parsed_final += ("\\t");
-
+        if (map_mode)
+        {
+            return "K:";
+        }
         else
-        escaped_parsed_final += c;
+        {
+            return "V:";
+        }
+        map_mode = !map_mode;
     }
-    return escaped_parsed_final;
+    else if (reference_character == 'S')
+    {
+        return "L:";
+    }
+    else
+    {
+        return "U:";
+    }
+    
 }
 
 void addToMap(std::map<std::string, std::string> & anchor_map, 
@@ -94,6 +85,10 @@ std::string parseLibyaml(std::string name_of_file)
     std::stack<std::string> anchor_save_stack;
 
     std::stack<std::string> anchor_data_save_stack;
+
+    std::stack<char> mode_stack;
+
+    bool map_mode = true;
     
     input = fopen(name_of_file.c_str(), "rb");
     foundfile = 1;
@@ -139,12 +134,8 @@ std::string parseLibyaml(std::string name_of_file)
 
                 break;
             case YAML_STREAM_START_EVENT:
-                local_event_output += ("+STR\n");
-
                 break;
             case YAML_STREAM_END_EVENT:
-                local_event_output += ("-STR\n");
-
                 if (!anchor_save_stack.empty())
                 {
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
@@ -154,33 +145,31 @@ std::string parseLibyaml(std::string name_of_file)
 
                 break;
             case YAML_DOCUMENT_START_EVENT:
-                local_event_output += ("+DOC");
-
                 if (!event.data.document_start.implicit)
                     local_event_output += (" ---");
 
-                local_event_output += ("\n");
-
                 break;
             case YAML_DOCUMENT_END_EVENT:
-                local_event_output += ("-DOC");
-
                 if (!event.data.document_end.implicit)
                     local_event_output += (" ...");
-
-                local_event_output += ("\n");
 
                 if (!anchor_save_stack.empty())
                 {
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
-                    anchor_data_save_stack.pop();
+                    anchor_data_save_stack.pop(); 
                 }
 
                 break;
             case YAML_MAPPING_START_EVENT:
-                local_event_output += ("+MAP");
-            
+                if(!mode_stack.empty())
+                {
+                    local_event_output += positionAnalysis(mode_stack.top(), map_mode) + "\n";
+                }
+
+                mode_stack.push('M');
+
+                map_mode = true;
 
                 if (flow == 0 && event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
                     local_event_output += (" {}");
@@ -190,25 +179,18 @@ std::string parseLibyaml(std::string name_of_file)
 
                 if (event.data.mapping_start.anchor)
                 {
-                    std::string temp_translator = ((char*)event.data.mapping_start.anchor);
-
-                    local_event_output += " &" + temp_translator;
-                    
-
-
-                    anchor_save_stack.push(temp_translator);
+                    anchor_save_stack.push(((char*)event.data.mapping_start.anchor));
                 }       
                 if (event.data.mapping_start.tag)
                 {
                     std::string temp_translator = ((char*)event.data.mapping_start.tag);
 
-                    local_event_output += " <&" + temp_translator + ">";
+                    local_event_output += " " + temp_translator + " - ";
                 }                
-                local_event_output += ("\n");
 
                 break;
             case YAML_MAPPING_END_EVENT:
-                local_event_output += ("-MAP\n");
+                mode_stack.pop();
 
                 if (!anchor_save_stack.empty())
                 {
@@ -219,7 +201,14 @@ std::string parseLibyaml(std::string name_of_file)
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
-                local_event_output += ("+SEQ");
+                if(!mode_stack.empty())
+                {
+                    local_event_output += positionAnalysis(mode_stack.top(), map_mode) + "\n";
+                }
+
+                map_mode != map_mode;
+
+                mode_stack.push('S');
 
                 if (flow == 0 && event.data.sequence_start.style == YAML_FLOW_SEQUENCE_STYLE)
                     local_event_output += (" []");
@@ -230,24 +219,18 @@ std::string parseLibyaml(std::string name_of_file)
                 if (event.data.sequence_start.anchor)
                 if (event.data.scalar.anchor)
                 {
-                    std::string temp_translator = ((char*)event.data.sequence_start.anchor);
-
-                    local_event_output += " &" + temp_translator;
-
-
-                    anchor_save_stack.push(temp_translator);
+                    anchor_save_stack.push((char*)event.data.sequence_start.anchor);
                 }
                 if (event.data.sequence_start.tag) 
                 {
                     std::string temp_translator = ((char*)event.data.sequence_start.tag);
 
-                    local_event_output += (" <" + temp_translator + ">");
+                    local_event_output += (" " + temp_translator + " - ");
                 }
-                local_event_output += ("\n");
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
-                local_event_output += ("-SEQ\n");
+                mode_stack.pop();
 
                 if (!anchor_save_stack.empty())
                 {
@@ -258,50 +241,28 @@ std::string parseLibyaml(std::string name_of_file)
 
                 break;
             case YAML_SCALAR_EVENT:
-                local_event_output += ("=VAL");
+                local_event_output += positionAnalysis(mode_stack.top(), map_mode);
 
-                if (event.data.scalar.anchor)
-                {
-                    std::string temp_translator = ((char*)event.data.scalar.anchor);
+                map_mode != map_mode;
 
-                    local_event_output += " &" + temp_translator;
-
-
-                    anchor_save_stack.push(temp_translator);
-                }
                 if (event.data.scalar.tag)
                 {
                     std::string temp_translator = ((char*)event.data.scalar.tag);
 
-                    local_event_output += " <" +temp_translator + ">";
+                    local_event_output += " " + temp_translator + " - ";
                 }
-                switch (event.data.scalar.style) 
+                else
                 {
-                    case YAML_PLAIN_SCALAR_STYLE:
-                        local_event_output += (" :");
-
-                        break;
-                    case YAML_SINGLE_QUOTED_SCALAR_STYLE:
-                        local_event_output += (" '");
-
-                        break;
-                    case YAML_DOUBLE_QUOTED_SCALAR_STYLE:
-                        local_event_output += (" \"");
-
-                        break;
-                    case YAML_LITERAL_SCALAR_STYLE:
-                        local_event_output += (" |");
-
-                        break;
-                    case YAML_FOLDED_SCALAR_STYLE:
-                        local_event_output += (" >");
-
-                        break;
-                    case YAML_ANY_SCALAR_STYLE:
-                        abort();
+                    local_event_output += " - ";
                 }
-                local_event_output += 
-                    parse_escaped(event.data.scalar.value, event.data.scalar.length);
+
+                if (event.data.scalar.anchor)
+                {
+                    anchor_save_stack.push((char*)event.data.scalar.anchor);
+                }
+
+
+                local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
                 
                 local_event_output += ("\n");
 
@@ -310,23 +271,24 @@ std::string parseLibyaml(std::string name_of_file)
             {
                 std::string temp_translator = ((char*) event.data.alias.anchor);
 
-                local_event_output += "=ALI |" + temp_translator + "|\n";
+                local_event_output += positionAnalysis(mode_stack.top(), map_mode) + " - " + temp_translator + "\n";
                 
+                map_mode != map_mode;
+
                 std::string& temp_holder = anchor_map[temp_translator];
 
                 if (!temp_holder.empty())
                 {
-                    local_event_output += "\n --get: \n" + temp_holder + "\n--done\n";
+                    local_event_output += temp_holder;
                 }
                 else
                 {
-                    local_event_output += "\n --get: \n------------------ ERROR\n--done\n";
+                    local_event_output += "ERROR";
                 }
                 break;
             }
             default:
                 abort();
-            
         }
         
         yaml_event_delete(&event);
@@ -335,7 +297,7 @@ std::string parseLibyaml(std::string name_of_file)
             break;
 
         addInfoToDataStack(anchor_data_save_stack, local_event_output);
-
+        
         libyaml_final_output += local_event_output;
     }
 
@@ -359,10 +321,8 @@ std::string parseYamlCppNode(YAML::Node& head)
 
     std::stack <std::string> additional_info_stack;
 
-    bool map_mode = false;
-
     iteration_list_stack.push(head);
-    additional_info_stack.push("");
+    additional_info_stack.push("s");
 
     std::string yamlcpp_final_output = "";
 
@@ -425,21 +385,16 @@ std::string parseYamlCppNode(YAML::Node& head)
                     additional_info_stack.push("L");
                 }                
 
-                map_mode = false;   
-
                 break;
             }
             case YAML::NodeType::Map:
             {
                 yamlcpp_final_output += "\n";
                 std::stack <YAML::const_iterator> loca_iterators_temp_stack;
-                
-                // key_counter = 0;
 
                 for (YAML::const_iterator it = base_iterator.begin(); it != base_iterator.end(); ++it) 
                 {
                     loca_iterators_temp_stack.push(it);
-                    // key_counter++;
                 }
 
                 while (!loca_iterators_temp_stack.empty())
@@ -451,22 +406,17 @@ std::string parseYamlCppNode(YAML::Node& head)
                     additional_info_stack.push("V");
                     iteration_list_stack.push(it->first);
                     additional_info_stack.push("K");
-                }   
-                // map_mode = true;       
+                }       
                 break;
             }
             case YAML::NodeType::Undefined:
-            {
-                // map_mode = false;   
-
+            {  
                 yamlcpp_final_output += "- Undef \n";
 
                 break;
             }
             default:
             {
-                map_mode = false;   
-
                 yamlcpp_final_output += "- ERROR: Unknown Input Type \n";
             }
         }
