@@ -179,7 +179,7 @@ std::string parseLibyaml(std::string name_of_file)
 
                 if(mode_stack.top()=='M')
                 {
-                    map_mode_stack.push(map_mode);
+                    map_mode_stack.push(!map_mode);
                 }
 
                 mode_stack.push('M');
