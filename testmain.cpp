@@ -70,6 +70,14 @@ bool addToMapDirective(std::map<std::string, std::string>& anchor_map,
     return interest_in_saving;
 }
 
+bool addToStack(std::stack<std::string>& anchor_save_stack,int& subtract_count, char* anchor)
+{
+    anchor_save_stack.push(anchor);
+    subtract_count = 2;
+    return true;
+}
+
+
 void addInfoToDataStack(std::stack<std::string>& anchor_data, 
     std::string info)
 {
@@ -175,9 +183,8 @@ std::string parseLibyaml(std::string name_of_file)
 
                 if (event.data.mapping_start.anchor)
                 {
-                    anchor_save_stack.push(((char*)event.data.mapping_start.anchor));
-                    interest_in_saving = true;
-                    subtract_count = 2;
+                    //anchor_save_stack
+                    interest_in_saving = addToStack(anchor_save_stack, subtract_count, (char*)event.data.mapping_start.anchor);
                 }      
                 else
                 {
@@ -221,9 +228,7 @@ std::string parseLibyaml(std::string name_of_file)
                 if (event.data.sequence_start.anchor)
                 if (event.data.scalar.anchor)
                 {
-                    anchor_save_stack.push((char*)event.data.sequence_start.anchor);
-                    interest_in_saving = true;
-                    subtract_count = 2;
+                    interest_in_saving = addToStack(anchor_save_stack, subtract_count, (char*)event.data.mapping_start.anchor);
                 }
                 else
                 {
@@ -265,9 +270,7 @@ std::string parseLibyaml(std::string name_of_file)
 
                 if (event.data.scalar.anchor)
                 {
-                    anchor_save_stack.push((char*)event.data.scalar.anchor);
-                    interest_in_saving = true;
-                    subtract_count = 2;
+                    interest_in_saving = addToStack(anchor_save_stack, subtract_count, (char*)event.data.mapping_start.anchor);
                 }
                 else
                 {
