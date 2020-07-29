@@ -3,8 +3,8 @@ base: &base
 
 foo: &foo
     <<: *base
-    <<: *bar
     age: 10
+    <<: *bar
 
 bar: &bar
     <<: *base
