@@ -39,7 +39,7 @@ bool positionAnalysis(std::string& add_to_me, char reference_character, bool map
     return map_mode;
 }
 
-void addToMap(std::map<std::string, std::string> & anchor_map, 
+void addToMap(std::map<std::string, std::string>& anchor_map, 
     std::string& anchor, std::string& anchor_data)
 {
     if (&anchor != nullptr)
@@ -53,6 +53,21 @@ void addToMap(std::map<std::string, std::string> & anchor_map,
             anchor_map.insert({anchor, anchor_data});
         }
     }
+}
+
+bool addToMapDirective(std::map<std::string, std::string>& anchor_map, 
+    std::stack<std::string>& anchor_save_stack, std::stack<std::string>& anchor_data_save_stack,
+    int& subtract_count, bool interest_in_saving)
+{
+    if (!anchor_save_stack.empty() && interest_in_saving)
+    {
+        addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
+        anchor_save_stack.pop();
+        anchor_data_save_stack.pop();
+        subtract_count = 2;
+        return false;
+    }
+    return interest_in_saving;
 }
 
 void addInfoToDataStack(std::stack<std::string>& anchor_data, 
@@ -132,26 +147,15 @@ std::string parseLibyaml(std::string name_of_file)
         switch (type)
         {
             case YAML_STREAM_END_EVENT:
-                if (!anchor_save_stack.empty() && interest_in_saving)
-                {
-                    addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
-                    anchor_save_stack.pop();
-                    anchor_data_save_stack.pop();
-                    interest_in_saving = false;
-                    subtract_count = 2;
-                }
+
+            interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
+                anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_DOCUMENT_END_EVENT:
 
-                if (!anchor_save_stack.empty() && interest_in_saving)
-                {
-                    addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
-                    anchor_save_stack.pop();
-                    anchor_data_save_stack.pop(); 
-                    interest_in_saving = false;
-                    subtract_count = 2;
-                }
+                interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
+                    anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_MAPPING_START_EVENT:
@@ -177,7 +181,8 @@ std::string parseLibyaml(std::string name_of_file)
                 }      
                 else
                 {
-                    local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);        
+                    local_event_output += 
+                        std::string((char*)event.data.scalar.value, event.data.scalar.length);        
                 }
 
                 if (event.data.mapping_start.tag)
@@ -201,14 +206,8 @@ std::string parseLibyaml(std::string name_of_file)
                     map_mode_stack.pop();
                 }
 
-                if (!anchor_save_stack.empty() && interest_in_saving)
-                {
-                    addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
-                    anchor_save_stack.pop();
-                    anchor_data_save_stack.pop();
-                    interest_in_saving = false;
-                    subtract_count = 2;
-                }
+            interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
+                anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
@@ -246,14 +245,8 @@ std::string parseLibyaml(std::string name_of_file)
             case YAML_SEQUENCE_END_EVENT:
                 mode_stack.pop();
 
-                if (!anchor_save_stack.empty() && interest_in_saving)
-                {
-                    addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
-                    anchor_save_stack.pop();
-                    anchor_data_save_stack.pop();
-                    interest_in_saving = false;
-                    subtract_count = 2;
-                }
+                interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
+                    anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_SCALAR_EVENT:
@@ -476,6 +469,7 @@ int main(int argc, char* args[])
     try
     {   
         YAML::Node node = YAML::LoadFile(args[1]);
+        
         // YAML::Node node = YAML::Load("[1, 2, 3]");
         std::cout << "Node type: " << node.Type() << std::endl;
 
@@ -485,6 +479,8 @@ int main(int argc, char* args[])
     {
         yamlcpp_final_output = err.what();
     }
+    std::cout << "Four" << std::endl;
+
 
     std::cout << "--------yaml-cpp Output:" << std::endl;
     std::cout << yamlcpp_final_output << "(END)" << std::endl;
