@@ -81,10 +81,17 @@ std::string parseLibyaml(std::string name_of_file)
 
     std::string libyaml_final_output = "";
 
+    // anchor/allias stuff:
+    std::string relevant_saving_info = "";
+    
+    bool interest_in_saving = false;
+
+    int subtract_count = 2;
+
     std::map<std::string, std::string> anchor_map;
 
     std::stack<std::string> anchor_save_stack;
-
+    
     std::stack<std::string> anchor_data_save_stack;
 
     std::stack<char> mode_stack;
@@ -96,6 +103,7 @@ std::string parseLibyaml(std::string name_of_file)
     bool map_mode = true;
     
     input = fopen(name_of_file.c_str(), "rb");
+
     foundfile = 1;
 
     if (!foundfile) 
@@ -146,38 +154,33 @@ std::string parseLibyaml(std::string name_of_file)
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
                     anchor_data_save_stack.pop();
+                    interest_in_saving = false;
+                    subtract_count = 2;
                 }
 
                 break;
             case YAML_DOCUMENT_START_EVENT:
-                if (!event.data.document_start.implicit)
-                {
-                    // local_event_output += (" ---");
-                }
 
                 break;
             case YAML_DOCUMENT_END_EVENT:
-                if (!event.data.document_end.implicit)
-                {
-                    // local_event_output += (" ...");
-                }
 
                 if (!anchor_save_stack.empty())
                 {
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
                     anchor_data_save_stack.pop(); 
+                    interest_in_saving = false;
+                    subtract_count = 2;
                 }
 
                 break;
             case YAML_MAPPING_START_EVENT:
                 if (!mode_stack.empty())
                 {
-                    // local_event_output += "->";
                     positionAnalysis(local_event_output, mode_stack.top(), map_mode);
                 }
 
-                if(mode_stack.top()=='M')
+                if (mode_stack.top()=='M')
                 {
                     map_mode_stack.push(!map_mode);
                 }
@@ -195,7 +198,14 @@ std::string parseLibyaml(std::string name_of_file)
                 if (event.data.mapping_start.anchor)
                 {
                     anchor_save_stack.push(((char*)event.data.mapping_start.anchor));
-                }       
+                    interest_in_saving = true;
+                    subtract_count = 2;
+                }      
+                else
+                {
+                    local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);        
+                }
+
                 if (event.data.mapping_start.tag)
                 {
                     std::string temp_translator = ((char*)event.data.mapping_start.tag);
@@ -222,6 +232,8 @@ std::string parseLibyaml(std::string name_of_file)
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
                     anchor_data_save_stack.pop();
+                    interest_in_saving = false;
+                    subtract_count = 2;
                 }
 
                 break;
@@ -243,7 +255,14 @@ std::string parseLibyaml(std::string name_of_file)
                 if (event.data.scalar.anchor)
                 {
                     anchor_save_stack.push((char*)event.data.sequence_start.anchor);
+                    interest_in_saving = true;
+                    subtract_count = 2;
                 }
+                else
+                {
+                    local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);                
+                }
+
                 if (event.data.sequence_start.tag) 
                 {
                     std::string temp_translator = ((char*)event.data.sequence_start.tag);
@@ -264,6 +283,8 @@ std::string parseLibyaml(std::string name_of_file)
                     addToMap(anchor_map, anchor_save_stack.top(), anchor_data_save_stack.top());
                     anchor_save_stack.pop();
                     anchor_data_save_stack.pop();
+                    interest_in_saving = false;
+                    subtract_count = 2;
                 }
 
                 break;
@@ -284,27 +305,28 @@ std::string parseLibyaml(std::string name_of_file)
                 if (event.data.scalar.anchor)
                 {
                     anchor_save_stack.push((char*)event.data.scalar.anchor);
+                    interest_in_saving = true;
+                    subtract_count = 2;
                 }
-
-
-                local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
-                
-                local_event_output += ("\n");
+                else
+                {
+                    local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
+                    
+                    local_event_output += ("\n");                   
+                }
 
                 break;
             case YAML_ALIAS_EVENT:
             {
                 std::string temp_translator = ((char*) event.data.alias.anchor);
 
-                map_mode = positionAnalysis(local_event_output, mode_stack.top(), map_mode);
-
-                local_event_output += "- " + temp_translator + "\n";
                 
                 std::string& temp_holder = anchor_map[temp_translator];
 
                 if (!temp_holder.empty())
                 {
-                    local_event_output += temp_holder;
+                    map_mode = positionAnalysis(local_event_output, mode_stack.top(), map_mode);
+                    local_event_output += "\n" + temp_holder;
                 }
                 else
                 {
@@ -314,6 +336,7 @@ std::string parseLibyaml(std::string name_of_file)
             }
             default:
                 abort();
+                    
         }
         
         yaml_event_delete(&event);
@@ -321,11 +344,20 @@ std::string parseLibyaml(std::string name_of_file)
         if (type == YAML_STREAM_END_EVENT)
             break;
 
-        addInfoToDataStack(anchor_data_save_stack, local_event_output);
-        
-        libyaml_final_output += local_event_output;
-    }
+        if(subtract_count <= 1 && interest_in_saving)
+        {
+            std::cout << "-----------------"<< std::endl << local_event_output << std::endl;
+            addInfoToDataStack(anchor_data_save_stack, local_event_output);
+        }
 
+        if(interest_in_saving)
+        {
+            subtract_count--;
+        }
+
+        libyaml_final_output += local_event_output;
+
+    }
 
     assert(!fclose(input));
 
@@ -351,8 +383,6 @@ std::string parseYamlCppNode(YAML::Node& head)
 
     std::string yamlcpp_final_output = "";
 
-    int key_counter = 1;
-
     while (!iteration_list_stack.empty())
     {
         YAML::Node base_iterator = iteration_list_stack.top();
@@ -361,7 +391,6 @@ std::string parseYamlCppNode(YAML::Node& head)
         yamlcpp_final_output += additional_info_stack.top() + ": ";
         additional_info_stack.pop();   
 
-        // Processes tags:
         const std::string& tag_holder = base_iterator.Tag();
 
         if(tag_holder != "?" && tag_holder != "!")
@@ -428,6 +457,10 @@ std::string parseYamlCppNode(YAML::Node& head)
     }
     return yamlcpp_final_output;
 }
+
+// ---------------------------------------------------------------------------------
+// ---------------------------------- testcode -------------------------------------
+// ---------------------------------------------------------------------------------
 
 bool compareStringsCustom(std::string compareMeOne, std::string compareMeTwo)
 {
