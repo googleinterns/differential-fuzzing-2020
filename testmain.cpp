@@ -76,12 +76,12 @@ std::string parseLibyaml(std::string name_of_file)
     yaml_event_t event;
     
     int flow = -1; 
-    int i = 0;
+    // int i = 0;
     int foundfile = 0;
 
     std::string libyaml_final_output = "";
 
-    // anchor/allias stuff:
+    // anchor/allias tracking information:
     std::string relevant_saving_info = "";
     
     bool interest_in_saving = false;
@@ -106,10 +106,6 @@ std::string parseLibyaml(std::string name_of_file)
 
     foundfile = 1;
 
-    if (!foundfile) 
-    {
-        input = stdin;
-    }
     assert(input);
 
     if (!yaml_parser_initialize(&parser)) 
@@ -118,7 +114,7 @@ std::string parseLibyaml(std::string name_of_file)
     }
     yaml_parser_set_input_file(&parser, input);
 
-    while (1) 
+    while (true) 
     {
         std::string local_event_output = "";
 
@@ -142,12 +138,6 @@ std::string parseLibyaml(std::string name_of_file)
 
         switch (type)
         {
-            case YAML_NO_EVENT:
-                local_event_output += ("???\n");
-
-                break;
-            case YAML_STREAM_START_EVENT:
-                break;
             case YAML_STREAM_END_EVENT:
                 if (!anchor_save_stack.empty())
                 {
@@ -157,9 +147,6 @@ std::string parseLibyaml(std::string name_of_file)
                     interest_in_saving = false;
                     subtract_count = 2;
                 }
-
-                break;
-            case YAML_DOCUMENT_START_EVENT:
 
                 break;
             case YAML_DOCUMENT_END_EVENT:
@@ -210,7 +197,7 @@ std::string parseLibyaml(std::string name_of_file)
                 {
                     std::string temp_translator = ((char*)event.data.mapping_start.tag);
 
-                    local_event_output += temp_translator + "\n";
+                    local_event_output += temp_translator + " \n";
                 }                
                 else
                 {
@@ -267,7 +254,7 @@ std::string parseLibyaml(std::string name_of_file)
                 {
                     std::string temp_translator = ((char*)event.data.sequence_start.tag);
 
-                    local_event_output += (temp_translator + "\n");
+                    local_event_output += (temp_translator + " \n");
                 }
                 else
                 {
@@ -335,7 +322,8 @@ std::string parseLibyaml(std::string name_of_file)
                 break;
             }
             default:
-                abort();
+                    // local_event_output += ("U:");                   
+                break;
                     
         }
         
@@ -402,7 +390,7 @@ std::string parseYamlCppNode(YAML::Node& head)
         {    
             case YAML::NodeType::Null:
             {
-                yamlcpp_final_output += "- Null case";
+                 yamlcpp_final_output = "";
                 break;
             }
             case YAML::NodeType::Scalar:
@@ -498,7 +486,7 @@ int main(int argc, char* args[])
     // parseLibyaml(args[1]);
 
     std::string libyaml_final_output = parseLibyaml(args[1]);
-    std::cout << libyaml_final_output << std::endl;
+    std::cout << libyaml_final_output << "(END)" << std::endl;
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
 
@@ -517,7 +505,7 @@ int main(int argc, char* args[])
     }
 
     std::cout << "--------yaml-cpp Output:" << std::endl;
-    std::cout << yamlcpp_final_output << std::endl;
+    std::cout << yamlcpp_final_output << "(END)" << std::endl;
     std::cout << "--------" << std::endl;
     std::cout << "- Conclusion: " << std::endl;
 
