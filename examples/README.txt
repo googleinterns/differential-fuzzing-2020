@@ -13,3 +13,32 @@ Directory contains testing files. Those contain:
 - multimap.yaml: Example for multiple maps
 - multisequence.yaml: Example for multiple sequences inside a sequence
 
+IMPORTANT TEMPORARY ERROR INFO:
+
+anchors2.yaml(x)
+
+yaml-cpp: error at line 2, column 10: illegal map value (anchormapping.yaml)
+
+yaml-cpp: error at line 1, column 22: end of map not found(END)
+
+yaml-cpp: error at line 1, column 6: illegal block entry
+
+illegal document indicator in scalar(END) (")
+
+anchorwithcoloninname.yaml  -> 2SXE
+
+tagsrootobject.yaml  -> 35KP
+
+enddoc.yaml ->3HFZ
+
+mapseparatevalues.yaml -> 4ABK
+
+specificnonspecifictag.yaml
+
+lineasmap.yaml
+
+explicitblockmapandemptycase.yaml 
+
+complexsequence.yaml
+
+return at 6jwb

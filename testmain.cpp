@@ -148,6 +148,11 @@ std::string parseLibyaml(std::string name_of_file)
             else {
                 fprintf(stderr, "Parse error: %s\n", parser.problem);
             }
+            yaml_event_delete(&event);
+
+            assert(!fclose(input));
+
+            yaml_parser_delete(&parser);
             return "ERROR: Bad parsing";
         }
         type = event.type;
