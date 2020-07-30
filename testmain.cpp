@@ -1,9 +1,12 @@
 #include <iostream>
+#include <fstream>
+
 #include <string>
+
 #include <stack>
 #include <map>
+
 #include <assert.h>
-#include <fstream>
 
 // From git file
 #include "include/yaml.h"
@@ -92,7 +95,7 @@ void addInfoToDataStack(std::stack<std::string>& anchor_data,
     }
 }
 
-std::string parseLibyaml(std::string name_of_file)
+std::string parseLibyaml(std::string name_of_file, std::string& error_message_container)
 {
     FILE *input;
     yaml_parser_t parser;
@@ -126,34 +129,31 @@ std::string parseLibyaml(std::string name_of_file)
 
     if (!yaml_parser_initialize(&parser)) 
     {
-        return "ERROR: Could not initialize the parser object\n";
+        error_message_container = "ERROR";
+        return libyaml_final_output;
     }
     yaml_parser_set_input_file(&parser, input);
 
     while (true) 
     {
+
         std::string local_event_output = "";
 
         yaml_event_type_t type;
 
         if (!yaml_parser_parse(&parser, &event)) 
         {
-            if ( parser.problem_mark.line || parser.problem_mark.column ) 
-            {
-                fprintf(stderr, "Parse error: %s\nLine: %lu Column: %lu\n",
-                    parser.problem,
-                    (unsigned long)parser.problem_mark.line + 1,
-                    (unsigned long)parser.problem_mark.column + 1);
-            }
-            else {
-                fprintf(stderr, "Parse error: %s\n", parser.problem);
-            }
             yaml_event_delete(&event);
 
             assert(!fclose(input));
 
             yaml_parser_delete(&parser);
-            return "ERROR: Bad parsing";
+
+            fprintf(stderr, "ERROR: Bad parsing\n");
+
+            error_message_container = "ERROR";
+
+            return libyaml_final_output;
         }
         type = event.type;
 
@@ -303,7 +303,12 @@ std::string parseLibyaml(std::string name_of_file)
                     assert(!fclose(input));
 
                     yaml_parser_delete(&parser);
-                    return "the referenced anchor is not defined";
+
+                    fprintf(stderr, "ERROR: Missing anchor\n");
+
+                    error_message_container = "ERROR";
+
+                    return libyaml_final_output;
                 }
                 break;
             }
@@ -343,7 +348,7 @@ std::string parseLibyaml(std::string name_of_file)
 // ------------------------------ yaml-cpp test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string parseYamlCppNode(YAML::Node& head)
+std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_container)
 {
     std::stack <YAML::Node> iteration_list_stack;
 
@@ -373,8 +378,8 @@ std::string parseYamlCppNode(YAML::Node& head)
         {    
             case YAML::NodeType::Null:
             {
-                 yamlcpp_final_output = "";
-                break;
+                 error_message_container = "ERROR";
+                return yamlcpp_final_output;
             }
             case YAML::NodeType::Scalar:
             {
@@ -468,27 +473,71 @@ int main(int argc, char* args[])
 
     // parseLibyaml(args[1]);
 
-    std::string libyaml_final_output = parseLibyaml(args[1]);
+    std::string libyaml_error_string;
+
+    std::string libyaml_final_output = parseLibyaml(args[1], libyaml_error_string);
+
+    std::cout << libyaml_final_output << std::endl;
+
+    std::cout << "----------- libyaml output:" << std::endl;
+
+    if(!libyaml_error_string.empty())
+    {
+        libyaml_final_output = libyaml_error_string;
+    }
+
     std::cout << libyaml_final_output << "(END)" << std::endl;
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
 
     std::string yamlcpp_final_output;
+
+    std::string yamlcpp_error_msg;
+
     try
     {   
-        YAML::Node node = YAML::LoadFile(args[1]);
-        
-        // YAML::Node node = YAML::Load("[1, 2, 3]");
-        std::cout << "Node type: " << node.Type() << std::endl;
+        std::ifstream stream_input_to_yamlcpp;
 
-        yamlcpp_final_output = parseYamlCppNode(node);
+        stream_input_to_yamlcpp.open(args[1]);
+
+        std::string input_to_yamlcpp;
+
+        std::string temp_stream_parser_line;
+
+        while(std::getline(stream_input_to_yamlcpp, temp_stream_parser_line))
+        {
+            input_to_yamlcpp += temp_stream_parser_line + "\n";
+        }
+
+
+        std::string::size_type prev = 0, current = 0;
+
+        while ((current = input_to_yamlcpp.find("\n---", current)) != std::string::npos)
+        {
+
+            YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
+
+            yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
+
+            prev = ++current;
+        }
+
+        YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
+
+        yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
+
+        std::cout << yamlcpp_final_output << std::endl;
+
+        if(!yamlcpp_error_msg.empty())
+        {
+            yamlcpp_final_output = yamlcpp_error_msg;
+        }
+        std::cout << "(END)" << std::endl;
     }
     catch (const std::exception& err)
     {
-        yamlcpp_final_output = err.what();
+        yamlcpp_final_output = "ERROR";
     }
-    std::cout << "Four" << std::endl;
-
 
     std::cout << "--------yaml-cpp Output:" << std::endl;
     std::cout << yamlcpp_final_output << "(END)" << std::endl;

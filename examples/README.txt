@@ -1,6 +1,7 @@
 Directory contains testing files. Those contain:
+
+    Normal cases:
 - anchors.yaml: contains use of aliases with anchors
-- anchors2.yaml: anchors with an alias without an ancho
 - anchorscomplex.yaml: more complex cases with multi-level anchors
 - global-tag.yaml: test the use of a global tag
 - mapping.yaml: test use of maps
@@ -13,32 +14,49 @@ Directory contains testing files. Those contain:
 - multimap.yaml: Example for multiple maps
 - multisequence.yaml: Example for multiple sequences inside a sequence
 
+    Error cases:
+- anchors2.yaml: anchors with an alias without an ancho
+- mapseparatevalues.yaml -> 4ABK
+- lineasmap.yaml
+- errormapping.yaml
+
 IMPORTANT TEMPORARY ERROR INFO:
 
-anchors2.yaml(x)
 
-yaml-cpp: error at line 2, column 10: illegal map value (anchormapping.yaml)
+- "yaml-cpp needs to parse full doc" error
 
-yaml-cpp: error at line 1, column 22: end of map not found(END)
+enddoc.yaml ->3HFZ (end doc error)
 
-yaml-cpp: error at line 1, column 6: illegal block entry
+tagsrootobject.yaml  -> 35KP (solved)
 
-illegal document indicator in scalar(END) (")
+-
 
-anchorwithcoloninname.yaml  -> 2SXE
+specificnonspecifictag.yaml (tag error)
 
-tagsrootobject.yaml  -> 35KP
+explicitblockmapandemptycase.yaml (? tag error)
 
-enddoc.yaml ->3HFZ
+-anchor as key
 
-mapseparatevalues.yaml -> 4ABK
+anchorwithcoloninname.yaml  -> 2SXE (weird anchor)
 
-specificnonspecifictag.yaml
+explicitemptykey.yaml (weird tag+weird anchor)
 
-lineasmap.yaml
+complexsequence.yaml (weird anchor)
 
-explicitblockmapandemptycase.yaml 
+anchorsandtokens.yaml (weird anchor)
 
-complexsequence.yaml
+twoends.yaml (end weird)
+-
+
+- (empty key)
+
+mapnoend.yaml (yaml-cpp refuse) (empty key)
+
+mapwithempty.yaml (yaml-cpp refuse) (empty key)
+-
+
+unicodeanchor.yaml (libyaml error)
+
+
 
 return at 6jwb
