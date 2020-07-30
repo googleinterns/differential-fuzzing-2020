@@ -378,7 +378,8 @@ std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_contai
         {    
             case YAML::NodeType::Null:
             {
-                 error_message_container = "ERROR";
+                // error_message_container = "ERROR";
+                yamlcpp_final_output = "";
                 return yamlcpp_final_output;
             }
             case YAML::NodeType::Scalar:
@@ -526,7 +527,7 @@ int main(int argc, char* args[])
 
         yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
 
-        std::cout << yamlcpp_final_output << std::endl;
+        std::cout << yamlcpp_final_output;
 
         if(!yamlcpp_error_msg.empty())
         {

@@ -20,16 +20,18 @@ Directory contains testing files. Those contain:
 - lineasmap.yaml
 - errormapping.yaml
 
-IMPORTANT TEMPORARY ERROR INFO:
-
-
 - "yaml-cpp needs to parse full doc" error
 
 enddoc.yaml ->3HFZ (end doc error)
 
+enddocandmore.yaml 
+
 tagsrootobject.yaml  -> 35KP (solved)
 
 -
+
+IMPORTANT TEMPORARY ERROR INFO:
+
 
 specificnonspecifictag.yaml (tag error)
 
