@@ -19,6 +19,7 @@ Directory contains testing files. Those contain:
 - mapseparatevalues.yaml -> 4ABK
 - lineasmap.yaml
 - errormapping.yaml
+- unicodeanchor.yaml (libyaml error)
 
 - "yaml-cpp needs to parse full doc" error
 
@@ -30,12 +31,12 @@ tagsrootobject.yaml  -> 35KP (solved)
 
 -
 
+specificnonspecifictag.yaml (tag error)
+
 IMPORTANT TEMPORARY ERROR INFO:
 
 
-specificnonspecifictag.yaml (tag error)
 
-explicitblockmapandemptycase.yaml (? tag error)
 
 -anchor as key
 
@@ -55,10 +56,12 @@ twoends.yaml (end weird)
 mapnoend.yaml (yaml-cpp refuse) (empty key)
 
 mapwithempty.yaml (yaml-cpp refuse) (empty key)
+
+explicitblockmapandemptycase.yaml (? tag error)
 -
 
-unicodeanchor.yaml (libyaml error)
 
 
+tagshorthandfull.yaml 
 
 return at 6jwb
