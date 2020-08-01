@@ -13,3 +13,6 @@ top6: &val6
 top7:
   &val7 seven
 top8: *k1
+top9: 
+  &k5 [2 ,3]: boo
+top10: *k5

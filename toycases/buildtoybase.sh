@@ -1,1 +1,1 @@
-clang++ -c ../differentialfuzzer.cpp
+clang++ -c ../differentialfuzzinglib/differentialfuzzer.cpp -I ../differentialfuzzinglib/

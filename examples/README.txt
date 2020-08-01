@@ -33,23 +33,26 @@ tagsrootobject.yaml  -> 35KP (solved)
 
 specificnonspecifictag.yaml (tag error)
 
+
+
 IMPORTANT TEMPORARY ERROR INFO:
-
-
 
 
 -anchor as key
 
 anchorwithcoloninname.yaml  -> 2SXE (weird anchor)
 
-explicitemptykey.yaml (weird tag+weird anchor)
-
-complexsequence.yaml (weird anchor)
+complexsequence.yaml (weird anchor) (solved)
 
 anchorsandtokens.yaml (weird anchor)
 
-twoends.yaml (end weird)
+propertyindicators.yaml
+
 -
+
+explicitemptykey.yaml (weird tag+weird anchor)
+
+twoends.yaml (end weird)
 
 - (empty key)
 
@@ -60,7 +63,9 @@ mapwithempty.yaml (yaml-cpp refuse) (empty key)
 explicitblockmapandemptycase.yaml (? tag error)
 -
 
+tagdeclarationbefiredoc.yaml
 
+sequencescallar.yaml
 
 tagshorthandfull.yaml 
 
