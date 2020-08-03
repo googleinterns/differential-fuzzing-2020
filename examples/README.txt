@@ -69,4 +69,8 @@ sequencescallar.yaml
 
 tagshorthandfull.yaml 
 
-return at 6jwb
+tagopenend.yaml
+
+anchorkeyandvalue.yaml
+
+return at E76Z.tml
