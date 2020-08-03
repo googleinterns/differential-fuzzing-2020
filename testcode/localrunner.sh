@@ -6,6 +6,6 @@ clang++ ../../../libraries/libyaml/src/.libs/libyaml.a ../../../libraries/yaml-c
 
 clang++ testmain.o ../../../libraries/libyaml/src/.libs/libyaml.a \
 ../../../libraries/yaml-cpp/build/libyaml-cpp.a \
--I ./code -I ../ -g -fsanitize=address
+-I ./code -I ../ -g -fsanitize=address -o manualtest
 
 

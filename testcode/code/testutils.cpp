@@ -133,6 +133,8 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
     bool prev_achor_scallar_case = false;
 
+    bool doing_something = false;
+
     std::map<std::string, std::string> anchor_map;
 
     std::stack<std::string> anchor_save_stack;
@@ -154,6 +156,7 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
     if (!yaml_parser_initialize(&parser)) 
     {
         error_message_container = "ERROR";
+
         return libyaml_final_output;
     }
     yaml_parser_set_input_file(&parser, input);
@@ -185,8 +188,8 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
         {
             case YAML_STREAM_END_EVENT:
 
-            interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
-                anchor_data_save_stack, subtract_count, interest_in_saving);
+                interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
+                    anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_DOCUMENT_END_EVENT:
@@ -196,6 +199,9 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 break;
             case YAML_MAPPING_START_EVENT:
+                doing_something = true;
+                std::cout << "flip" <<std::endl;
+
                 if (!mode_stack.empty())
                 {
                     positionAnalysis(local_event_output, mode_stack.top(), map_mode);
@@ -235,6 +241,7 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 break;
             case YAML_MAPPING_END_EVENT:
+                std::cout << "flop" <<std::endl;
                 mode_stack.pop();
 
                 if(mode_stack.top()=='M')
@@ -248,6 +255,9 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
+                std::cout << "flip" <<std::endl;
+                doing_something = true;
+
                 
                 if (!mode_stack.empty())
                 {
@@ -281,6 +291,7 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
+                std::cout << "flop" <<std::endl;
                 mode_stack.pop();
 
                 interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
@@ -289,7 +300,6 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
                 break;
             case YAML_SCALAR_EVENT:
                 map_mode = positionAnalysis(local_event_output, mode_stack.top(), map_mode);
-                    
 
                 if (event.data.scalar.tag)
                 {
@@ -323,8 +333,16 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
                 }
                 else
                 {
-                    local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
+                    std::string temp = std::string((char*)event.data.scalar.value, event.data.scalar.length);
                     
+                    local_event_output += temp;
+
+                    if (temp.empty())
+                    {
+                    local_event_output += ("(X)");         
+                        error_message_container = "ERROR";
+                    }
+
                     local_event_output += ("\n");         
 
                     if(prev_achor_scallar_case)
@@ -338,6 +356,7 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
                 break;
             case YAML_ALIAS_EVENT:
             {
+
                 std::string temp_translator = ((char*) event.data.alias.anchor);
                 
                 std::string& temp_holder = anchor_map[temp_translator];
@@ -392,6 +411,8 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
     fflush(stdout);
 
+    std::cout << mode_stack.top() << std::endl;
+
     return libyaml_final_output;
 }
 
@@ -415,12 +436,17 @@ std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_contai
         YAML::Node base_iterator = iteration_list_stack.top();
         iteration_list_stack.pop();
 
-        yamlcpp_final_output += additional_info_stack.top() + ": ";
+        yamlcpp_final_output +=  additional_info_stack.top() + ": ";
+
+        
+
+        char current_mode =  additional_info_stack.top().front();
+
         additional_info_stack.pop();   
 
         const std::string& tag_holder = base_iterator.Tag();
 
-        if(tag_holder != "?" && tag_holder != "!")
+        if (tag_holder != "?" && tag_holder != "!")
         {
             yamlcpp_final_output += tag_holder + " ";
         }
@@ -429,9 +455,19 @@ std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_contai
         {    
             case YAML::NodeType::Null:
             {
-                // error_message_container = "ERROR";
-                yamlcpp_final_output = "";
-                return yamlcpp_final_output;
+                std::cout << "e" <<std::endl;
+                if (current_mode == 'U')
+                {
+                    yamlcpp_final_output = "";
+                    return yamlcpp_final_output;
+                }
+                else
+                {
+                    error_message_container = "ERROR";
+                    return yamlcpp_final_output;
+                }
+                std::cout << "o" <<std::endl;
+                
             }
             case YAML::NodeType::Scalar:
             {
@@ -483,6 +519,12 @@ std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_contai
             }
         }
     }
+
+    if(yamlcpp_final_output.empty())
+    {
+        return "ERROR";
+    }
+
     return yamlcpp_final_output;
 }
 
@@ -507,7 +549,6 @@ bool compareStringsCustom(std::string compareMeOne, std::string compareMeTwo, st
 
     if(!((ptrOne == compareMeOne.end())  && (ptrTwo == compareMeTwo.end())))
     {
-        buffer += "(X)";
         return false;
     }
     else

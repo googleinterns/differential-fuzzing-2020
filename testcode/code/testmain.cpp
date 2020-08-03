@@ -13,13 +13,15 @@ int main(int argc, char* args[])
 
     std::string libyaml_final_output = parseLibyaml(args[1], libyaml_error_string);
 
-    std::cout << libyaml_final_output << std::endl;
-
     std::cout << "----------- libyaml output:" << std::endl;
 
     if(!libyaml_error_string.empty())
     {
+        std::cout << "-------- Before error:" << std::endl;
+        std::cout << libyaml_final_output << std::endl;
         libyaml_final_output = libyaml_error_string;
+        std::cout << "-------- " << std::endl;
+
     }
 
     std::cout << libyaml_final_output << "(END)" << std::endl;
@@ -62,11 +64,12 @@ int main(int argc, char* args[])
 
         yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
 
-        std::cout << yamlcpp_final_output;
-
         if(!yamlcpp_error_msg.empty())
         {
+            std::cout << "-------- Before error:" << std::endl;
+            std::cout << yamlcpp_final_output << std::endl;
             yamlcpp_final_output = yamlcpp_error_msg;
+            std::cout << "-------- " << std::endl;
         }
         std::cout << "(END)" << std::endl;
     }
@@ -91,6 +94,7 @@ int main(int argc, char* args[])
     }
     else
     {
+        std::cout << buffer << std::endl;  
         std::cout << "(END)" << std::endl;
         std::cout << "Cases different!" << std::endl;
     }
