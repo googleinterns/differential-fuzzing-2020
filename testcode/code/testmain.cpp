@@ -47,22 +47,30 @@ int main(int argc, char* args[])
             input_to_yamlcpp += temp_stream_parser_line + "\n";
         }
 
-
         std::string::size_type prev = 0, current = 0;
 
-        while ((current = input_to_yamlcpp.find("\n---", current)) != std::string::npos)
+        // while ((current = input_to_yamlcpp.find("\n...", current)) != std::string::npos)
+        // {
+
+        //     YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
+
+        //     yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
+
+        //     prev = ++current;
+        // }
+
+        // YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
+
+        // yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
+
+        std::vector<YAML::Node> node = YAML::LoadAllFromFile(args[1]);
+
+        for (std::vector<YAML::Node>::iterator it = node.begin(); 
+            it != node.end(); it++)
         {
-
-            YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
-
-            yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
-
-            prev = ++current;
+            std::cout << parseYamlCppNode(*it, yamlcpp_error_msg) << std::endl;
+            yamlcpp_final_output += parseYamlCppNode(*it, yamlcpp_error_msg);
         }
-
-        YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
-
-        yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
 
         if(!yamlcpp_error_msg.empty())
         {
@@ -75,7 +83,8 @@ int main(int argc, char* args[])
     }
     catch (const std::exception& err)
     {
-        yamlcpp_final_output = "ERROR";
+        std::cout << "SUPER ERROR OUTPUT: \n"<< yamlcpp_final_output << std::endl;
+        yamlcpp_final_output = err.what();
     }
 
     std::cout << "--------yaml-cpp Output:" << std::endl;

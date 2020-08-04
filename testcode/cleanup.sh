@@ -1,1 +1,1 @@
-rm *.o *.h.gch testexecutable
+rm *.o *.h.gch testexecutable manualtest autotest

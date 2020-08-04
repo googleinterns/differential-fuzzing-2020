@@ -188,14 +188,88 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
         {
             case YAML_STREAM_END_EVENT:
 
+                // local_event_output += "(S)";
                 interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
                     anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_DOCUMENT_END_EVENT:
 
+                // local_event_output += "(D)";
+
                 interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
-                    anchor_data_save_stack, subtract_count, interest_in_saving);
+                    anchor_data_save_stack, subtract_count, interest_in_saving);   
+
+                interest_in_saving = false;
+
+                subtract_count = 2;
+
+                prev_achor_scallar_case = false;
+
+                doing_something = false;
+
+                anchor_map.clear();
+
+                while (!anchor_save_stack.empty())
+                {
+                    anchor_save_stack.pop();
+                }
+
+                while (!anchor_data_save_stack.empty())
+                {
+                    anchor_data_save_stack.pop();
+                }
+
+                while (!mode_stack.empty())
+                {
+                    mode_stack.pop();
+                }
+
+                mode_stack.push(' ');
+
+                while (!map_mode_stack.empty())
+                {
+                    map_mode_stack.pop();
+                }
+
+                    map_mode = true;
+
+                break;            
+            case YAML_DOCUMENT_START_EVENT:
+
+                interest_in_saving = false;
+
+                subtract_count = 2;
+
+                prev_achor_scallar_case = false;
+
+                doing_something = false;
+
+                anchor_map.clear();
+
+                while (!anchor_save_stack.empty())
+                {
+                    anchor_save_stack.pop();
+                }
+
+                while (!anchor_data_save_stack.empty())
+                {
+                    anchor_data_save_stack.pop();
+                }
+
+                while (!mode_stack.empty())
+                {
+                    mode_stack.pop();
+                }
+
+                mode_stack.push(' ');
+
+                while (!map_mode_stack.empty())
+                {
+                    map_mode_stack.pop();
+                }
+
+                    map_mode = true;
 
                 break;
             case YAML_MAPPING_START_EVENT:
@@ -291,7 +365,7 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
-                std::cout << "flop" <<std::endl;
+                std::cout << "flup" <<std::endl;
                 mode_stack.pop();
 
                 interest_in_saving = addToMapDirective(anchor_map, anchor_save_stack, 
@@ -458,6 +532,7 @@ std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_contai
                 if (current_mode == 'U')
                 {
                     yamlcpp_final_output = "";
+                    std::cout << "o" <<std::endl;
                     return yamlcpp_final_output;
                 }
                 else
@@ -465,7 +540,7 @@ std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_contai
                     error_message_container = "ERROR";
                     return yamlcpp_final_output;
                 }
-                std::cout << "o" <<std::endl;
+                
                 
             }
             case YAML::NodeType::Scalar:

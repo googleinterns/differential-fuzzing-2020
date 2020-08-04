@@ -34,19 +34,14 @@ bool runTest(std::string file_name, std::string& buffer)
 
         std::string::size_type prev = 0, current = 0;
 
-        while ((current = input_to_yamlcpp.find("\n---", current)) != std::string::npos)
+        std::vector<YAML::Node> node = YAML::LoadAllFromFile(file_name);
+
+        for (std::vector<YAML::Node>::iterator it = node.begin(); 
+            it != node.end(); it++)
         {
-
-            YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
-
-            yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
-
-            prev = ++current;
+            std::cout << parseYamlCppNode(*it, yamlcpp_error_msg) << std::endl;
+            yamlcpp_final_output += parseYamlCppNode(*it, yamlcpp_error_msg);
         }
-
-        YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
-
-        yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
 
         if(!yamlcpp_error_msg.empty())
         {
