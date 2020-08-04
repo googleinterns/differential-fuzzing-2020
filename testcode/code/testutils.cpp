@@ -337,9 +337,8 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
                     
                     local_event_output += temp;
 
-                    if (temp.empty())
-                    {
-                    local_event_output += ("(X)");         
+                    if (temp.empty() && !(event.data.scalar.tag))
+                    {       
                         error_message_container = "ERROR";
                     }
 

@@ -74,3 +74,29 @@ tagopenend.yaml
 anchorkeyandvalue.yaml
 
 return at E76Z.tml
+
+secondarytaghandle
+
+CANT BE TESTED:
+1)
+
+- &a
+- a
+-
+  &a : a
+  b: &b
+-
+  &c : &a
+-
+  ? &d
+-
+  ? &e
+  : &a
+
+2)
+
+---
+key: &an:chor value
+
+3)
+&ee unicode anchor

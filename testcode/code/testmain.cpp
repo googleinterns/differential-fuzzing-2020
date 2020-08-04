@@ -76,8 +76,6 @@ int main(int argc, char* args[])
     catch (const std::exception& err)
     {
         yamlcpp_final_output = "ERROR";
-
-        yamlcpp_final_output = err.what();
     }
 
     std::cout << "--------yaml-cpp Output:" << std::endl;
