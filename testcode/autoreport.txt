@@ -11,7 +11,5 @@ baredocafterend.yaml
 anchorwithcoloninname.yaml
 endthenmore.yaml
 sequencescallar.yaml
-propertyindicators.yaml
-anchoraskeylast.yaml
 emptydocs.yaml
 tagdefinedonlyfirst.yaml

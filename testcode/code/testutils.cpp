@@ -377,6 +377,7 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 if (event.data.scalar.tag)
                 {
+                    std::cout << "Scalar tag" << std::endl;
                     std::string temp_translator = ((char*)event.data.scalar.tag);
 
                     local_event_output += addTag(temp_translator) + "- ";
@@ -399,9 +400,22 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
                         local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
                         local_event_output += "\n";
                         subtract_count = 2;
-                    
 
-                        std::string thing = "- " + std::string((char*)event.data.scalar.value, event.data.scalar.length) + "\n";
+                        std::string thing = "";
+
+                        if (event.data.scalar.tag)
+                        {
+                            std::string temp_tag_translator = ((char*)event.data.scalar.tag);
+
+                            thing += addTag(temp_tag_translator) + "- ";
+                        }
+                        else
+                        {
+                            thing += "- ";
+                        }
+
+                        thing += std::string((char*)event.data.scalar.value, event.data.scalar.length) + "\n";
+
                         addToMap(anchor_map, temp_translator, thing);
                     }
                     else
