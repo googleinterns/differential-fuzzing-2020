@@ -59,11 +59,11 @@ bool runTest(std::string file_name, std::string& buffer)
 }
 
 // ---------------------------------------------------------------------------------
-// --------------------------- tipical test helper ---------------------------------
+// --------------------------- typical test helper ---------------------------------
 // ---------------------------------------------------------------------------------
 
 
-bool tipicalPositiveTest(std::string name)
+bool typicalPositiveTest(std::string name)
 {
     std::string buffer = "";
 
@@ -84,7 +84,7 @@ bool tipicalPositiveTest(std::string name)
     return !return_me;
 }
 
-bool tipicalNegativeTest(std::string name)
+bool typicalNegativeTest(std::string name)
 {
     std::string buffer = "";
 
@@ -125,7 +125,7 @@ int main()
         {
             if(ent->d_name[0] != '.')
             {
-                if (tipicalPositiveTest(std::string(ent->d_name)))
+                if (typicalPositiveTest(std::string(ent->d_name)))
                 {
                     myfile << std::string(ent->d_name) << std::endl;
                 }

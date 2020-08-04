@@ -10,13 +10,8 @@ questionmarksinscalars.yaml
 baredocafterend.yaml
 anchorwithcoloninname.yaml
 endthenmore.yaml
-anchorasvalue.yaml
 sequencescallar.yaml
 propertyindicators.yaml
-anchorkeyandvalue.yaml
-anchorsandtokens.yaml
 anchoraskeylast.yaml
-aliasesinblocksequence.yaml
 emptydocs.yaml
-taginemptyarray.yaml
 tagdefinedonlyfirst.yaml

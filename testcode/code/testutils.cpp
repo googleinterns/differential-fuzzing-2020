@@ -377,7 +377,6 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 if (event.data.scalar.tag)
                 {
-                    
                     std::string temp_translator = ((char*)event.data.scalar.tag);
 
                     local_event_output += addTag(temp_translator) + "- ";
@@ -389,21 +388,28 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
 
                 if (event.data.scalar.anchor)
                 {
-
+                    std::cout << "Scalar anchor" << std::endl;
                     std::string temp_translator = ((char*)event.data.mapping_start.anchor);
 
                     // BUG HERE!
-                    interest_in_saving = addToStack
-                        (anchor_save_stack, subtract_count, (char*)event.data.mapping_start.anchor, 
-                        local_event_output, mode_stack.top(), map_mode);
-                    subtract_count = 2;
                     prev_achor_scallar_case = true;
 
-                    if(event.data.scalar.value)
+                    if (event.data.scalar.value)
                     {
                         local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
                         local_event_output += "\n";
+                        subtract_count = 2;
+                    
+
+                        std::string thing = "- " + std::string((char*)event.data.scalar.value, event.data.scalar.length) + "\n";
+                        addToMap(anchor_map, temp_translator, thing);
                     }
+                    else
+                    {
+                        interest_in_saving = addToStack
+                        (anchor_save_stack, subtract_count, (char*)event.data.mapping_start.anchor, 
+                        local_event_output, mode_stack.top(), map_mode);
+                    }            
                 }
                 else
                 {
@@ -437,7 +443,12 @@ std::string parseLibyaml(std::string name_of_file, std::string& error_message_co
                 if (!temp_holder.empty())
                 {
                     map_mode = positionAnalysis(local_event_output, mode_stack.top(), map_mode);
-                    local_event_output += "\n" + temp_holder;
+                    if (temp_holder.front() == 'K' || temp_holder.front() == 'V' || temp_holder.front() == 'L'||
+                        temp_holder.front() == 'U')
+                    {
+                        local_event_output += "\n";
+                    }
+                    local_event_output += temp_holder;
                 }
                 else
                 {
@@ -528,11 +539,9 @@ std::string parseYamlCppNode(YAML::Node& head, std::string& error_message_contai
         {    
             case YAML::NodeType::Null:
             {
-                std::cout << "e" <<std::endl;
                 if (current_mode == 'U')
                 {
                     yamlcpp_final_output = "";
-                    std::cout << "o" <<std::endl;
                     return yamlcpp_final_output;
                 }
                 else
