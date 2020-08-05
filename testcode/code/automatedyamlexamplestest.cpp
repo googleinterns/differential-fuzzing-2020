@@ -39,8 +39,15 @@ bool runTest(std::string file_name, std::string& buffer)
         for (std::vector<YAML::Node>::iterator it = node.begin(); 
             it != node.end(); it++)
         {
-            std::cout << parseYamlCppNode(&(*it), &yamlcpp_error_msg) << std::endl;
-            yamlcpp_final_output += parseYamlCppNode(&(*it), &yamlcpp_error_msg);
+            std::cout << "Node:" << std::endl;
+            std::string temp_result_holder = parseYamlCppNode(&(*it), &yamlcpp_error_msg);
+            std::cout << temp_result_holder << std::endl;
+            yamlcpp_final_output += temp_result_holder;
+
+            if(temp_result_holder.empty() && yamlcpp_error_msg.empty())
+            {
+                yamlcpp_error_msg = "ERROR";
+            }
         }
 
         if (!yamlcpp_error_msg.empty())
@@ -127,7 +134,7 @@ int main()
             {
                 if (typicalPositiveTest(std::string(ent->d_name)))
                 {
-                    myfile << std::string(ent->d_name) << std::endl;
+                    myfile << "../examples/" << std::string(ent->d_name) << std::endl;
                 }
             }
         }

@@ -54,8 +54,15 @@ int main(int argc, char* args[])
         for (std::vector<YAML::Node>::iterator it = node.begin(); 
             it != node.end(); it++)
         {
-            std::cout << parseYamlCppNode(&(*it), &yamlcpp_error_msg) << std::endl;
-            yamlcpp_final_output += parseYamlCppNode(&(*it), &yamlcpp_error_msg);
+            std::cout << "Node:" << std::endl;
+            std::string temp_result_holder = parseYamlCppNode(&(*it), &yamlcpp_error_msg);
+            std::cout << temp_result_holder << std::endl;
+            yamlcpp_final_output += temp_result_holder;
+
+            if(temp_result_holder.empty() && yamlcpp_error_msg.empty())
+            {
+                yamlcpp_error_msg = "ERROR";
+            }
         }
 
         if(!yamlcpp_error_msg.empty())
@@ -69,8 +76,8 @@ int main(int argc, char* args[])
     }
     catch (const std::exception& err)
     {
-        std::cout << "SUPER ERROR OUTPUT: \n"<< yamlcpp_final_output << std::endl;
-        yamlcpp_final_output = err.what();
+        std::cout << "ERROR: yaml-cpp based parser error \n"<< yamlcpp_final_output << std::endl;
+        yamlcpp_final_output = "ERROR";
     }
 
     std::cout << "--------yaml-cpp Output:" << std::endl;

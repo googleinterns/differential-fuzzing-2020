@@ -146,6 +146,7 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 
         return libyaml_final_output;
     }
+
     yaml_parser_set_input_file(&parser, input);
 
     while (true) 
@@ -214,9 +215,7 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 
                 map_mode = true;
 
-                
-                // libyaml_final_output += "(X)";
-                
+                std::cout << "Doc end" << std::endl;
 
                 break;            
             case YAML_DOCUMENT_START_EVENT:
@@ -396,16 +395,16 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
                     
                     local_event_output += temp;
 
-                    if (temp.empty() && !(event.data.scalar.tag))
+                    if (temp.empty() && !(event.data.scalar.tag) && 
+                        event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {       
                         fprintf(stderr, "ERROR: Empty case\n");
                         *error_message_container = "ERROR";
+                        local_event_output += "(X)";
                     }
 
                     local_event_output += ("\n");         
                 }
-
-                // add info here
 
                 break;
             case YAML_ALIAS_EVENT:
