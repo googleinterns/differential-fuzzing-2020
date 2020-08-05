@@ -11,11 +11,11 @@ int main(int argc, char* args[])
 
     std::string libyaml_error_string;
 
-    std::string libyaml_final_output = parseLibyaml(args[1], libyaml_error_string);
+    std::string libyaml_final_output = parseLibyaml(args[1], &libyaml_error_string);
 
     std::cout << "----------- libyaml output:" << std::endl;
 
-    if(!libyaml_error_string.empty())
+    if (!libyaml_error_string.empty())
     {
         std::cout << "-------- Before error:" << std::endl;
         std::cout << libyaml_final_output << std::endl;
@@ -49,27 +49,13 @@ int main(int argc, char* args[])
 
         std::string::size_type prev = 0, current = 0;
 
-        // while ((current = input_to_yamlcpp.find("\n...", current)) != std::string::npos)
-        // {
-
-        //     YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
-
-        //     yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
-
-        //     prev = ++current;
-        // }
-
-        // YAML::Node node = YAML::Load(input_to_yamlcpp.substr(prev, current-prev));
-
-        // yamlcpp_final_output += parseYamlCppNode(node, yamlcpp_error_msg);
-
         std::vector<YAML::Node> node = YAML::LoadAllFromFile(args[1]);
 
         for (std::vector<YAML::Node>::iterator it = node.begin(); 
             it != node.end(); it++)
         {
-            std::cout << parseYamlCppNode(*it, yamlcpp_error_msg) << std::endl;
-            yamlcpp_final_output += parseYamlCppNode(*it, yamlcpp_error_msg);
+            std::cout << parseYamlCppNode(&(*it), &yamlcpp_error_msg) << std::endl;
+            yamlcpp_final_output += parseYamlCppNode(&(*it), &yamlcpp_error_msg);
         }
 
         if(!yamlcpp_error_msg.empty())

@@ -5,7 +5,7 @@ bool runTest(std::string file_name, std::string& buffer)
 {
     std::string libyaml_error_string;
 
-    std::string libyaml_final_output = parseLibyaml(file_name, libyaml_error_string);
+    std::string libyaml_final_output = parseLibyaml(file_name, &libyaml_error_string);
 
     if(!libyaml_error_string.empty())
     {
@@ -26,7 +26,7 @@ bool runTest(std::string file_name, std::string& buffer)
 
         std::string temp_stream_parser_line;
 
-        while(std::getline(stream_input_to_yamlcpp, temp_stream_parser_line))
+        while (std::getline(stream_input_to_yamlcpp, temp_stream_parser_line))
         {
             input_to_yamlcpp += temp_stream_parser_line + "\n";
         }
@@ -39,11 +39,11 @@ bool runTest(std::string file_name, std::string& buffer)
         for (std::vector<YAML::Node>::iterator it = node.begin(); 
             it != node.end(); it++)
         {
-            std::cout << parseYamlCppNode(*it, yamlcpp_error_msg) << std::endl;
-            yamlcpp_final_output += parseYamlCppNode(*it, yamlcpp_error_msg);
+            std::cout << parseYamlCppNode(&(*it), &yamlcpp_error_msg) << std::endl;
+            yamlcpp_final_output += parseYamlCppNode(&(*it), &yamlcpp_error_msg);
         }
 
-        if(!yamlcpp_error_msg.empty())
+        if (!yamlcpp_error_msg.empty())
         {
             yamlcpp_final_output = yamlcpp_error_msg;
         }
@@ -123,7 +123,7 @@ int main()
         /* print all the files and directories within directory */
         while ((ent = readdir (dir)) != NULL) 
         {
-            if(ent->d_name[0] != '.')
+            if (ent->d_name[0] != '.')
             {
                 if (typicalPositiveTest(std::string(ent->d_name)))
                 {
