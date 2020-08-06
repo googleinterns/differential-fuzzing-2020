@@ -1,16 +1,4 @@
-#include <iostream>
-#include <fstream>
-
-#include <string>
-
-#include <stack>
-#include <map>
-
-#include <assert.h>
-
-// From git file
-#include "include/yaml.h"
-#include "yaml-cpp/yaml.h"
+#include "testutils.h"
 
 // ---------------------------------------------------------------------------------
 // ------------------------------- libyaml test code -------------------------------
@@ -299,8 +287,8 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
                     map_mode_stack.pop();
                 }
 
-            interest_in_saving = addToMapDirective(&anchor_map, &anchor_save_stack, 
-                &anchor_data_save_stack, subtract_count, interest_in_saving);
+                interest_in_saving = addToMapDirective(&anchor_map, &anchor_save_stack, 
+                    &anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
@@ -312,7 +300,7 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 
                 mode_stack.push('S');
 
-                if (event.data.sequence_start.anchor) 
+                // if (event.data.sequence_start.anchor) 
                 if (event.data.scalar.anchor)
                 {
                     interest_in_saving = addToStack
@@ -343,6 +331,10 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 
                 break;
             case YAML_SCALAR_EVENT:
+
+                
+
+
                 map_mode = positionAnalysis(&local_event_output, mode_stack.top(), map_mode);
 
                 if (event.data.scalar.tag)
@@ -362,35 +354,46 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 
                     if (event.data.scalar.value)
                     {
+
                         local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
                         local_event_output += "\n";
                         subtract_count = 2;
 
-                        std::string thing = "";
+                        std::string temp_anchor_data = "";
 
                         if (event.data.scalar.tag)
                         {
                             std::string temp_tag_translator = ((char*)event.data.scalar.tag);
 
-                            thing += addTag(&temp_tag_translator) + "- ";
+                            temp_anchor_data += addTag(&temp_tag_translator) + "- ";
                         }
                         else
                         {
-                            thing += "- ";
+                            temp_anchor_data += "- ";
                         }
 
-                        thing += std::string((char*)event.data.scalar.value, event.data.scalar.length) + "\n";
+                        temp_anchor_data += std::string((char*)event.data.scalar.value, event.data.scalar.length) + "\n";
 
-                        addToMap(&anchor_map, &temp_translator, &thing);
+                        addToMap(&anchor_map, &temp_translator, &temp_anchor_data);
+
+                        std::cout << "Scalar anchor" << std::endl;
+
+                        if (event.data.scalar.length == 0)
+                        {
+                            local_event_output = "";
+                        }                    
                     }
                     else
                     {
                         interest_in_saving = addToStack
-                        (&anchor_save_stack, &subtract_count, (char*)event.data.mapping_start.anchor);
-                    }            
+                            (&anchor_save_stack, &subtract_count, (char*)event.data.mapping_start.anchor);
+                    }    
                 }
                 else
                 {
+                    // Possible removal of information to solve
+                    // anchor as key problem (&anchor: value)
+
                     std::string temp = std::string((char*)event.data.scalar.value, event.data.scalar.length);
                     
                     local_event_output += temp;
@@ -400,7 +403,6 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
                     {       
                         fprintf(stderr, "ERROR: Empty case\n");
                         *error_message_container = "ERROR";
-                        local_event_output += "(X)";
                     }
 
                     local_event_output += ("\n");         
@@ -480,7 +482,7 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 // ------------------------------ yaml-cpp test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-std::string parseYamlCppNode(YAML::Node* head, std::string* error_message_container)
+std::string normalizeYamlCppNode(YAML::Node* head, std::string* error_message_container)
 {
     std::stack <YAML::Node> iteration_list_stack;
 

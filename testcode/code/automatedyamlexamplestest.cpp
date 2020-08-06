@@ -1,4 +1,4 @@
-#include "testutils.cpp"
+#include "testutils.h"
 #include <dirent.h>
 
 bool runTest(std::string file_name, std::string& buffer)
@@ -40,7 +40,7 @@ bool runTest(std::string file_name, std::string& buffer)
             it != node.end(); it++)
         {
             std::cout << "Node:" << std::endl;
-            std::string temp_result_holder = parseYamlCppNode(&(*it), &yamlcpp_error_msg);
+            std::string temp_result_holder = normalizeYamlCppNode(&(*it), &yamlcpp_error_msg);
             std::cout << temp_result_holder << std::endl;
             yamlcpp_final_output += temp_result_holder;
 
@@ -57,6 +57,7 @@ bool runTest(std::string file_name, std::string& buffer)
     }
     catch (const std::exception& err)
     {
+        std::cout << err.what() << std::endl;
         yamlcpp_final_output = "ERROR";
     }
 

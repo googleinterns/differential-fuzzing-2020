@@ -1,4 +1,4 @@
-#include "testutils.cpp"
+#include "testutils.h"
 
 // ---------------------------------------------------------------------------------
 // -------------------------------------- main -------------------------------------
@@ -55,7 +55,7 @@ int main(int argc, char* args[])
             it != node.end(); it++)
         {
             std::cout << "Node:" << std::endl;
-            std::string temp_result_holder = parseYamlCppNode(&(*it), &yamlcpp_error_msg);
+            std::string temp_result_holder = normalizeYamlCppNode(&(*it), &yamlcpp_error_msg);
             std::cout << temp_result_holder << std::endl;
             yamlcpp_final_output += temp_result_holder;
 
@@ -76,7 +76,7 @@ int main(int argc, char* args[])
     }
     catch (const std::exception& err)
     {
-        std::cout << "ERROR: yaml-cpp based parser error \n"<< yamlcpp_final_output << std::endl;
+        std::cout << err.what() << std::endl;
         yamlcpp_final_output = "ERROR";
     }
 

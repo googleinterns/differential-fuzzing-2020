@@ -1,3 +1,5 @@
+../examples/emptyanchor.yaml
+../examples/enddoc.yaml
 ../examples/tagshorthandfull.yaml
 ../examples/anchorsequenceerror.yaml
 ../examples/invalidtag.yaml
