@@ -34,7 +34,7 @@ void addInfoToDataStack(std::stack<std::string>* anchor_data,
 
 std::string addTag(std::string* tag);
 
-yaml_parser_t parseLibyaml(std::string name_of_file, std::string* error_message_container);
+std::string parseLibyaml(std::string name_of_file, std::string* error_message_container);
 
 std::string normalizeLibyaml(std::string name_of_file, std::string* error_message_container);
 

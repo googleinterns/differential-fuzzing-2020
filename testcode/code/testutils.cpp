@@ -96,25 +96,9 @@ std::string addTag(std::string* tag)
     return temp_translator + " ";
 }
 
-yaml_parser_t parseLibyaml(std::string name_of_file, std::string* error_message_container)
+std::string parseLibyaml(std::string name_of_file, std::string* error_message_container)
 {
-    FILE *input;
-    yaml_parser_t parser;
-
-    input = fopen(name_of_file.c_str(), "rb");
-
-    if (!yaml_parser_initialize(&parser)) 
-    {
-        fprintf(stderr, "ERROR: Failed to initialize\n");
-
-        *error_message_container = "ERROR";
-
-        return parser;
-    }
-
-    yaml_parser_set_input_file(&parser, input);
-
-    return parser;
+    return name_of_file;
 }
 
 std::string normalizeLibyaml(std::string name_of_file, std::string* error_message_container)
@@ -157,7 +141,6 @@ std::string normalizeLibyaml(std::string name_of_file, std::string* error_messag
     }
 
     yaml_parser_set_input_file(&parser, input);
-
     while (true) 
     {
 
@@ -511,7 +494,17 @@ std::string normalizeLibyaml(std::string name_of_file, std::string* error_messag
 std::vector<YAML::Node> parseYamlCpp(std::string parse_me, 
                                             std::string* error_message_container)
 {
-    return YAML::LoadAllFromFile(parse_me);
+    std::vector<YAML::Node> return_me;
+    try
+    {
+        return_me = YAML::LoadAllFromFile(parse_me);
+    }
+    catch (const std::exception& err)
+    {
+        std::cout << err.what() << std::endl;
+        *error_message_container = "ERROR";
+    }
+    return return_me;
 }
 
 std::string normalizeYamlCpp(std::vector<YAML::Node>* nodes, 

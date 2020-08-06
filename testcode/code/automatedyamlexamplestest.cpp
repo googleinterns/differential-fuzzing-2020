@@ -3,63 +3,39 @@
 
 bool runTest(std::string file_name, std::string& buffer)
 {
-    std::string libyaml_error_string;
+    std::string libyaml_error_string = "";
 
-    std::string libyaml_final_output = normalizeLibyaml(file_name, &libyaml_error_string);
+    std::string libyaml_final_output = normalizeLibyaml(parseLibyaml
+        (file_name, &libyaml_error_string), &libyaml_error_string);
 
-    if(!libyaml_error_string.empty())
+    if (!libyaml_error_string.empty())
     {
         libyaml_final_output = libyaml_error_string;
     }
+    
+    std::string yamlcpp_error_msg = "";
+
+    std::vector<YAML::Node> parsed_nodes= parseYamlCpp(file_name, &yamlcpp_error_msg);
 
     std::string yamlcpp_final_output;
-
-    std::string yamlcpp_error_msg;
-
-    try
-    {   
-        std::ifstream stream_input_to_yamlcpp;
-
-        stream_input_to_yamlcpp.open(file_name);
-
-        std::string input_to_yamlcpp;
-
-        std::string temp_stream_parser_line;
-
-        while (std::getline(stream_input_to_yamlcpp, temp_stream_parser_line))
-        {
-            input_to_yamlcpp += temp_stream_parser_line + "\n";
-        }
-
-
-        std::string::size_type prev = 0, current = 0;
-
-        std::vector<YAML::Node> node = YAML::LoadAllFromFile(file_name);
-
-        for (std::vector<YAML::Node>::iterator it = node.begin(); 
-            it != node.end(); it++)
-        {
-            std::cout << "Node:" << std::endl;
-            std::string temp_result_holder = normalizeYamlCppNode(&(*it), &yamlcpp_error_msg);
-            std::cout << temp_result_holder << std::endl;
-            yamlcpp_final_output += temp_result_holder;
-
-            if(temp_result_holder.empty() && yamlcpp_error_msg.empty())
-            {
-                yamlcpp_error_msg = "ERROR";
-            }
-        }
+    if (!yamlcpp_error_msg.empty())
+    {
+        std::cout << "Oops" << std::endl;
+        yamlcpp_final_output = yamlcpp_error_msg;
+    }
+    else
+    {
+        std::cout << "Eeps" << std::endl;
+        yamlcpp_final_output = normalizeYamlCpp
+                (&parsed_nodes, &yamlcpp_error_msg);
 
         if (!yamlcpp_error_msg.empty())
         {
+            std::cout << "Uups" << std::endl;
             yamlcpp_final_output = yamlcpp_error_msg;
         }
     }
-    catch (const std::exception& err)
-    {
-        std::cout << err.what() << std::endl;
-        yamlcpp_final_output = "ERROR";
-    }
+    
 
     bool test = compareStringsCustom(libyaml_final_output, yamlcpp_final_output, buffer);
 

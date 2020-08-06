@@ -11,7 +11,7 @@ int main(int argc, char* args[])
 
     std::string libyaml_error_string;
 
-    std::string libyaml_final_output = normalizeLibyaml(args[1], &libyaml_error_string);
+    std::string libyaml_final_output = normalizeLibyaml(parseLibyaml(args[1], &libyaml_error_string), &libyaml_error_string);
 
     std::cout << "----------- libyaml output:" << std::endl;
 
@@ -21,7 +21,6 @@ int main(int argc, char* args[])
         std::cout << libyaml_final_output << std::endl;
         libyaml_final_output = libyaml_error_string;
         std::cout << "-------- " << std::endl;
-
     }
 
     std::cout << libyaml_final_output << "(END)" << std::endl;
@@ -38,6 +37,11 @@ int main(int argc, char* args[])
     std::cout << "--------yaml-cpp Output:" << std::endl;
     std::cout << yamlcpp_final_output << "(END)" << std::endl;
     std::cout << "--------" << std::endl;
+
+    if (!yamlcpp_error_msg.empty())
+    {
+        yamlcpp_final_output = yamlcpp_error_msg;
+    }
     std::cout << "- Conclusion: " << std::endl;
 
     std::string buffer;
