@@ -96,7 +96,28 @@ std::string addTag(std::string* tag)
     return temp_translator + " ";
 }
 
-std::string parseLibyaml(std::string name_of_file, std::string* error_message_container)
+yaml_parser_t parseLibyaml(std::string name_of_file, std::string* error_message_container)
+{
+    FILE *input;
+    yaml_parser_t parser;
+
+    input = fopen(name_of_file.c_str(), "rb");
+
+    if (!yaml_parser_initialize(&parser)) 
+    {
+        fprintf(stderr, "ERROR: Failed to initialize\n");
+
+        *error_message_container = "ERROR";
+
+        return parser;
+    }
+
+    yaml_parser_set_input_file(&parser, input);
+
+    return parser;
+}
+
+std::string normalizeLibyaml(std::string name_of_file, std::string* error_message_container)
 {
     FILE *input;
     yaml_parser_t parser;
@@ -240,6 +261,11 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 
                 break;
             case YAML_MAPPING_START_EVENT:
+
+                if (event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
+                {
+                    std::cout << "flow style" << std::endl;
+                }
 
                 if (!mode_stack.empty())
                 {
@@ -481,6 +507,42 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
 // ---------------------------------------------------------------------------------
 // ------------------------------ yaml-cpp test code -------------------------------
 // ---------------------------------------------------------------------------------
+
+std::vector<YAML::Node> parseYamlCpp(std::string parse_me, 
+                                            std::string* error_message_container)
+{
+    return YAML::LoadAllFromFile(parse_me);
+}
+
+std::string normalizeYamlCpp(std::vector<YAML::Node>* nodes, 
+                                std::string* error_message_container)
+{
+    std::string yamlcpp_final_output;
+
+    try
+    {   
+        for (std::vector<YAML::Node>::iterator it = nodes->begin(); 
+            it != nodes->end(); it++)
+        {
+            std::string temp_result_holder = normalizeYamlCppNode(&(*it), error_message_container);
+            std::cout << temp_result_holder << std::endl;
+            yamlcpp_final_output += temp_result_holder;
+
+            if(temp_result_holder.empty() && error_message_container->empty())
+            {
+                *error_message_container = "ERROR";
+            }
+        }
+    }
+    catch (const std::exception& err)
+    {
+        std::cout << err.what() << std::endl;
+        yamlcpp_final_output = "ERROR";
+    }
+
+    return yamlcpp_final_output;
+}
+
 
 std::string normalizeYamlCppNode(YAML::Node* head, std::string* error_message_container)
 {

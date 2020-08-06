@@ -34,11 +34,19 @@ void addInfoToDataStack(std::stack<std::string>* anchor_data,
 
 std::string addTag(std::string* tag);
 
-std::string parseLibyaml(std::string name_of_file, std::string* error_message_container);
+yaml_parser_t parseLibyaml(std::string name_of_file, std::string* error_message_container);
 
+std::string normalizeLibyaml(std::string name_of_file, std::string* error_message_container);
+
+// virtual void* parse(const uint8_t* input, size_t input_size, std::string* error_code) = 0;
+// virtual differential_parser::ParserOutput* normalize(void* input, std::string* error_code) = 0;
 // ---------------------------------------------------------------------------------
 // ------------------------------ yaml-cpp test code -------------------------------
 // ---------------------------------------------------------------------------------
+
+std::vector<YAML::Node> parseYamlCpp(std::string parse_me, std::string* error_message_container);
+
+std::string normalizeYamlCpp(std::vector<YAML::Node>* nodes, std::string* error_message_container);
 
 std::string normalizeYamlCppNode(YAML::Node* head, std::string* error_message_container);
 

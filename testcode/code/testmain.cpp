@@ -7,11 +7,11 @@ int main(int argc, char* args[])
 {
     std::cout << "----------- libyaml tests -----------" << std::endl;
 
-    // parseLibyaml(args[1]);
+    // normalizeLibyaml(args[1]);
 
     std::string libyaml_error_string;
 
-    std::string libyaml_final_output = parseLibyaml(args[1], &libyaml_error_string);
+    std::string libyaml_final_output = normalizeLibyaml(args[1], &libyaml_error_string);
 
     std::cout << "----------- libyaml output:" << std::endl;
 
@@ -27,58 +27,13 @@ int main(int argc, char* args[])
     std::cout << libyaml_final_output << "(END)" << std::endl;
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
-
-    std::string yamlcpp_final_output;
-
+    
     std::string yamlcpp_error_msg;
 
-    try
-    {   
-        std::ifstream stream_input_to_yamlcpp;
+    std::vector<YAML::Node> parsed_nodes= parseYamlCpp(args[1], &yamlcpp_error_msg);
 
-        stream_input_to_yamlcpp.open(args[1]);
-
-        std::string input_to_yamlcpp;
-
-        std::string temp_stream_parser_line;
-
-        while(std::getline(stream_input_to_yamlcpp, temp_stream_parser_line))
-        {
-            input_to_yamlcpp += temp_stream_parser_line + "\n";
-        }
-
-        std::string::size_type prev = 0, current = 0;
-
-        std::vector<YAML::Node> node = YAML::LoadAllFromFile(args[1]);
-
-        for (std::vector<YAML::Node>::iterator it = node.begin(); 
-            it != node.end(); it++)
-        {
-            std::cout << "Node:" << std::endl;
-            std::string temp_result_holder = normalizeYamlCppNode(&(*it), &yamlcpp_error_msg);
-            std::cout << temp_result_holder << std::endl;
-            yamlcpp_final_output += temp_result_holder;
-
-            if(temp_result_holder.empty() && yamlcpp_error_msg.empty())
-            {
-                yamlcpp_error_msg = "ERROR";
-            }
-        }
-
-        if(!yamlcpp_error_msg.empty())
-        {
-            std::cout << "-------- Before error:" << std::endl;
-            std::cout << yamlcpp_final_output << std::endl;
-            yamlcpp_final_output = yamlcpp_error_msg;
-            std::cout << "-------- " << std::endl;
-        }
-        std::cout << "(END)" << std::endl;
-    }
-    catch (const std::exception& err)
-    {
-        std::cout << err.what() << std::endl;
-        yamlcpp_final_output = "ERROR";
-    }
+    std::string yamlcpp_final_output = normalizeYamlCpp
+                (&parsed_nodes, &yamlcpp_error_msg);
 
     std::cout << "--------yaml-cpp Output:" << std::endl;
     std::cout << yamlcpp_final_output << "(END)" << std::endl;

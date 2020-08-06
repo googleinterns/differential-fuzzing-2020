@@ -5,7 +5,7 @@ bool runTest(std::string file_name, std::string& buffer)
 {
     std::string libyaml_error_string;
 
-    std::string libyaml_final_output = parseLibyaml(file_name, &libyaml_error_string);
+    std::string libyaml_final_output = normalizeLibyaml(file_name, &libyaml_error_string);
 
     if(!libyaml_error_string.empty())
     {
