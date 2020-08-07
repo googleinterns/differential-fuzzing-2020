@@ -101,13 +101,13 @@ std::string parseLibyaml(std::string name_of_file, std::string* error_message_co
     return name_of_file;
 }
 
-std::string normalizeLibyaml(std::string name_of_file, std::string* error_message_container)
+std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* error_message_container)
 {
     FILE *input;
     yaml_parser_t parser;
     yaml_event_t event;
 
-    std::string libyaml_final_output = "";
+    std::vector<YAML::Node> libyaml_final_output;
     
     bool interest_in_saving = false;
 
@@ -141,10 +141,11 @@ std::string normalizeLibyaml(std::string name_of_file, std::string* error_messag
     }
 
     yaml_parser_set_input_file(&parser, input);
+    
+    YAML::Node current_node;
+    
     while (true) 
-    {
-
-        std::string local_event_output = "";
+    {   
 
         yaml_event_type_t type;
 
@@ -174,305 +175,42 @@ std::string normalizeLibyaml(std::string name_of_file, std::string* error_messag
                 break;
             case YAML_DOCUMENT_END_EVENT:
 
-                interest_in_saving = addToMapDirective(&anchor_map, &anchor_save_stack, 
-                    &anchor_data_save_stack, subtract_count, interest_in_saving);   
-
-                interest_in_saving = false;
-
-                subtract_count = 2;
-
-                anchor_map.clear();
-
-                while (!anchor_save_stack.empty())
-                {
-                    anchor_save_stack.pop();
-                }
-
-                while (!anchor_data_save_stack.empty())
-                {
-                    anchor_data_save_stack.pop();
-                }
-
-                while (!mode_stack.empty())
-                {
-                    mode_stack.pop();
-                }
-
-                mode_stack.push(' ');
-
-                while (!map_mode_stack.empty())
-                {
-                    map_mode_stack.pop();
-                }
-
-                map_mode = true;
-
-                std::cout << "Doc end" << std::endl;
+                // dump code
 
                 break;            
             case YAML_DOCUMENT_START_EVENT:
 
-                interest_in_saving = false;
-
-                subtract_count = 2;
-
-                anchor_map.clear();
-
-                while (!anchor_save_stack.empty())
-                {
-                    anchor_save_stack.pop();
-                }
-
-                while (!anchor_data_save_stack.empty())
-                {
-                    anchor_data_save_stack.pop();
-                }
-
-                while (!mode_stack.empty())
-                {
-                    mode_stack.pop();
-                }
-
-                mode_stack.push(' ');
-
-                while (!map_mode_stack.empty())
-                {
-                    map_mode_stack.pop();
-                }
-
-                    map_mode = true;
+                // dump code
 
                 break;
             case YAML_MAPPING_START_EVENT:
 
-                if (event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
-                {
-                    std::cout << "flow style" << std::endl;
-                }
-
-                if (!mode_stack.empty())
-                {
-                    positionAnalysis(&local_event_output, mode_stack.top(), map_mode);
-                }
-
-                if (mode_stack.top()=='M')
-                {
-                    map_mode_stack.push(!map_mode);
-                }
-
-                mode_stack.push('M');
-
-                map_mode = true;
-
-                if (event.data.mapping_start.anchor)
-                {
-                    interest_in_saving = addToStack
-                        (&anchor_save_stack, &subtract_count, (char*)event.data.mapping_start.anchor);
-                }      
-                else
-                {
-                    local_event_output += 
-                        std::string((char*)event.data.scalar.value, event.data.scalar.length);        
-                }
-
-                if (event.data.mapping_start.tag)
-                {
-                    std::string temp_translator = ((char*)event.data.mapping_start.tag);
-
-                    local_event_output += addTag(&temp_translator) + "\n";
-                }                
-                else
-                {
-                    local_event_output += "\n";
-                }
 
                 break;
             case YAML_MAPPING_END_EVENT:
-                mode_stack.pop();
-
-                if(mode_stack.top()=='M')
-                {
-                    map_mode = map_mode_stack.top();
-                    map_mode_stack.pop();
-                }
-
-                interest_in_saving = addToMapDirective(&anchor_map, &anchor_save_stack, 
-                    &anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
                 
-                if (!mode_stack.empty())
-                {
-                    map_mode = positionAnalysis(&local_event_output, mode_stack.top(), map_mode);
-                }
-
-                mode_stack.push('S');
-
-                // if (event.data.sequence_start.anchor) 
-                if (event.data.scalar.anchor)
-                {
-                    interest_in_saving = addToStack
-                        (&anchor_save_stack, &subtract_count, (char*)event.data.mapping_start.anchor);
-                }
-                else
-                {
-                    local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);                
-                }
-
-                if (event.data.sequence_start.tag) 
-                {
-                    std::string temp_translator = ((char*)event.data.sequence_start.tag);
-
-                    local_event_output += (addTag(&temp_translator) + "\n");
-                }
-                else
-                {
-                    local_event_output += "\n";
-                }
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
-                mode_stack.pop();
-
-                interest_in_saving = addToMapDirective(&anchor_map, &anchor_save_stack, 
-                    &anchor_data_save_stack, subtract_count, interest_in_saving);
 
                 break;
             case YAML_SCALAR_EVENT:
-
-                
-
-
-                map_mode = positionAnalysis(&local_event_output, mode_stack.top(), map_mode);
-
-                if (event.data.scalar.tag)
-                {
-                    std::string temp_translator = ((char*)event.data.scalar.tag);
-
-                    local_event_output += addTag(&temp_translator) + "- ";
-                }
-                else
-                {
-                    local_event_output += "- ";
-                }
-
-                if (event.data.scalar.anchor)
-                {
-                    std::string temp_translator = ((char*)event.data.mapping_start.anchor);
-
-                    if (event.data.scalar.value)
-                    {
-
-                        local_event_output += std::string((char*)event.data.scalar.value, event.data.scalar.length);
-                        local_event_output += "\n";
-                        subtract_count = 2;
-
-                        std::string temp_anchor_data = "";
-
-                        if (event.data.scalar.tag)
-                        {
-                            std::string temp_tag_translator = ((char*)event.data.scalar.tag);
-
-                            temp_anchor_data += addTag(&temp_tag_translator) + "- ";
-                        }
-                        else
-                        {
-                            temp_anchor_data += "- ";
-                        }
-
-                        temp_anchor_data += std::string((char*)event.data.scalar.value, event.data.scalar.length) + "\n";
-
-                        addToMap(&anchor_map, &temp_translator, &temp_anchor_data);
-
-                        std::cout << "Scalar anchor" << std::endl;
-
-                        if (event.data.scalar.length == 0)
-                        {
-                            local_event_output = "";
-                        }                    
-                    }
-                    else
-                    {
-                        interest_in_saving = addToStack
-                            (&anchor_save_stack, &subtract_count, (char*)event.data.mapping_start.anchor);
-                    }    
-                }
-                else
-                {
-                    // Possible removal of information to solve
-                    // anchor as key problem (&anchor: value)
-
-                    std::string temp = std::string((char*)event.data.scalar.value, event.data.scalar.length);
-                    
-                    local_event_output += temp;
-
-                    if (temp.empty() && !(event.data.scalar.tag) && 
-                        event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
-                    {       
-                        fprintf(stderr, "ERROR: Empty case\n");
-                        *error_message_container = "ERROR";
-                    }
-
-                    local_event_output += ("\n");         
-                }
 
                 break;
             case YAML_ALIAS_EVENT:
             {
 
-                std::string temp_translator = ((char*) event.data.alias.anchor);
-                
-                std::string& temp_holder = anchor_map[temp_translator];
-
-                if (!temp_holder.empty())
-                {
-                    map_mode = positionAnalysis(&local_event_output, mode_stack.top(), map_mode);
-                    
-                    if (temp_holder.front() == 'K' || temp_holder.front() == 'V' || temp_holder.front() == 'L'||
-                        temp_holder.front() == 'U')
-                    {
-                        local_event_output += "\n";
-                    }
-                    local_event_output += temp_holder;
-                }
-                else
-                {
-                    yaml_event_delete(&event);
-
-                    assert(!fclose(input));
-
-                    yaml_parser_delete(&parser);
-
-                    fprintf(stderr, "ERROR: Missing anchor\n");
-
-                    *error_message_container = "ERROR";
-
-                    return libyaml_final_output;
-                }
                 break;
             }
             default: 
-                std::cout << "Default case" << std::endl;                
+
                 break;
         }
         
         yaml_event_delete(&event);
-
-        if (type == YAML_STREAM_END_EVENT)
-            break;
-
-        if (subtract_count <= 1 && interest_in_saving)
-        {
-            addInfoToDataStack(&anchor_data_save_stack, local_event_output);
-        }
-
-        if(interest_in_saving)
-        {
-            subtract_count--;
-        }
-
-        libyaml_final_output += local_event_output;
 
     }
 

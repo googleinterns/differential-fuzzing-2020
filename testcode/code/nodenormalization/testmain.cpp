@@ -7,7 +7,10 @@ int main(int argc, char* args[])
 {
     std::cout << "----------- libyaml tests -----------" << std::endl;
 
-    // normalizeLibyaml(args[1]);
+    YAML::Node temp_test;
+    YAML::Node another_layer;
+
+    normalizeLibyaml(args[1]);
 
     std::string libyaml_error_string;
 

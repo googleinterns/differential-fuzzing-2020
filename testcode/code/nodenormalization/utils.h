@@ -36,7 +36,8 @@ std::string addTag(std::string* tag);
 
 std::string parseLibyaml(std::string name_of_file, std::string* error_message_container);
 
-std::string normalizeLibyaml(std::string name_of_file, std::string* error_message_container);
+std::vector<YAML::Node> normalizeLibyaml
+        (std::string name_of_file, std::string* error_message_container);
 
 // virtual void* parse(const uint8_t* input, size_t input_size, std::string* error_code) = 0;
 // virtual differential_parser::ParserOutput* normalize(void* input, std::string* error_code) = 0;
