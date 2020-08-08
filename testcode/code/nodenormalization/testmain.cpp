@@ -10,23 +10,23 @@ int main(int argc, char* args[])
     YAML::Node temp_test;
     YAML::Node another_layer;
 
-    normalizeLibyaml(args[1]);
+    std::string libyaml_error_string = "";
+    // scalar
+    // sequence
+    // anchor
 
-    std::string libyaml_error_string;
 
-    std::string libyaml_final_output = normalizeLibyaml(parseLibyaml(args[1], &libyaml_error_string), &libyaml_error_string);
+    std::vector<YAML::Node> libyaml_final_output = 
+        normalizeLibyaml(parseLibyaml(args[1], &libyaml_error_string), &libyaml_error_string);
 
-    std::cout << "----------- libyaml output:" << std::endl;
+    std::string libyaml_final_string_output = normalizeYamlCpp(&libyaml_final_output, &libyaml_error_string);
 
     if (!libyaml_error_string.empty())
     {
         std::cout << "-------- Before error:" << std::endl;
-        std::cout << libyaml_final_output << std::endl;
-        libyaml_final_output = libyaml_error_string;
+        libyaml_final_string_output = libyaml_error_string;
         std::cout << "-------- " << std::endl;
     }
-
-    std::cout << libyaml_final_output << "(END)" << std::endl;
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
     
@@ -49,7 +49,7 @@ int main(int argc, char* args[])
 
     std::string buffer;
 
-    if (compareStringsCustom(libyaml_final_output, yamlcpp_final_output, buffer))
+    if (compareStringsCustom(libyaml_final_string_output, yamlcpp_final_output, buffer))
     {
         std::cout << buffer << std::endl;  
         std::cout << "Cases equal!" << std::endl;

@@ -18,7 +18,7 @@
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-bool positionAnalysis(std::string* add_to_me, char reference_character, bool map_mode);
+bool positionAnalysis(char* add_to_me, char reference_character, bool map_mode);
 
 void addToMap(std::map<std::string, std::string>* anchor_map, 
     std::string* anchor, std::string* anchor_data);
@@ -33,6 +33,9 @@ void addInfoToDataStack(std::stack<std::string>* anchor_data,
     std::string info);
 
 std::string addTag(std::string* tag);
+
+void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
+    char* tracking_current_type);
 
 std::string parseLibyaml(std::string name_of_file, std::string* error_message_container);
 

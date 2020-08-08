@@ -5,8 +5,10 @@ bool runTest(std::string file_name, std::string& buffer)
 {
     std::string libyaml_error_string = "";
 
-    std::string libyaml_final_output = normalizeLibyaml(parseLibyaml
-        (file_name, &libyaml_error_string), &libyaml_error_string);
+    std::vector<YAML::Node> libyaml_final_output_nodes = 
+        normalizeLibyaml(parseLibyaml(file_name, &libyaml_error_string), &libyaml_error_string);
+
+    std::string libyaml_final_output = normalizeYamlCpp(&libyaml_final_output_nodes, &libyaml_error_string);
 
     if (!libyaml_error_string.empty())
     {

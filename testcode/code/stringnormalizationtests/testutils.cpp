@@ -243,12 +243,8 @@ std::string normalizeLibyaml(std::string name_of_file, std::string* error_messag
                     map_mode = true;
 
                 break;
+                // --------
             case YAML_MAPPING_START_EVENT:
-
-                if (event.data.mapping_start.style == YAML_FLOW_MAPPING_STYLE)
-                {
-                    std::cout << "flow style" << std::endl;
-                }
 
                 if (!mode_stack.empty())
                 {
@@ -342,8 +338,6 @@ std::string normalizeLibyaml(std::string name_of_file, std::string* error_messag
             case YAML_SCALAR_EVENT:
 
                 
-
-
                 map_mode = positionAnalysis(&local_event_output, mode_stack.top(), map_mode);
 
                 if (event.data.scalar.tag)
