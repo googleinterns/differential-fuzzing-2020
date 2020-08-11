@@ -1,12 +1,14 @@
 #include "utils.h"
 
+enum mode_type {map_type, key_type, value_type, sequence_type, unknown_type};
+
 // ---------------------------------------------------------------------------------
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
 
 bool positionAnalysis(char* add_to_me, const char reference_character, const bool map_mode)
 {
-    if (reference_character == 'M')
+    if (reference_character == map_type)
     {
         if (map_mode)
         {
@@ -18,7 +20,7 @@ bool positionAnalysis(char* add_to_me, const char reference_character, const boo
         }
         return !map_mode;
     }
-    else if (reference_character == 'S')
+    else if (reference_character == sequence_type)
     {
         *add_to_me = 'L';
     }
@@ -149,7 +151,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
     std::stack<char> mode_stack;
 
-    mode_stack.push(' ');
+    mode_stack.push(unknown_type);
 
     std::stack<bool> map_mode_stack;
 
@@ -220,7 +222,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 mode_stack.pop();
 
-                if(mode_stack.top()=='M')
+                if (mode_stack.top() == map_type)
                 {
                     map_mode = map_mode_stack.top();
                     map_mode_stack.pop();
@@ -249,7 +251,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
                 }
 
-                if (mode_stack.top()=='M')
+                if (mode_stack.top() == map_type)
                 {
                     map_mode_stack.push(!map_mode);
                 }
@@ -259,7 +261,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 //     //handle anchors
                 // }      
 
-                mode_stack.push('M');
+                mode_stack.push(map_type);
                 map_mode = true;
 
                 if (event.data.mapping_start.tag)
@@ -285,7 +287,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 //     //handle anchors
                 // }      
 
-                mode_stack.push('S');
+                mode_stack.push(sequence_type);
 
                 if (event.data.sequence_start.tag) 
                 {
