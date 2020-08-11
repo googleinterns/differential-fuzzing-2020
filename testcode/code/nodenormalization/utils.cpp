@@ -4,12 +4,7 @@
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-void addKeyToNode(YAML::Node* destinty, std::string key)
-{
-    (*destinty)[key];
-}
-
-bool positionAnalysis(char* add_to_me, char reference_character, bool map_mode)
+bool positionAnalysis(char* add_to_me, const char reference_character, const bool map_mode)
 {
     if (reference_character == 'M')
     {
@@ -67,29 +62,6 @@ bool addToMapDirective(std::map<std::string, std::string>* anchor_map,
     return interest_in_saving;
 }
 
-bool addToStack(std::stack<std::string>* anchor_save_stack,int* subtract_count, char* anchor)
-{
-    anchor_save_stack->push(anchor);
-    *subtract_count = 2;
-
-    return true;
-}
-
-
-void addInfoToDataStack(std::stack<std::string>* anchor_data, 
-    std::string info)
-{
-    if (!anchor_data->empty())
-    {
-        std::string& temp = anchor_data->top();
-        temp += info;
-    }
-    else
-    {
-        anchor_data->push(info);
-    }
-}
-
 void addTag(YAML::Node* current_node, yaml_char_t* tag)
 {
     if(tag)
@@ -106,7 +78,7 @@ void addTag(YAML::Node* current_node, yaml_char_t* tag)
 
 void addToNode
     (YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
-    char* tracking_current_type, yaml_char_t* tag)
+    const char* tracking_current_type, yaml_char_t* tag)
 {
     addTag(addToMe, tag);
 
@@ -130,7 +102,7 @@ void addToNode
     }
 }
 
-std::string parseLibyaml(std::string name_of_file, std::string* error_message_container)
+std::string parseLibyaml(const std::string name_of_file, std::string* error_message_container)
 {
     return name_of_file;
 }
@@ -402,7 +374,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 // ------------------------------ yaml-cpp test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-std::vector<YAML::Node> parseYamlCpp(std::string parse_me, 
+std::vector<YAML::Node> parseYamlCpp(const std::string parse_me, 
                                             std::string* error_message_container)
 {
     std::vector<YAML::Node> return_me;
@@ -418,7 +390,7 @@ std::vector<YAML::Node> parseYamlCpp(std::string parse_me,
     return return_me;
 }
 
-std::string normalizeYamlCpp(std::vector<YAML::Node>* nodes, 
+std::string normalizeYamlCpp(const std::vector<YAML::Node>* nodes, 
                                 std::string* error_message_container)
 {
     std::string yamlcpp_final_output;
@@ -431,7 +403,7 @@ std::string normalizeYamlCpp(std::vector<YAML::Node>* nodes,
 
     try
     {   
-        for (std::vector<YAML::Node>::iterator it = nodes->begin(); 
+        for (std::vector<YAML::Node>::const_iterator it = nodes->begin(); 
             it != nodes->end(); it++)
         {
             std::string temp_result_holder = normalizeYamlCppNode(&(*it), error_message_container);
@@ -454,7 +426,7 @@ std::string normalizeYamlCpp(std::vector<YAML::Node>* nodes,
 }
 
 
-std::string normalizeYamlCppNode(YAML::Node* head, std::string* error_message_container)
+std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_message_container)
 {
     std::stack <YAML::Node> iteration_list_stack;
 
@@ -563,10 +535,10 @@ std::string normalizeYamlCppNode(YAML::Node* head, std::string* error_message_co
 // ---------------------------------- testcode -------------------------------------
 // ---------------------------------------------------------------------------------
 
-bool compareStringsCustom(std::string compareMeOne, std::string compareMeTwo, std::string& buffer)
+bool compareStringsCustom(const std::string compareMeOne, const std::string compareMeTwo, std::string& buffer)
 {
-    std::string::iterator ptrOne = compareMeOne.begin();
-    std::string::iterator ptrTwo = compareMeTwo.begin();
+    std::string::const_iterator ptrOne = compareMeOne.begin();
+    std::string::const_iterator ptrTwo = compareMeTwo.begin();
 
     while (*ptrOne == *ptrTwo && ((ptrOne != compareMeOne.end()) || (ptrTwo != compareMeTwo.end())))
     {
