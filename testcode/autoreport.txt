@@ -1,4 +1,3 @@
 ../examples/emptyanchor.yaml
 ../examples/anchors.yaml
 ../examples/enddoc.yaml
-../examples/multisequence.yaml

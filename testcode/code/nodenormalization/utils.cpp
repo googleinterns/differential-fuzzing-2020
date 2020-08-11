@@ -87,18 +87,18 @@ void addToNode
     std::cout << *tracking_current_type << "----"<< std::endl;
     if (*tracking_current_type == sequence_type)
     {
-        std::cout << *addToMe << "--L--" << *addMe << std::endl;
+        std::cout << "--L--" << *addMe << std::endl;
         addToMe->push_back(*addMe);
     }
     else if (*tracking_current_type == key_type)
     {
-        std::cout << *addToMe << "--K--" << *addMe << std::endl;
+        std::cout << "--K--" << *addMe << std::endl;
         key_stack->push(*addMe);
         (*addToMe)[*addMe] = "";
     }
     else if (*tracking_current_type == value_type)
     {
-        std::cout << *addToMe << "--V--" << *addMe << std::endl;
+        std::cout << "--V--" << *addMe << std::endl;
         (*addToMe)[key_stack->top()] = *addMe;
         key_stack->pop();
     }
@@ -218,7 +218,18 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
             case YAML_MAPPING_END_EVENT:
 
-                std::cout << "map end" << std::endl;
+                mode_stack.pop();
+                
+                if (mode_stack.top() == map_type)
+                {
+                    map_mode = map_mode_stack.top();
+                    map_mode_stack.pop();
+                }
+
+                end_event_addition(&libyaml_final_output, &mode_stack.top(), !map_mode, &key_stack);
+
+                break;
+            case YAML_SEQUENCE_END_EVENT:
 
                 mode_stack.pop();
 
@@ -231,18 +242,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 end_event_addition(&libyaml_final_output, &mode_stack.top(), !map_mode, &key_stack);
 
                 break;
-            case YAML_SEQUENCE_END_EVENT:
-
-                std::cout << "sequence end" << std::endl;
-
-                mode_stack.pop();
-
-                end_event_addition(&libyaml_final_output, &mode_stack.top(), map_mode, &key_stack);
-
-                break;
             case YAML_MAPPING_START_EVENT:
-
-                std::cout << "map start" << std::endl;
                 
                 libyaml_final_output.push_back(YAML::Node());
 
@@ -256,13 +256,14 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     map_mode_stack.push(!map_mode);
                 }
 
+                mode_stack.push(map_type);
+                map_mode = true;
+
                 // if (event.data.mapping_start.anchor)
                 // {
                 //     //handle anchors
                 // }      
 
-                mode_stack.push(map_type);
-                map_mode = true;
 
                 if (event.data.mapping_start.tag)
                 {
@@ -276,19 +277,19 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 libyaml_final_output.push_back(YAML::Node());
 
-                if (mode_stack.empty())
+                if (mode_stack.top() == map_type)
                 {
-                    std::cout << "Create" << std::endl;
-                    libyaml_final_output.push_back(YAML::Node());
+                    map_mode_stack.push(!map_mode);
                 }
+
+            
+                mode_stack.push(sequence_type);
 
                 // if (event.data.sequence_start.anchor)
                 // {
                 //     //handle anchors
                 // }      
-
-                mode_stack.push(sequence_type);
-
+                
                 if (event.data.sequence_start.tag) 
                 {
                     //more squences cases
@@ -350,8 +351,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
         if (type == YAML_STREAM_END_EVENT)
             break;
-
-        std::cout << "Size:" << libyaml_final_output.size() << std::endl;
     }
 
     assert(!fclose(input));
