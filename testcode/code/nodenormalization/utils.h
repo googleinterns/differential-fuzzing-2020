@@ -35,7 +35,7 @@ void addInfoToDataStack(std::stack<std::string>* anchor_data,
 std::string addTag(std::string* tag);
 
 void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
-    char* tracking_current_type);
+    char* tracking_current_type, yaml_char_t* tag);
 
 std::string parseLibyaml(std::string name_of_file, std::string* error_message_container);
 
