@@ -12,21 +12,21 @@ bool positionAnalysis(char* add_to_me, const char reference_character, const boo
     {
         if (map_mode)
         {
-            *add_to_me = 'K';
+            *add_to_me = key_type;
         }
         else
         {
-            *add_to_me = 'V';
+            *add_to_me = value_type;
         }
         return !map_mode;
     }
     else if (reference_character == sequence_type)
     {
-        *add_to_me = 'L';
+        *add_to_me = sequence_type;
     }
     else
     {
-        *add_to_me = 'U';
+        *add_to_me = unknown_type;
     }
 
     return map_mode;
@@ -85,18 +85,18 @@ void addToNode
     addTag(addToMe, tag);
 
     std::cout << *tracking_current_type << "----"<< std::endl;
-    if (*tracking_current_type == 'L')
+    if (*tracking_current_type == sequence_type)
     {
         std::cout << *addToMe << "--L--" << *addMe << std::endl;
         addToMe->push_back(*addMe);
     }
-    else if (*tracking_current_type == 'K')
+    else if (*tracking_current_type == key_type)
     {
         std::cout << *addToMe << "--K--" << *addMe << std::endl;
         key_stack->push(*addMe);
         (*addToMe)[*addMe] = "";
     }
-    else if (*tracking_current_type == 'V')
+    else if (*tracking_current_type == value_type)
     {
         std::cout << *addToMe << "--V--" << *addMe << std::endl;
         (*addToMe)[key_stack->top()] = *addMe;

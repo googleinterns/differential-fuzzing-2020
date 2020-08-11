@@ -14,11 +14,13 @@
 #include "include/yaml.h"
 #include "yaml-cpp/yaml.h"
 
+enum mode_type {map_type, key_type, value_type, sequence_type, unknown_type};
+
 // ---------------------------------------------------------------------------------
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-bool positionAnalysis(char* add_to_me, const char reference_character, 
+bool positionAnalysis(mode_type* add_to_me, const char reference_character, 
     const bool map_mode);
 
 void addToMap(std::map<std::string, std::string>* anchor_map, 
