@@ -52,7 +52,7 @@ int main(int argc, char* args[])
     
     std::string yamlcpp_error_msg;
 
-    std::vector<YAML::Node> parsed_nodes= parseYamlCpp(args[1], &yamlcpp_error_msg);
+    std::vector<YAML::Node> parsed_nodes = parseYamlCpp(args[1], &yamlcpp_error_msg);
 
     std::string yamlcpp_final_output = normalizeYamlCpp
                 (&parsed_nodes, &yamlcpp_error_msg);
@@ -64,6 +64,7 @@ int main(int argc, char* args[])
     if (!yamlcpp_error_msg.empty())
     {
         yamlcpp_final_output = yamlcpp_error_msg;
+        std::cout << "ERROR" << std::endl;
     }
     std::cout << "- Conclusion: " << std::endl;
 

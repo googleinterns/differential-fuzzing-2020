@@ -81,7 +81,7 @@ void addToNode
     (YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
     const mode_type* tracking_current_type, yaml_char_t* tag)
 {
-
+    addTag(addMe, tag);
     if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
     {
         addToMe->push_back(*addMe);
@@ -89,7 +89,7 @@ void addToNode
     else if (*tracking_current_type ==  mode_type::KEY_TYPE)
     {
         key_stack->push(*addMe);
-        (*addToMe)[*addMe] = "";
+        (*addToMe)[*addMe];
     }
     else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
     {
@@ -98,7 +98,7 @@ void addToNode
     }
     else
     {
-        std::cout << "SCL" << std::endl;
+        std::cout << "no case" << std::endl;
     }
     
 }
@@ -232,6 +232,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             case YAML_MAPPING_END_EVENT:
 
                 std::cout << "SQU-" << std::endl;
+
                 map_mode = end_event_addition(&libyaml_final_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
@@ -300,8 +301,23 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             {
                 std::cout << "SCL" << std::endl;
                 map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
-                
+
                 YAML::Node addMe(std::string((char*)event.data.scalar.value, event.data.scalar.length));
+
+                if (event.data.scalar.length <= 0)
+                {
+                    yaml_event_delete(&event);
+
+                    assert(!fclose(input));
+
+                    yaml_parser_delete(&parser);
+
+                    fprintf(stderr, "ERROR: Empty node\n");
+
+                    *error_message_container = "ERROR";
+
+                    return libyaml_final_output;
+                }
 
                 if (libyaml_final_output.empty())
                 {
@@ -309,10 +325,10 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 }            
                 else
                 {
-                    addTag(&addMe, event.data.scalar.tag);
+                    // addTag(&addMe, event.data.scalar.tag);
                     addToNode(&libyaml_final_output.back(), &addMe, &key_stack, &tracking_current_type, 
-                        nullptr);
-                }
+                        event.data.scalar.tag);
+                }           
                 
                 std::cout << libyaml_final_output.back() <<std::endl;
 
@@ -371,7 +387,9 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
     if (!libyaml_final_output.empty())
     {
+        std::cout << "Node output:" << std::endl;
         std::cout << libyaml_final_output.back() << std::endl;
+        std::cout << "-----------------" << std::endl;
     }
     
     return libyaml_final_output;
@@ -457,7 +475,7 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
 
         const std::string& tag_holder = base_iterator.Tag();
 
-        if (tag_holder != "?" && tag_holder != "!")
+        if (tag_holder != "?" && tag_holder != "!" && tag_holder != "")
         {
             yamlcpp_final_output += tag_holder + " ";
         }
@@ -560,6 +578,7 @@ bool compareStringsCustom
 
     if(!((ptrOne == compareMeOne.end())  && (ptrTwo == compareMeTwo.end())))
     {
+         buffer += "(X)";
         return false;
     }
     else
