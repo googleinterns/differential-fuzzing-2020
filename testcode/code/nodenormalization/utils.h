@@ -30,13 +30,6 @@ enum class mode_type
 bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character, 
     const bool map_mode);
 
-void addToMap(std::map<std::string, std::string>* anchor_map, 
-    std::string* anchor, std::string* anchor_data);
-
-bool addToMapDirective(std::map<std::string, std::string>* anchor_map, 
-    std::stack<std::string>* anchor_save_stack, std::stack<std::string>* anchor_data_save_stack,
-    int& subtract_count, bool interest_in_saving); 
-
 std::string addTag(std::string* tag);
 
 void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 

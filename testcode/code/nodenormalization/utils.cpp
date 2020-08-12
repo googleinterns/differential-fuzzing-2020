@@ -30,38 +30,6 @@ bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character,
     return map_mode;
 }
 
-void addToMap(std::map<std::string, std::string>* anchor_map, 
-    std::string* anchor, std::string* anchor_data)
-{
-    if (anchor != nullptr)
-    {
-        if (anchor_map->count(*anchor))
-        {
-            (*anchor_map)[*anchor] = *anchor_data;
-        }
-        else
-        {
-            anchor_map->insert({*anchor, *anchor_data});
-        }
-    }
-}
-
-bool addToMapDirective(std::map<std::string, std::string>* anchor_map, 
-    std::stack<std::string>* anchor_save_stack, std::stack<std::string>* anchor_data_save_stack,
-    int& subtract_count, bool interest_in_saving)
-{
-    if (!anchor_save_stack->empty() && interest_in_saving)
-    {
-        addToMap(anchor_map, &anchor_save_stack->top(), &anchor_data_save_stack->top());
-        anchor_save_stack->pop();
-        anchor_data_save_stack->pop();
-        subtract_count = 2;
-        return false;
-    }
-
-    return interest_in_saving;
-}
-
 void addTag(YAML::Node* current_node, yaml_char_t* tag)
 {
     if (tag)
@@ -103,10 +71,6 @@ void addToNode
     
 }
 
-std::string parseLibyaml(const std::string name_of_file, std::string* error_message_container)
-{
-    return name_of_file;
-}
 // map_mode = end_event_addition(&libyaml_final_output, &mode_stack, &map_mode_stack, !map_mode, &key_stack);
 bool end_event_addition
     (std::vector<YAML::Node>* libyaml_final_output, std::stack<mode_type>* mode_stack, 
@@ -137,6 +101,11 @@ bool end_event_addition
     return map_mode;
 }
 
+std::string parseLibyaml(const std::string name_of_file, std::string* error_message_container)
+{
+    return name_of_file;
+}
+
 std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* error_message_container)
 {
     FILE *input;
@@ -144,30 +113,19 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
     yaml_event_t event;
 
     std::vector<YAML::Node> libyaml_final_output;
-    // libyaml_final_output.push_back(YAML::Node());
-    
-    bool interest_in_saving = false;
-
-    int subtract_count = 2;
-
-    std::map<std::string, std::string> anchor_map;
-
-    std::stack<std::string> anchor_save_stack;
-    
-    std::stack<std::string> anchor_data_save_stack;
 
     std::stack<YAML::Node> key_stack;
 
-
     std::stack<mode_type> mode_stack;
 
-    mode_stack.push( mode_type::UNKNOWN_TYPE);
+    mode_stack.push(mode_type::UNKNOWN_TYPE);
 
     std::stack<bool> map_mode_stack;
 
     bool map_mode = true;
     
-
+    std::map<std::string, YAML::Node> anchor_map;
+    
     input = fopen(name_of_file.c_str(), "rb");
 
     assert(input);
@@ -213,10 +171,9 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
         switch (type)
         {
             case YAML_STREAM_END_EVENT:
-
-                interest_in_saving = addToMapDirective(&anchor_map, &anchor_save_stack, 
-                    &anchor_data_save_stack, subtract_count, interest_in_saving);
-
+                
+                std::cout << "end event" << std::endl;
+                
                 break;
             case YAML_DOCUMENT_END_EVENT:
 
@@ -241,6 +198,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 std::cout << "SQU-" << std::endl;
                 map_mode = end_event_addition(&libyaml_final_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
+                if (event.data.scalar.anchor)
+                {
+                    anchor_map[std::string((char*)event.data.scalar.anchor)] = libyaml_final_output.back();
+                }
+
                 break;
             case YAML_MAPPING_START_EVENT:
                 
@@ -257,14 +219,13 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     map_mode_stack.push(!map_mode);
                 }
 
-                mode_stack.push( mode_type::MAP_TYPE);
+                mode_stack.push(mode_type::MAP_TYPE);
                 map_mode = true;
 
-                // if (event.data.mapping_start.anchor)
-                // {
-                //     //handle anchors
-                // }      
-
+                if (event.data.mapping_start.anchor)
+                {
+                    anchor_map[std::string((char*)event.data.mapping_start.anchor)] = libyaml_final_output.back();
+                }
 
                 if (event.data.mapping_start.tag)
                 {
@@ -329,14 +290,41 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     addToNode(&libyaml_final_output.back(), &addMe, &key_stack, &tracking_current_type, 
                         event.data.scalar.tag);
                 }           
-                
-                std::cout << libyaml_final_output.back() <<std::endl;
+
+                // add scalar anchor
 
                 break;
             }
             case YAML_ALIAS_EVENT:
             {
-                // std::string temp_translator = ((char*) event.data.alias.anchor);
+                std::cout << "ALI" << std::endl;
+
+                std::string temp_translator = ((char*) event.data.alias.anchor);
+
+                if(anchor_map[temp_translator])
+                {
+                    map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    
+                    // std::cout << anchor_map[temp_translator] << std::endl;
+
+                    addToNode(&libyaml_final_output.back(), &anchor_map[temp_translator], 
+                        &key_stack, &tracking_current_type, nullptr);
+                }
+                else
+                {
+                    yaml_event_delete(&event);
+
+                    assert(!fclose(input));
+
+                    yaml_parser_delete(&parser);
+
+                    fprintf(stderr, "ERROR: Missing anchor\n");
+
+                    *error_message_container = "ERROR";
+
+                    return libyaml_final_output;                    
+                }
+                
 
                 // if ((libyaml_final_output.back())[temp_translator])
                 // {
@@ -350,17 +338,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 // }
                 // else
                 // {
-                //     yaml_event_delete(&event);
 
-                //     assert(!fclose(input));
-
-                //     yaml_parser_delete(&parser);
-
-                //     fprintf(stderr, "ERROR: Missing anchor\n");
-
-                //     *error_message_container = "ERROR";
-
-                //     return libyaml_final_output;
                 // }
                 break;
             }

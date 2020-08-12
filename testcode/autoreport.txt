@@ -1,18 +1,15 @@
 ../examples/emptyanchor.yaml
-../examples/anchors.yaml
 ../examples/enddoc.yaml
 ../examples/stripclipkeep.yaml
 ../examples/tagpostdeclaration.yaml
 ../examples/tagshorthandfull.yaml
 ../examples/tagsrootobject.yaml
 ../examples/anchorsequenceerror.yaml
-../examples/anchors2.yaml
 ../examples/invalidtag.yaml
 ../examples/unicodeanchor.yaml
 ../examples/tagdeclarationbefiredoc.yaml
 ../examples/questionmarksinscalars.yaml
 ../examples/baredocafterend.yaml
-../examples/anchorscomplex.yaml
 ../examples/anchorwithcoloninname.yaml
 ../examples/endthenmore.yaml
 ../examples/anchorasvalue.yaml
@@ -24,7 +21,6 @@
 ../examples/anchorkeyandvalue.yaml
 ../examples/anchoraskeylast.yaml
 ../examples/twoindependentdocs.yaml
-../examples/startpage.yaml
 ../examples/aliasesinblocksequence.yaml
 ../examples/taginemptyarray.yaml
 ../examples/tagdefinedonlyfirst.yaml
