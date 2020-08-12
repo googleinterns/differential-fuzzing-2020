@@ -1,32 +1,30 @@
 #include "utils.h"
 
-enum mode_type {map_type, key_type, value_type, sequence_type, unknown_type};
-
 // ---------------------------------------------------------------------------------
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
 
-bool positionAnalysis(char* add_to_me, const char reference_character, const bool map_mode)
+bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character, const bool map_mode)
 {
-    if (reference_character == map_type)
+    if (reference_character ==  mode_type::MAP_TYPE)
     {
         if (map_mode)
         {
-            *add_to_me = key_type;
+            *add_to_me =  mode_type::KEY_TYPE;
         }
         else
         {
-            *add_to_me = value_type;
+            *add_to_me =  mode_type::VALUE_TYPE;
         }
         return !map_mode;
     }
-    else if (reference_character == sequence_type)
+    else if (reference_character ==  mode_type::SEQUENCE_TYPE)
     {
-        *add_to_me = sequence_type;
+        *add_to_me =  mode_type::SEQUENCE_TYPE;
     }
     else
     {
-        *add_to_me = unknown_type;
+        *add_to_me =  mode_type::UNKNOWN_TYPE;
     }
 
     return map_mode;
@@ -81,19 +79,19 @@ void addTag(YAML::Node* current_node, yaml_char_t* tag)
 
 void addToNode
     (YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
-    const char* tracking_current_type, yaml_char_t* tag)
+    const mode_type* tracking_current_type, yaml_char_t* tag)
 {
 
-    if (*tracking_current_type == sequence_type)
+    if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
     {
         addToMe->push_back(*addMe);
     }
-    else if (*tracking_current_type == key_type)
+    else if (*tracking_current_type ==  mode_type::KEY_TYPE)
     {
         key_stack->push(*addMe);
         (*addToMe)[*addMe] = "";
     }
-    else if (*tracking_current_type == value_type)
+    else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
     {
         (*addToMe)[key_stack->top()] = *addMe;
         key_stack->pop();
@@ -111,13 +109,13 @@ std::string parseLibyaml(const std::string name_of_file, std::string* error_mess
 }
 // map_mode = end_event_addition(&libyaml_final_output, &mode_stack, &map_mode_stack, !map_mode, &key_stack);
 bool end_event_addition
-    (std::vector<YAML::Node>* libyaml_final_output, std::stack<char>* mode_stack, 
+    (std::vector<YAML::Node>* libyaml_final_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack)
 {
 
     mode_stack->pop();
     
-    if (mode_stack->top() == map_type)
+    if (mode_stack->top() ==  mode_type::MAP_TYPE)
     {
         map_mode = map_mode_stack->top();
         map_mode_stack->pop();
@@ -125,7 +123,7 @@ bool end_event_addition
 
     if (libyaml_final_output->size() > 1)
     {
-        char temp_position_info;
+        mode_type temp_position_info;
 
         positionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
 
@@ -161,9 +159,9 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
     std::stack<YAML::Node> key_stack;
 
 
-    std::stack<char> mode_stack;
+    std::stack<mode_type> mode_stack;
 
-    mode_stack.push(unknown_type);
+    mode_stack.push( mode_type::UNKNOWN_TYPE);
 
     std::stack<bool> map_mode_stack;
 
@@ -194,7 +192,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
         yaml_event_type_t type;
 
-        char tracking_current_type;
+        mode_type tracking_current_type;
 
         if (!yaml_parser_parse(&parser, &event)) 
         {
@@ -253,12 +251,12 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
                 }
 
-                if (mode_stack.top() == map_type)
+                if (mode_stack.top() ==  mode_type::MAP_TYPE)
                 {
                     map_mode_stack.push(!map_mode);
                 }
 
-                mode_stack.push(map_type);
+                mode_stack.push( mode_type::MAP_TYPE);
                 map_mode = true;
 
                 // if (event.data.mapping_start.anchor)
@@ -278,13 +276,13 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 libyaml_final_output.push_back(YAML::Node());
 
-                if (mode_stack.top() == map_type)
+                if (mode_stack.top() ==  mode_type::MAP_TYPE)
                 {
                     map_mode_stack.push(!map_mode);
                 }
 
             
-                mode_stack.push(sequence_type);
+                mode_stack.push( mode_type::SEQUENCE_TYPE);
 
                 // if (event.data.sequence_start.anchor)
                 // {
@@ -404,7 +402,7 @@ std::string normalizeYamlCpp(const std::vector<YAML::Node>* nodes,
 {
     std::string yamlcpp_final_output;
 
-    if(nodes->empty())
+    if (nodes->empty())
     {
         *error_message_container = "ERROR";
         return yamlcpp_final_output;
@@ -544,7 +542,8 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
 // ---------------------------------- testcode -------------------------------------
 // ---------------------------------------------------------------------------------
 
-bool compareStringsCustom(const std::string compareMeOne, const std::string compareMeTwo, std::string& buffer)
+bool compareStringsCustom
+    (const std::string compareMeOne, const std::string compareMeTwo, std::string& buffer)
 {
     std::string::const_iterator ptrOne = compareMeOne.begin();
     std::string::const_iterator ptrTwo = compareMeTwo.begin();
