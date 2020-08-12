@@ -291,7 +291,12 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                         event.data.scalar.tag);
                 }           
 
-                // add scalar anchor
+                if (event.data.scalar.anchor)
+                {
+                    std::string temp_translator = ((char*)event.data.scalar.anchor);
+
+                    
+                }
 
                 break;
             }
@@ -554,7 +559,7 @@ bool compareStringsCustom
         ptrTwo++;
     }
 
-    if(!((ptrOne == compareMeOne.end())  && (ptrTwo == compareMeTwo.end())))
+    if (!((ptrOne == compareMeOne.end())  && (ptrTwo == compareMeTwo.end())))
     {
          buffer += "(X)";
         return false;
