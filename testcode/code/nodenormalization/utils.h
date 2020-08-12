@@ -33,9 +33,9 @@ std::string addTag(std::string* tag);
 void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
     const char* tracking_current_type, yaml_char_t* tag);
 
-void end_event_addition
-    (std::vector<YAML::Node>* libyaml_final_output, char* mode_stack_top, bool map_mode, 
-    std::stack<YAML::Node>* key_stack);
+bool end_event_addition
+    (std::vector<YAML::Node>* libyaml_final_output, std::stack<char>* mode_stack, 
+    std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack);
 
 std::string parseLibyaml(const std::string name_of_file, std::string* error_message_container);
 
