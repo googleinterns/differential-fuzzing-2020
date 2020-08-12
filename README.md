@@ -2,18 +2,15 @@
 
 **File Key:**
 
-- *library_set_up*:
-Contains multiple *.sh* files for setting up libraries used in this library
-
 - *differentialfuzzinglib*:
-Contains files used for the differential fuzzing library
+Contains files used for the differential fuzzing library. in particular
+    baseparser.h: file used a virtual for the differeential fuzzer, and
+    it is used as the base of new classes used with the wrapper
 
-- *testcode*:
-Code used for testing the differential fuzzer libraries found in *differentialfuzzinglib*,
-and other tests related to yaml parsing
+    differentialfuzzer.h: methods used for the differential fuzzer
+    wrapepr
+
+    differentialfuzzer.cpp: code for differentialfuzzer.h
 
 - *toycases*:
 Directory contains toy cases, and code used for executing, and testing it
-
-- *examples*:
-Multiple yaml files used for testing 
