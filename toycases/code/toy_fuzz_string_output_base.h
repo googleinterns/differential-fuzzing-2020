@@ -17,6 +17,7 @@ class ToyFuzzGenericStringOutput
     private:
         std::string* data;
         std::string* error;
+
     public:
         ToyFuzzGenericStringOutput(std::string* info, std::string* error_code);
         ~ToyFuzzGenericStringOutput();
@@ -53,7 +54,7 @@ class ToyFuzzGenericStringParser : virtual public differential_parser::Parser
 
 bool compareStrings(differential_parser::ParserOutput* compared_object_one, 
     differential_parser::ParserOutput* compared_object_two);
-} // namespace yaml_differential_parser
+} // namespace toy_generic_string_helper
 
 
 #endif

@@ -109,4 +109,4 @@ bool compareStrings(differential_parser::ParserOutput* compared_object_one,
     }
     return *(std::string*)compared_object_two->getData() == *(std::string*)compared_object_one->getData();
 }
-}
+} // namespace toy_generic_string_helper

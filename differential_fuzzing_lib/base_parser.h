@@ -8,7 +8,7 @@ namespace differential_parser
 class ParserOutput
 {
     public:
-        virtual ~ParserOutput(){};
+        virtual ~ParserOutput() {};
         virtual bool equivalent(ParserOutput* compared_object) = 0;
         virtual void* getData() = 0;
         virtual std::string* getError() = 0;

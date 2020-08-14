@@ -36,7 +36,7 @@ class ToyIntParser : virtual public differential_parser::Parser
         void* parse(const uint8_t* input, size_t input_size, std::string* error_code);
         differential_parser::ParserOutput* normalize(void* input, std::string* error_code);
 };
-} // namespace yaml_differential_parser
+} // namespace toy_int_differential_parser
 
 
 #endif

@@ -80,4 +80,4 @@ differential_parser::ParserOutput* ToyIntParser::normalize
     
     return returnMe;
 }
-}
+} // namespace toy_int_differential_parser

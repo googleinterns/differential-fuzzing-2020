@@ -34,13 +34,13 @@ namespace differential_fuzzer
 
         bool CheckAndAdd(differential_parser::Parser* parser, EquivalenceParserOutputs** head, 
             const uint8_t* input_data, size_t size_of_input);
-    }
+    }// namespace parser
 
     namespace fuzzer
     {
         bool DifferentiallyFuzz(differential_parser::Parser** parser_array, int number_of_parsers, 
             const uint8_t* input_data, size_t size_of_input);
-    }
-}
+    } // namespace fuzzer
+} // namespace differential_fuzzer
 
 #endif

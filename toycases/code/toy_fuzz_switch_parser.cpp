@@ -41,4 +41,4 @@ differential_parser::ParserOutput* ToySwitchParser::normalize
 
     return returnMe;
 }
-}
+} // namespace toy_switch_differential_parser
