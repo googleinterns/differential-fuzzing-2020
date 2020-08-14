@@ -20,7 +20,7 @@ void* ToySwitchParser::parse(const uint8_t* input, size_t input_size, std::strin
     char deciding_factor = input[0];
     std::string* toy_output = new std::string;
 
-    if(*input == '0')
+    if (*input == '0')
     {
         *toy_output = std::string((const char*)input, input_size) + " wears a hot ";
     }

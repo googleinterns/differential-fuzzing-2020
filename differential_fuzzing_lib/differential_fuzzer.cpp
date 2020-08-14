@@ -42,7 +42,7 @@ void differential_fuzzer::parser::DeleteEquivalenceNormalizedOutputs
 // --------------------------- struc print functions -------------------------------
 // ---------------------------------------------------------------------------------
 
-void differential_fuzzer::parser::PrintAssociatedParserName(AssociatedParserName* head)
+void differential_fuzzer::parser::PrintParserList(AssociatedParserName* head)
 {
     AssociatedParserName* ptr = head;
 
@@ -92,7 +92,7 @@ void differential_fuzzer::parser::PrintEquivalenceNormalizedOutputs(EquivalenceN
 
         if (ptr->container_basket != nullptr)
         {
-            PrintAssociatedParserName(ptr->container_basket);
+            PrintParserList(ptr->container_basket);
         }
         else
         {

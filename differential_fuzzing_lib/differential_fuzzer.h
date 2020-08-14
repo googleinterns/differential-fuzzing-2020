@@ -26,7 +26,7 @@ namespace differential_fuzzer
 
         void DeleteEquivalenceNormalizedOutputs(EquivalenceNormalizedOutputs* delete_me);
 
-        void PrintAssociatedParserName(AssociatedParserName* head);
+        void PrintParserList(AssociatedParserName* head);
 
         void PrintEquivalenceNormalizedOutputs(EquivalenceNormalizedOutputs* head);
 

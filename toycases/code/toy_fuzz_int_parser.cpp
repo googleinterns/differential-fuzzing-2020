@@ -27,7 +27,7 @@ bool ToyIntParserOutput::equivalent(NormalizedOutput* compared_object)
 {
     if (!this->getError()->empty() && !compared_object->getError()->empty())
     {
-        if(*this->getError() == *compared_object->getError())
+        if (*this->getError() == *compared_object->getError())
         {
             return true;
         }
