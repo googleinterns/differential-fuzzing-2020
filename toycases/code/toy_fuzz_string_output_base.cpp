@@ -23,7 +23,7 @@ ToyFuzzGenericStringOutput::~ToyFuzzGenericStringOutput()
     delete this->error;
 }
 
-bool ToyFuzzGenericStringOutput::equivalent(ParserOutput* compared_object)
+bool ToyFuzzGenericStringOutput::equivalent(NormalizedOutput* compared_object)
 {
     return toy_generic_string_helper::compareStrings(this, compared_object);
 }
@@ -52,11 +52,6 @@ ToyFuzzGenericStringParser::ToyFuzzGenericStringParser(std::string given_parser_
     this->error_modifier = given_error_modifier;
 }
 
-ToyFuzzGenericStringParser::~ToyFuzzGenericStringParser()
-{
-
-}
-
 std::string ToyFuzzGenericStringParser::getName()
 {
     return this->name_modifier;
@@ -65,8 +60,8 @@ std::string ToyFuzzGenericStringParser::getName()
 
 void* ToyFuzzGenericStringParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
-    std::string* toy_output = new std::string;
-
+    std::string* toy_output = new std::string();
+    
     *toy_output = std::string((const char*)input, input_size) + this->parser_modifier;
 
     *error_code = this->error_modifier;
@@ -74,11 +69,11 @@ void* ToyFuzzGenericStringParser::parse(const uint8_t* input, size_t input_size,
     return (void*)toy_output;
 }
 
-differential_parser::ParserOutput* ToyFuzzGenericStringParser::normalize
+differential_parser::NormalizedOutput* ToyFuzzGenericStringParser::normalize
     (void* input, std::string* error_code)
 {   
     *(std::string*)input = *(std::string*)input + this->normalizer_modifier;
-    differential_parser::ParserOutput* returnMe = new
+    differential_parser::NormalizedOutput* returnMe = new
         toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, error_code);
     
     return returnMe;
@@ -89,8 +84,8 @@ differential_parser::ParserOutput* ToyFuzzGenericStringParser::normalize
 // ---------------------- Helper Compare Strings Method ----------------------------
 // ---------------------------------------------------------------------------------
 
-bool compareStrings(differential_parser::ParserOutput* compared_object_one, 
-    differential_parser::ParserOutput* compared_object_two)
+bool compareStrings(differential_parser::NormalizedOutput* compared_object_one, 
+    differential_parser::NormalizedOutput* compared_object_two)
 {
     if (!compared_object_two->getError()->empty() && !compared_object_one->getError()->empty())
     {

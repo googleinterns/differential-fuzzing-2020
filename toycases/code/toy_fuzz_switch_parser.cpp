@@ -32,11 +32,11 @@ void* ToySwitchParser::parse(const uint8_t* input, size_t input_size, std::strin
     return (void*)toy_output;
 }
 
-differential_parser::ParserOutput* ToySwitchParser::normalize
+differential_parser::NormalizedOutput* ToySwitchParser::normalize
     (void* input, std::string* error_code)
 {   
     *(std::string*)input = *(std::string*)input + "pair of glasses";
-    differential_parser::ParserOutput* returnMe = new
+    differential_parser::NormalizedOutput* returnMe = new
         toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, error_code);
 
     return returnMe;

@@ -23,7 +23,7 @@ ToyIntParserOutput::~ToyIntParserOutput()
     delete this->error;
 }
 
-bool ToyIntParserOutput::equivalent(ParserOutput* compared_object)
+bool ToyIntParserOutput::equivalent(NormalizedOutput* compared_object)
 {
     if (!this->getError()->empty() && !compared_object->getError()->empty())
     {
@@ -72,10 +72,10 @@ void* ToyIntParser::parse(const uint8_t* input, size_t input_size, std::string* 
     return (void*)toy_output;
 }
 
-differential_parser::ParserOutput* ToyIntParser::normalize
+differential_parser::NormalizedOutput* ToyIntParser::normalize
     (void* input, std::string* error_code)
-{   
-    differential_parser::ParserOutput* returnMe = new
+{
+    differential_parser::NormalizedOutput* returnMe = new
         ToyIntParserOutput((int*)input, error_code);
     
     return returnMe;

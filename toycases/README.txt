@@ -11,7 +11,7 @@ offers a generic mutable class for strings
 
 - ./code/toy_fuzz_int_parser.h and toy_fuzz_int_parser.cpp:
 Show parsing of data throw a class that primarily deals with
-the integer tipe
+the integer type
 
 - ./code/toy_fuzz_switch_parser.cpp and toy_fuzz_switch_parser.h: 
 Class where output changes depending on input

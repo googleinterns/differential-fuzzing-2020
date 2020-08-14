@@ -81,10 +81,10 @@ void runTest1()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case1), 
         (differential_parser::Parser*)(&toy_string_case1)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
 
     size_t size = 3;
-    
+
     std::cout << "------ TEST 1: Equal Data, No Error Case " << std::endl << "(1 and 1)" << std::endl;
     
     assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
@@ -96,7 +96,7 @@ void runTest2()
 
     differential_parser::Parser* array_of_parsers[0] = {};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 2: Empty Case" << std::endl;
@@ -110,7 +110,7 @@ void runTest3()
 
     differential_parser::Parser* array_of_parsers[1] = {(differential_parser::Parser*)(&toy_string_case1)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 3: One Case" << std::endl << "(1)" << std::endl;
@@ -126,7 +126,7 @@ void runTest4()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case1), 
         (differential_parser::Parser*)(&toy_string_case2)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 4: Different Data, No Error Case" << std::endl << "(1 and 2)" << std::endl;
@@ -144,7 +144,7 @@ void runTest5()
     differential_parser::Parser* array_of_parsers[3] = {(differential_parser::Parser*)(&toy_string_case1), 
         (differential_parser::Parser*)(&toy_string_case2), (differential_parser::Parser*)(&toy_string_case3)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 5: Mixed Data, No Errors " << std::endl <<"(1 != 2, 3; (2 == 3))" << std::endl;
@@ -161,7 +161,7 @@ void runTest6()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case2),
         (differential_parser::Parser*)(&toy_string_case4)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 6: Same Data, One Error " << std::endl <<"(2 == 4; 4 has error)" << std::endl;
@@ -177,7 +177,7 @@ void runTest7()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case5),
         (differential_parser::Parser*)(&toy_string_case4)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 7: Different Data, Same Errors " << std::endl <<"(4 != 5)" << std::endl;
@@ -193,7 +193,7 @@ void runTest8()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case5),
         (differential_parser::Parser*)(&toy_string_case6)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 8: Same Data, Different Errors " << std::endl <<"(5 != 6; err same)" << std::endl;
@@ -209,7 +209,7 @@ void runTest9()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case1),
         (differential_parser::Parser*)(&toy_int_case1)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 9: Different type conversion" << std::endl <<"(1 ?? 7)" << std::endl;
@@ -225,7 +225,7 @@ void runTest10()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_int_case1),
         (differential_parser::Parser*)(&toy_string_case1)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 10: Different type conversion" << std::endl <<"(7 ?? 1)" << std::endl;
@@ -241,7 +241,7 @@ void runTest11()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case8),
         (differential_parser::Parser*)(&toy_string_case1)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 11: Bad Normalizer, No Error" << std::endl <<"(8 != 1)" << std::endl;
@@ -257,7 +257,7 @@ void runTest12()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_switch_case1),
         (differential_parser::Parser*)(&toy_string_case8)};
     
-    const uint8_t *DataOne = (uint8_t*)(std::string("1bob").c_str());
+    const uint8_t *DataOne = (uint8_t*)("1bob");
     size_t size = 4;
     
     std::cout << "------ TEST 12: Tests Uncertain Case" << std::endl << "8 vs 9" << std::endl;
@@ -266,7 +266,7 @@ void runTest12()
 
     bool finalAssessment = assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, DataOne, size));
 
-    const uint8_t *DataZero = (uint8_t*)(std::string("0bob").c_str());
+    const uint8_t *DataZero = (uint8_t*)("0bob");
 
     std::cout << "--- Local Test 2:" << std::endl;
 
@@ -284,7 +284,7 @@ void runTest13()
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case2),
         (differential_parser::Parser*)(&toy_string_case8)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST 13: Different Due to Normalizer" << std::endl <<"(2 != 8)" << std::endl;
@@ -311,7 +311,7 @@ void runTestAll1()
         (differential_parser::Parser*)(&toy_string_case6), (differential_parser::Parser*)(&toy_int_case1),
         (differential_parser::Parser*)(&toy_string_case8), (differential_parser::Parser*)(&toy_switch_case1)};
     
-    const uint8_t *Data = (uint8_t*)(std::string("bob").c_str());
+    const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
     
     std::cout << "------ TEST All: Throw Everything at Differential Fuzzer" << std::endl <<"All of Cases" << std::endl;

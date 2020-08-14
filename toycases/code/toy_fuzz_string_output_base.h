@@ -12,7 +12,7 @@ namespace toy_generic_string_helper
 // ---------------------------------------------------------------------------------
 
 class ToyFuzzGenericStringOutput 
-    : virtual public differential_parser::ParserOutput
+    : virtual public differential_parser::NormalizedOutput
 {
     private:
         std::string* data;
@@ -21,7 +21,7 @@ class ToyFuzzGenericStringOutput
     public:
         ToyFuzzGenericStringOutput(std::string* info, std::string* error_code);
         ~ToyFuzzGenericStringOutput();
-        bool equivalent(ParserOutput* compared_object);
+        bool equivalent(NormalizedOutput* compared_object);
         void* getData();
         std::string* getError();
 };
@@ -42,18 +42,18 @@ class ToyFuzzGenericStringParser : virtual public differential_parser::Parser
         ToyFuzzGenericStringParser(std::string given_parser_modifier,
                 std::string given_normalizer_modifier, std::string given_name_modifier,
                 std::string given_error_modifier);
-        ~ToyFuzzGenericStringParser();
+        ~ToyFuzzGenericStringParser() {};
         std::string getName();
         void* parse(const uint8_t* input, size_t input_size, std::string* error_code);
-        differential_parser::ParserOutput* normalize(void* input, std::string* error_code);
+        differential_parser::NormalizedOutput* normalize(void* input, std::string* error_code);
 };
 
 // ---------------------------------------------------------------------------------
 // ---------------------- Helper Compare Strings Method ----------------------------
 // ---------------------------------------------------------------------------------
 
-bool compareStrings(differential_parser::ParserOutput* compared_object_one, 
-    differential_parser::ParserOutput* compared_object_two);
+bool compareStrings(differential_parser::NormalizedOutput* compared_object_one, 
+    differential_parser::NormalizedOutput* compared_object_two);
 } // namespace toy_generic_string_helper
 
 

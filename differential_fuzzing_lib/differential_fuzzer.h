@@ -15,24 +15,24 @@ namespace differential_fuzzer
 
         // Linked list used to transverse between previous sets of parsers.
         // One representative for each set is saved for future comparisons.
-        struct EquivalenceParserOutputs
+        struct EquivalenceNormalizedOutputs
         {
-            EquivalenceParserOutputs* next;
-            differential_parser::ParserOutput* representative;
+            EquivalenceNormalizedOutputs* next;
+            differential_parser::NormalizedOutput* representative;
             AssociatedParserName* container_basket;
         };
 
         void DeleteAssociatedParserName(AssociatedParserName* delete_me);
 
-        void DeleteEquivalenceParserOutputs(EquivalenceParserOutputs* delete_me);
+        void DeleteEquivalenceNormalizedOutputs(EquivalenceNormalizedOutputs* delete_me);
 
         void PrintAssociatedParserName(AssociatedParserName* head);
 
-        void PrintEquivalenceParserOutputs(EquivalenceParserOutputs* head);
+        void PrintEquivalenceNormalizedOutputs(EquivalenceNormalizedOutputs* head);
 
         void AddToAssociatedParserName(AssociatedParserName** head, std::string name);
 
-        bool CheckAndAdd(differential_parser::Parser* parser, EquivalenceParserOutputs** head, 
+        bool CheckAndAdd(differential_parser::Parser* parser, EquivalenceNormalizedOutputs** head, 
             const uint8_t* input_data, size_t size_of_input);
     }// namespace parser
 
