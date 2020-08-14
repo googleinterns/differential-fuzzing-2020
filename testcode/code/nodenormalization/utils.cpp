@@ -246,6 +246,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 
                 std::cout << "MAP+" << std::endl;
                 libyaml_local_output.push_back(YAML::Node());
+                addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
                 if (!mode_stack.empty())
                 {
@@ -264,18 +265,15 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 {
                     std::cout << "ANCH-M" << std::endl;
                     anchor_map[std::string((char*)event.data.mapping_start.anchor)] = libyaml_local_output.back();
-                }
-
-                if (event.data.mapping_start.tag)
-                {
-                    //more mapps cases
-                }                
+                }   
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
+
                 std::cout << "SQU+" << std::endl;
 
                 libyaml_local_output.push_back(YAML::Node());
+                addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
                 if (mode_stack.top() ==  mode_type::MAP_TYPE)
                 {
@@ -290,11 +288,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     std::cout << "ANCH-S" << std::endl;
                     anchor_map[std::string((char*)event.data.sequence_start.anchor)] = libyaml_local_output.back();
                 }      
-                
-                if (event.data.sequence_start.tag) 
-                {
-                    //more squences cases
-                }
 
                 break;
 
@@ -318,7 +311,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                         if(event.data.scalar.length != 0)
                         {
-                            YAML::Node addMeTrue(temp_translator);
                             map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
                             
                             if (libyaml_local_output.empty())
