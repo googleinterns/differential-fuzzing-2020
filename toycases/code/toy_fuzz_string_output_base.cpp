@@ -1,4 +1,4 @@
-#include "toyfuzzstringoutputbase.h"
+#include "toy_fuzz_string_output_base.h"
 
 #include <iostream>
 

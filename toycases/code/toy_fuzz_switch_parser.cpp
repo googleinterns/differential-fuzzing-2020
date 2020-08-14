@@ -1,5 +1,5 @@
-#include "toyfuzzswitchparser.h"
-#include "toyfuzzstringoutputbase.h"
+#include "toy_fuzz_switch_parser.h"
+#include "toy_fuzz_string_output_base.h"
 
 #include <iostream>
 

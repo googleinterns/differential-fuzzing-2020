@@ -1,7 +1,7 @@
-#ifndef TOYFUZZSTRINGOUTPUTBASE_H
-#define TOYFUZZSTRINGOUTPUTBASE_H
+#ifndef TOY_FUZZ_STRING_OUTPUT_BASE_H
+#define TOY_FUZZ_STRING_OUTPUT_BASE_H
 
-#include "baseparser.h"
+#include "base_parser.h"
 
 #include <string>
 

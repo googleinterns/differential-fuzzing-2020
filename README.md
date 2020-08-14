@@ -2,15 +2,16 @@
 
 **File Key:**
 
-- *differentialfuzzinglib*:
-Contains files used for the differential fuzzing library. in particular
-    baseparser.h: file used a virtual for the differeential fuzzer, and
-    it is used as the base of new classes used with the wrapper
+- *differential_fuzzing_lib*:
+Contains files used for the differential fuzzing library. in particular:
+    baseparser.h: file used as a virtual class for the differential fuzzer.
+    This class is used as the base of new classes used with the wrapper
 
-    differentialfuzzer.h: methods used for the differential fuzzer
-    wrapepr
+    differential_fuzzer.h: methods used for the differential fuzzer
+    wrapper
 
-    differentialfuzzer.cpp: code for differentialfuzzer.h
+    differential_fuzzer.cpp: code for differentialfuzzer.h
 
-- *toycases*:
-Directory contains toy cases, and code used for executing, and testing it
+- *toy_cases*:
+Directory contains toy cases, and code used for executing, and testing it. 
+More information found in ./testcode/README.txt

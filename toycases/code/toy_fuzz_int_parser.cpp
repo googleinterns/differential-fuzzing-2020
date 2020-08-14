@@ -1,4 +1,4 @@
-#include "toyfuzzintparser.h"
+#include "toy_fuzz_int_parser.h"
 
 #include <iostream>
 

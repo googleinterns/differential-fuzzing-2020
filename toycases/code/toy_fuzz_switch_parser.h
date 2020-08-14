@@ -1,7 +1,7 @@
-#ifndef TOYFUZZSWITCHPARSER_H
-#define TOYFUZZSWITCHPARSER_H
+#ifndef TOY_FUZZ_SWITCH_PARSER_H
+#define TOY_FUZZ_SWITCH_PARSER_H
 
-#include "baseparser.h"
+#include "base_parser.h"
 
 #include <string>
 

@@ -1,11 +1,11 @@
 #include <iostream>
 #include <string>
 
-#include "baseparser.h"
-#include "differentialfuzzer.h"
-#include "toyfuzzintparser.h"
-#include "toyfuzzswitchparser.h"
-#include "toyfuzzstringoutputbase.h"
+#include "base_parser.h"
+#include "differential_fuzzer.h"
+#include "toy_fuzz_int_parser.h"
+#include "toy_fuzz_switch_parser.h"
+#include "toy_fuzz_string_output_base.h"
 
 // Key to toy case:
 // --- toy-1:

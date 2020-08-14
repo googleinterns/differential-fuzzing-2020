@@ -1,17 +1,16 @@
-#include <string.h>
+#include <iostream>
+#include <string>
 #include <assert.h>
 
-#include "differentialfuzzer.h"
+#include "differential_fuzzer.h"
 
-
-#include <iostream>
 
 // ---------------------------------------------------------------------------------
 // ----------------------------------- Deleters ------------------------------------
 // ---------------------------------------------------------------------------------
 
 void differential_fuzzer::parser::DeleteAssociatedParserName(AssociatedParserName* delete_me)
-{    
+{
     AssociatedParserName* prev = delete_me;
 
     while (delete_me != nullptr)
