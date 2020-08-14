@@ -1,8 +1,6 @@
 ../examples/emptyanchor.yaml
 ../examples/stripclipkeep.yaml
-../examples/tagpostdeclaration.yaml
 ../examples/tagshorthandfull.yaml
-../examples/tagsrootobject.yaml
 ../examples/anchorsequenceerror.yaml
 ../examples/invalidtag.yaml
 ../examples/unicodeanchor.yaml
@@ -11,7 +9,4 @@
 ../examples/anchorwithcoloninname.yaml
 ../examples/endthenmore.yaml
 ../examples/sequencescallar.yaml
-../examples/enddocandmore.yaml
-../examples/tagsontags.yaml
-../examples/taginemptyarray.yaml
 ../examples/tagdefinedonlyfirst.yaml
