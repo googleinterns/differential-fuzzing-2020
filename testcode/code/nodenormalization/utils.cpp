@@ -39,7 +39,7 @@ void addTag(YAML::Node* current_node, yaml_char_t* tag)
 
         current_node->SetTag(temp_tag_translator);                    
     }
-    else
+    else if(current_node->Tag().empty())
     {
         current_node->SetTag("?");
     }
@@ -71,9 +71,9 @@ void addToNode
     
 }
 
-// map_mode = end_event_addition(&libyaml_final_output, &mode_stack, &map_mode_stack, !map_mode, &key_stack);
+// map_mode = end_event_addition(&libyaml_local_output, &mode_stack, &map_mode_stack, !map_mode, &key_stack);
 bool end_event_addition
-    (std::vector<YAML::Node>* libyaml_final_output, std::stack<mode_type>* mode_stack, 
+    (std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack)
 {
 
@@ -85,17 +85,17 @@ bool end_event_addition
         map_mode_stack->pop();
     }
 
-    if (libyaml_final_output->size() > 1)
+    if (libyaml_local_output->size() > 1)
     {
         mode_type temp_position_info;
 
         positionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
 
-        YAML::Node temp_node = libyaml_final_output->back();
+        YAML::Node temp_node = libyaml_local_output->back();
 
-        libyaml_final_output->pop_back();
+        libyaml_local_output->pop_back();
 
-        addToNode(&libyaml_final_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
+        addToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
     }
 
     return map_mode;
@@ -111,6 +111,8 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
     FILE *input;
     yaml_parser_t parser;
     yaml_event_t event;
+
+    std::vector<YAML::Node> libyaml_local_output;
 
     std::vector<YAML::Node> libyaml_final_output;
 
@@ -136,7 +138,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
         *error_message_container = "ERROR";
 
-        return libyaml_final_output;
+        return libyaml_local_output;
     }
 
     yaml_parser_set_input_file(&parser, input);
@@ -164,7 +166,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
             *error_message_container = "ERROR";
 
-            return libyaml_final_output;
+            return libyaml_local_output;
         }
         type = event.type;
         
@@ -172,17 +174,58 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
         {
             case YAML_STREAM_END_EVENT:
                 
-                std::cout << "end event" << std::endl;
-                
                 break;
             case YAML_DOCUMENT_END_EVENT:
 
-                std::cout << "Endoc" << std::endl;
+                while (!key_stack.empty())
+                {
+                    key_stack.pop();
+                }
+                
+                while (!mode_stack.empty())
+                {
+                    mode_stack.pop();
+                };
+                mode_stack.push(mode_type::UNKNOWN_TYPE);
+
+                while (!map_mode_stack.empty())
+                {
+                    map_mode_stack.pop();
+                }
+
+                map_mode = true;
+
+                anchor_map.clear();
 
                 break;            
             case YAML_DOCUMENT_START_EVENT:
+                
+                while (!key_stack.empty())
+                {
+                    key_stack.pop();
+                }
+                
+                while (!mode_stack.empty())
+                {
+                    mode_stack.pop();
+                };
+                mode_stack.push(mode_type::UNKNOWN_TYPE);
 
-                std::cout << "Startdoc" << std::endl;
+                while (!map_mode_stack.empty())
+                {
+                    map_mode_stack.pop();
+                }
+
+                if (!libyaml_local_output.empty())
+                {
+                    libyaml_final_output.push_back(libyaml_local_output.back());
+                }
+                
+                libyaml_local_output.clear();
+
+                map_mode = true;
+
+                anchor_map.clear();
 
                 break;
 
@@ -190,24 +233,19 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 std::cout << "SQU-" << std::endl;
 
-                map_mode = end_event_addition(&libyaml_final_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
+                map_mode = end_event_addition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
 
                 std::cout << "SQU-" << std::endl;
-                map_mode = end_event_addition(&libyaml_final_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
-
-                if (event.data.scalar.anchor)
-                {
-                    anchor_map[std::string((char*)event.data.scalar.anchor)] = libyaml_final_output.back();
-                }
+                map_mode = end_event_addition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_MAPPING_START_EVENT:
                 
                 std::cout << "MAP+" << std::endl;
-                libyaml_final_output.push_back(YAML::Node());
+                libyaml_local_output.push_back(YAML::Node());
 
                 if (!mode_stack.empty())
                 {
@@ -224,7 +262,8 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 if (event.data.mapping_start.anchor)
                 {
-                    anchor_map[std::string((char*)event.data.mapping_start.anchor)] = libyaml_final_output.back();
+                    std::cout << "ANCH-M" << std::endl;
+                    anchor_map[std::string((char*)event.data.mapping_start.anchor)] = libyaml_local_output.back();
                 }
 
                 if (event.data.mapping_start.tag)
@@ -236,7 +275,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             case YAML_SEQUENCE_START_EVENT:
                 std::cout << "SQU+" << std::endl;
 
-                libyaml_final_output.push_back(YAML::Node());
+                libyaml_local_output.push_back(YAML::Node());
 
                 if (mode_stack.top() ==  mode_type::MAP_TYPE)
                 {
@@ -244,12 +283,13 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 }
 
             
-                mode_stack.push( mode_type::SEQUENCE_TYPE);
+                mode_stack.push(mode_type::SEQUENCE_TYPE);
 
-                // if (event.data.sequence_start.anchor)
-                // {
-                //     //handle anchors
-                // }      
+                if (event.data.sequence_start.anchor)
+                {
+                    std::cout << "ANCH-S" << std::endl;
+                    anchor_map[std::string((char*)event.data.sequence_start.anchor)] = libyaml_local_output.back();
+                }      
                 
                 if (event.data.sequence_start.tag) 
                 {
@@ -261,42 +301,85 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             case YAML_SCALAR_EVENT:
             {
                 std::cout << "SCL" << std::endl;
-                map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
-
+                
                 YAML::Node addMe(std::string((char*)event.data.scalar.value, event.data.scalar.length));
-
-                if (event.data.scalar.length <= 0)
-                {
-                    yaml_event_delete(&event);
-
-                    assert(!fclose(input));
-
-                    yaml_parser_delete(&parser);
-
-                    fprintf(stderr, "ERROR: Empty node\n");
-
-                    *error_message_container = "ERROR";
-
-                    return libyaml_final_output;
-                }
-
-                if (libyaml_final_output.empty())
-                {
-                    libyaml_final_output.push_back(addMe);
-                }            
-                else
-                {
-                    // addTag(&addMe, event.data.scalar.tag);
-                    addToNode(&libyaml_final_output.back(), &addMe, &key_stack, &tracking_current_type, 
-                        event.data.scalar.tag);
-                }           
 
                 if (event.data.scalar.anchor)
                 {
-                    std::string temp_translator = ((char*)event.data.scalar.anchor);
+                    std::cout << "ANCH" << std::endl;
 
+                    std::string temp_translator = ((char*)event.data.scalar.anchor);
+                    
+                    if (event.data.scalar.value)
+                    {
+                        std::cout << "scl" << std::endl;
+                        addTag(&addMe, event.data.scalar.tag);
+                        anchor_map[temp_translator] = addMe;    
+
+                        if(event.data.scalar.length != 0)
+                        {
+                            YAML::Node addMeTrue(temp_translator);
+                            map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                            
+                            if (libyaml_local_output.empty())
+                            {
+                                libyaml_local_output.push_back(addMe);
+                            }            
+                            else
+                            {
+                                addTag(&addMe, event.data.scalar.tag);
+                                addToNode(&libyaml_local_output.back(), &addMe, &key_stack, &tracking_current_type, 
+                                    event.data.scalar.tag);
+                            }      
+                        }
+                        else
+                        {
+                            std::cout << "empty" << std::endl;
+                        }
+                    }
+                    // else
+                    // {
+                    //     mode_stack.pop();
+                    //     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    //     break;
+                    // }
                     
                 }
+                else
+                {
+                    map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    
+                    std::cout << addMe << std::endl;
+                    
+                    if (event.data.scalar.length <= 0)
+                    {
+                        yaml_event_delete(&event);
+
+                        assert(!fclose(input));
+
+                        yaml_parser_delete(&parser);
+
+                        fprintf(stderr, "ERROR: Empty node\n");
+
+                        *error_message_container = "ERROR";
+
+                        return libyaml_local_output;
+                    }
+
+                    if (libyaml_local_output.empty())
+                    {
+                        libyaml_local_output.push_back(addMe);
+                    }            
+                    else
+                    {
+                        
+                        // addTag(&addMe, event.data.scalar.tag);
+                        addToNode(&libyaml_local_output.back(), &addMe, &key_stack, &tracking_current_type, 
+                            event.data.scalar.tag);
+                    }                          
+                }
+
+
 
                 break;
             }
@@ -312,7 +395,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     
                     // std::cout << anchor_map[temp_translator] << std::endl;
 
-                    addToNode(&libyaml_final_output.back(), &anchor_map[temp_translator], 
+                    addToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
                         &key_stack, &tracking_current_type, nullptr);
                 }
                 else
@@ -327,24 +410,9 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                     *error_message_container = "ERROR";
 
-                    return libyaml_final_output;                    
+                    return libyaml_local_output;                    
                 }
                 
-
-                // if ((libyaml_final_output.back())[temp_translator])
-                // {
-                //     // UNTESTED
-                //     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
-
-                //     YAML::Node temp = (libyaml_final_output.back())[temp_translator];
-
-                //     addToNode(&libyaml_final_output.back(), &temp, &key_stack, &tracking_current_type,
-                //         event.data.scalar.tag);
-                // }
-                // else
-                // {
-
-                // }
                 break;
             }
             default: 
@@ -355,7 +423,16 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
         yaml_event_delete(&event);
 
         if (type == YAML_STREAM_END_EVENT)
+        {
             break;
+        }
+
+        if (!libyaml_local_output.empty())
+        {
+            std::cout << "-------" << std::endl;
+            std::cout << libyaml_local_output.back() << std::endl;
+            std::cout << "-------" << std::endl;            
+        }
     }
 
     assert(!fclose(input));
@@ -366,13 +443,14 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
     
     std::cout << "I got to the end of the parser!" << std::endl;
 
-    std::cout << "Size:" << libyaml_final_output.size() << std::endl;
+    std::cout << "Size:" << libyaml_local_output.size() << std::endl;
 
-    if (!libyaml_final_output.empty())
+    if (!libyaml_local_output.empty())
     {
         std::cout << "Node output:" << std::endl;
-        std::cout << libyaml_final_output.back() << std::endl;
+        std::cout << libyaml_local_output.back() << std::endl;
         std::cout << "-----------------" << std::endl;
+        libyaml_final_output.push_back(libyaml_local_output.back());
     }
     
     return libyaml_final_output;

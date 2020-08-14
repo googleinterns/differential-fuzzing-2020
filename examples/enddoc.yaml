@@ -1,4 +1,5 @@
 ---
-&bob key: value
+key: "value"
 ... 
-"invalid"
+---
+keye: "valueu"
