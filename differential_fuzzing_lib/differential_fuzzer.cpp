@@ -13,7 +13,7 @@ void differential_fuzzer::parser::DeleteAssociatedParserName(AssociatedParserNam
 {
     while (delete_me != nullptr)
     {
-        AssociatedParserName* next = delete_me->next_container;
+        AssociatedParserName* next = delete_me->next_parser;
 
         delete delete_me;
         
@@ -55,7 +55,7 @@ void differential_fuzzer::parser::PrintParserList(AssociatedParserName* head)
     {
         std::cerr << ptr->name;
 
-        ptr = ptr->next_container;
+        ptr = ptr->next_parser;
 
         if (ptr == nullptr)
         {
@@ -115,7 +115,7 @@ void differential_fuzzer::parser::AddToAssociatedParserName(AssociatedParserName
     AssociatedParserName* ptr =  new AssociatedParserName;
 
     ptr->name = name;
-    ptr->next_container = *head;
+    ptr->next_parser = *head;
 
     *head = ptr;
 }
@@ -137,7 +137,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
 {
     // Iterator:
     EquivalenceNormalizedOutputs* ptr = *head;
-
+    
     std::string* local_error = new std::string();
 
     void* temp_parse_holder = parser->parse(input_data, size_of_input, local_error);
@@ -157,19 +157,20 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
             return true;
         }
         ptr = ptr->next;
-
     }
+    
+    bool return_me = (*head == nullptr);
+
     ptr = new EquivalenceNormalizedOutputs;
     ptr->representative = parser_output;
     ptr->container_basket = new AssociatedParserName;
     ptr->container_basket->name = parser->getName();
-    ptr->container_basket->next_container = nullptr;
+    ptr->container_basket->next_parser = nullptr;
     ptr->next = *head;
 
     *head = ptr;
-    // add to parse basket
 
-    return false;
+    return return_me;
 }
 
 bool differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
@@ -183,26 +184,14 @@ bool differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
     }
 
     // Creates iteration structure
-    parser::EquivalenceNormalizedOutputs* head = new parser::EquivalenceNormalizedOutputs;
-
-    // First case:
-    std::string* local_error  = new std::string();
-
-    void* temp_parse_holder = parser_array[0]->parse(input_data, size_of_input, local_error); // (X)
-
-    head->representative = parser_array[0]->normalize(temp_parse_holder, local_error);
-    head->next = nullptr;
-    head->container_basket = new parser::AssociatedParserName;
-    head->container_basket->name = parser_array[0]->getName();
-    head->container_basket->next_container = nullptr;
+    parser::EquivalenceNormalizedOutputs* head = nullptr;
 
     bool all_parser_are_similar = true;
 
-    for (int i = 1; i < number_of_parsers; i++)
+    for (int i = 0; i < number_of_parsers; i++)
     {
         if (!CheckAndAdd(parser_array[i], &head, input_data, size_of_input))
         {
-            
             all_parser_are_similar = false;
         }
     }

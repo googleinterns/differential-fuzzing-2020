@@ -10,7 +10,7 @@ namespace differential_fuzzer
         struct AssociatedParserName
         {
             std::string name;
-            AssociatedParserName* next_container;
+            AssociatedParserName* next_parser;
         };
 
         // Linked list used to transverse between previous sets of parsers.
