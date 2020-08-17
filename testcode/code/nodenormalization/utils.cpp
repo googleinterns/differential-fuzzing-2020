@@ -93,7 +93,7 @@ bool endEventAddition
     return map_mode;
 }
 
-void dumpVariables(std::stack<YAML::Node>* key_stack, 
+void restartVariables (std::stack<YAML::Node>* key_stack, 
     std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack, 
     std::vector<YAML::Node>* libyaml_local_output, std::vector<YAML::Node>* libyaml_final_output,
     bool* map_mode, std::map<std::string, YAML::Node>* anchor_map)
@@ -204,13 +204,13 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 break;
             case YAML_DOCUMENT_END_EVENT:
 
-                dumpVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
 
                 break;        
             case YAML_DOCUMENT_START_EVENT:
 
-                dumpVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
 
                 break;
