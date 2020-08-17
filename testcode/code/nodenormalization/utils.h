@@ -35,7 +35,7 @@ std::string addTag(std::string* tag);
 void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
     const mode_type* tracking_current_type, yaml_char_t* tag);
 
-bool end_event_addition
+bool endEventAddition
     (std::vector<YAML::Node>* libyaml_final_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack);
 

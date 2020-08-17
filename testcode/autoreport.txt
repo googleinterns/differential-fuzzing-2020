@@ -1,10 +1,7 @@
-../examples/emptyanchor.yaml
 ../examples/enddoc.yaml
-../examples/stripclipkeep.yaml
 ../examples/tagshorthandfull.yaml
 ../examples/anchorsequenceerror.yaml
 ../examples/invalidtag.yaml
-../examples/unicodeanchor.yaml
 ../examples/questionmarksinscalars.yaml
 ../examples/baredocafterend.yaml
 ../examples/anchorwithcoloninname.yaml
