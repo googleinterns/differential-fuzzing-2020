@@ -16,7 +16,7 @@ void differential_fuzzer::parser::DeleteAssociatedParserName(AssociatedParserNam
         AssociatedParserName* next = delete_me->next_parser;
 
         delete delete_me;
-        
+
         delete_me = next;
     }
 }
@@ -87,7 +87,7 @@ void differential_fuzzer::parser::PrintEquivalenceNormalizedOutputs(EquivalenceN
     while (ptr != nullptr)
     {
         std::cerr << "Set #" << set_id << ":" << std::endl;
-        
+
         set_id++;
 
         if (ptr->container_basket != nullptr)

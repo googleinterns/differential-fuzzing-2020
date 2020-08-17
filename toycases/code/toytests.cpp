@@ -51,7 +51,7 @@
 bool Assess(bool result)
 {
     std::cout << "------ Result: ";
-    
+
     bool returnMe;
 
     if (result)
@@ -63,7 +63,7 @@ bool Assess(bool result)
     {
         std::cout << "FAIL" << std::endl;
         returnMe = false;
-    }    
+    }
 
     std::cout << std::endl;
 
@@ -81,13 +81,13 @@ void RunSelfAgainstSelfTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case1), 
         (differential_parser::Parser*)(&toy_string_case1)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
 
     size_t size = 3;
 
     std::cout << "------ TEST 1: Equal Data, No Error Case " << std::endl << "(1 and 1)" << std::endl;
-    
+
     Assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -97,12 +97,12 @@ void RunEmptyTestCase()
     toy_generic_string_helper::ToyFuzzGenericStringParser toy_string_case1(" wears a cool hat", "", "toy-1", "");
 
     differential_parser::Parser* array_of_parsers[0] = {};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 2: Empty Case" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 0, Data, size));
 }
 
@@ -112,12 +112,12 @@ void RunOneParserTestCase()
     toy_generic_string_helper::ToyFuzzGenericStringParser toy_string_case1(" wears a cool hat", "", "toy-1", "");
 
     differential_parser::Parser* array_of_parsers[1] = {(differential_parser::Parser*)(&toy_string_case1)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 3: One Case" << std::endl << "(1)" << std::endl;
-    
+
     Assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 1, Data, size));
 }
 
@@ -129,12 +129,12 @@ void RunTwoEqualParsersTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case1), 
         (differential_parser::Parser*)(&toy_string_case2)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 4: Different Data, No Error Case" << std::endl << "(1 and 2)" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -148,12 +148,12 @@ void RunDiverseDifferentParsersTestCase()
 
     differential_parser::Parser* array_of_parsers[3] = {(differential_parser::Parser*)(&toy_string_case1), 
         (differential_parser::Parser*)(&toy_string_case2), (differential_parser::Parser*)(&toy_string_case3)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 5: Mixed Data, No Errors " << std::endl <<"(1 != 2, 3; (2 == 3))" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 3, Data, size));
 }
 
@@ -166,12 +166,12 @@ void RunDifferentDueToErrorTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case2),
         (differential_parser::Parser*)(&toy_string_case4)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 6: Same Data, One Error " << std::endl <<"(2 == 4; 4 has error)" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -183,12 +183,12 @@ void RunOneErrorTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case5),
         (differential_parser::Parser*)(&toy_string_case4)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 7: Different Data, Same Errors " << std::endl <<"(4 != 5)" << std::endl;
-    
+
     Assess(differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -200,12 +200,12 @@ void RunDifferentErrorsTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case5),
         (differential_parser::Parser*)(&toy_string_case6)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 8: Same Data, Different Errors " << std::endl <<"(5 != 6; err same)" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -218,12 +218,12 @@ void RunDifferentTypesTestCase1()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case1),
         (differential_parser::Parser*)(&toy_int_case1)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 9: Different type conversion" << std::endl <<"(1 ?? 7)" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -236,12 +236,12 @@ void RunDifferentTypesTestCase2()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_int_case1),
         (differential_parser::Parser*)(&toy_string_case1)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 10: Different type conversion" << std::endl <<"(7 ?? 1)" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -253,12 +253,12 @@ void RunDifferentCasesWithDifferentNormalizersTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case8),
         (differential_parser::Parser*)(&toy_string_case1)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 11: Bad Normalizer, No Error" << std::endl <<"(8 != 1)" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -271,12 +271,12 @@ void RunInputDependentParserTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_switch_case1),
         (differential_parser::Parser*)(&toy_string_case8)};
-    
+
     const uint8_t *DataOne = (uint8_t*)("1bob");
     size_t size = 4;
-    
+
     std::cout << "------ TEST 12: Tests Uncertain Case" << std::endl << "8 vs 9" << std::endl;
-    
+
     std::cout << "--- Local Test 1:" << std::endl;
 
     bool finalAssessment = Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, DataOne, size));
@@ -299,12 +299,12 @@ void RunDifferenceByNormalizerTestCase()
 
     differential_parser::Parser* array_of_parsers[2] = {(differential_parser::Parser*)(&toy_string_case2),
         (differential_parser::Parser*)(&toy_string_case8)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST 13: Different Due to Normalizer" << std::endl <<"(2 != 8)" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, Data, size));
 }
 
@@ -327,12 +327,12 @@ void RunTestAll1()
         (differential_parser::Parser*)(&toy_string_case4), (differential_parser::Parser*)(&toy_string_case5), 
         (differential_parser::Parser*)(&toy_string_case6), (differential_parser::Parser*)(&toy_int_case1),
         (differential_parser::Parser*)(&toy_string_case8), (differential_parser::Parser*)(&toy_switch_case1)};
-    
+
     const uint8_t *Data = (uint8_t*)(("Bob"));
     size_t size = 3;
-    
+
     std::cout << "------ TEST All: Throw Everything at Differential Fuzzer" << std::endl <<"All of Cases" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 9, Data, size));
 }
 
@@ -354,13 +354,13 @@ void RunTestAll2()
         (differential_parser::Parser*)(&toy_string_case4), (differential_parser::Parser*)(&toy_string_case5), 
         (differential_parser::Parser*)(&toy_string_case6), (differential_parser::Parser*)(&toy_int_case1),
         (differential_parser::Parser*)(&toy_string_case8), (differential_parser::Parser*)(&toy_switch_case1)};
-    
+
     int integer_holder = int(30);
     const uint8_t *Data = (uint8_t*)(&integer_holder);
     size_t size = 3;
-    
+
     std::cout << "------ TEST All: Throw Everything at Differential Fuzzer" << std::endl <<"All of Cases" << std::endl;
-    
+
     Assess(!differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 9, Data, size));
 }
 
