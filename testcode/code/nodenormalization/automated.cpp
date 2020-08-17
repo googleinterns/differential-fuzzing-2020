@@ -14,7 +14,7 @@ bool runTest(std::string file_name, std::string& buffer)
     {
         libyaml_final_output = libyaml_error_string;
     }
-    
+
     std::string yamlcpp_error_msg = "";
 
     std::vector<YAML::Node> parsed_nodes= parseYamlCpp(file_name, &yamlcpp_error_msg);
@@ -37,7 +37,6 @@ bool runTest(std::string file_name, std::string& buffer)
             yamlcpp_final_output = yamlcpp_error_msg;
         }
     }
-    
 
     bool test = compareStringsCustom(libyaml_final_output, yamlcpp_final_output, buffer);
 
