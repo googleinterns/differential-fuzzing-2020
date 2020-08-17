@@ -159,7 +159,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
         ptr = ptr->next;
     }
     
-    bool return_me = (*head == nullptr);
+    bool is_first = (*head == nullptr);
 
     ptr = new EquivalenceNormalizedOutputs;
     ptr->representative = parser_output;
@@ -170,7 +170,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
 
     *head = ptr;
 
-    return return_me;
+    return is_first;
 }
 
 bool differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 
