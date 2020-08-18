@@ -2,7 +2,7 @@
 #define YAMLCPP_PARSER_H
 
 #include "base_parser.h"
-
+#include "yaml-cpp/yaml.h"
 #include <string>
 
 namespace yamlcpp_differential_parser
@@ -15,10 +15,10 @@ class YamlCppNormalizedOutput
     : virtual public differential_parser::NormalizedOutput
 {
     private:
-        std::string* data;
+        std::vector<YAML::Node>* data;
         std::string* error;
     public:
-        YamlCppNormalizedOutput(std::string* info, std::string* error_code);
+        YamlCppNormalizedOutput(std::vector<YAML::Node>* info, std::string* error_code);
         ~YamlCppNormalizedOutput();
         bool equivalent(NormalizedOutput* compared_object);
         void* getData();
