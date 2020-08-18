@@ -1,5 +1,5 @@
-#ifndef LIBYAMLPARSER_H
-#define LIBYAMLPARSER_H
+#ifndef LIBYAML_PARSER_H
+#define LIBYAML_PARSER_H
 
 #include "base_parser.h"
 

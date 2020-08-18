@@ -1,5 +1,5 @@
-#ifndef YAMLCPPPARSER_H
-#define YAMLCPPPARSER_H
+#ifndef YAMLCPP_PARSER_H
+#define YAMLCPP_PARSER_H
 
 #include "base_parser.h"
 

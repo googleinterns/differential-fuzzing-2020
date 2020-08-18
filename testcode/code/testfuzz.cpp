@@ -1,7 +1,7 @@
 #include "base_parser.h"
 #include "differential_fuzzer.h"
-#include "yamlcppparser.h"
-#include "libyamlparser.h"
+#include "yamlcpp_parser.h"
+#include "libyaml_parser.h"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t size) 
 {

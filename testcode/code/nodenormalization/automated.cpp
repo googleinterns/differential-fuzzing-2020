@@ -1,3 +1,6 @@
+#include "libyaml_utils.h"
+#include "yamlcpp_utils.h"
+#include "comparison_utils.h"
 #include "utils.h"
 #include <dirent.h>
 
