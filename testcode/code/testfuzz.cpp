@@ -1,5 +1,5 @@
-#include "baseparser.h"
-#include "differentialfuzzer.h"
+#include "base_parser.h"
+#include "differential_fuzzer.h"
 #include "yamlcppparser.h"
 #include "libyamlparser.h"
 
