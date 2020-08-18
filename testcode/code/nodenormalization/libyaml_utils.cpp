@@ -208,7 +208,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
 
-                break;        
+                break;
             case YAML_DOCUMENT_START_EVENT:
 
                 restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
@@ -230,7 +230,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 break;
             case YAML_MAPPING_START_EVENT:
-                
+
                 std::cout << "MAP+" << std::endl;
                 libyaml_local_output.push_back(YAML::Node());
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
@@ -281,7 +281,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             case YAML_SCALAR_EVENT:
             {
                 std::cout << "SCL" << std::endl;
-                
+
                 YAML::Node addMe(std::string((char*)event.data.scalar.value, event.data.scalar.length));
                 addTag(&addMe, event.data.scalar.tag);
 
@@ -290,11 +290,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     std::cout << "ANCH" << std::endl;
 
                     std::string temp_translator = ((char*)event.data.scalar.anchor);
-                    
+
                     if (event.data.scalar.value)
                     {
                         std::cout << "scl" << std::endl;
-                        
+
                         anchor_map[temp_translator] = addMe;    
 
                         if(event.data.scalar.length != 0)
@@ -327,9 +327,9 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 else
                 {
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
-                    
+
                     std::cout << addMe << std::endl;
-                    
+
                     if (event.data.scalar.length <= 0 && !event.data.scalar.tag && 
                             event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
@@ -349,11 +349,9 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     if (libyaml_local_output.empty())
                     {
                         libyaml_local_output.push_back(addMe);
-                    }            
+                    }
                     else
                     {
-                        
-                        // addTag(&addMe, event.data.scalar.tag);
                         addToNode(&libyaml_local_output.back(), &addMe, &key_stack, &tracking_current_type, 
                             event.data.scalar.tag);
                     }

@@ -1,14 +1,17 @@
 #include "comparison_utils.h"
 
-void disectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack)
+void disectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack, 
+    std::stack <char>* additional_info_stack)
 {
     for (int i = disect_me->size() - 1; i >= 0; i--) 
     {
         data_save_stack->push((*disect_me)[i]);
+        additional_info_stack->push('L');
     }
 }
 
-void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack)
+void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack,
+    std::stack <char>* additional_info_stack)
 {
     std::stack <YAML::const_iterator> loca_iterators_temp_stack;
 
@@ -23,7 +26,9 @@ void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_sta
         loca_iterators_temp_stack.pop();
 
         data_save_stack->push(it->second);
+        additional_info_stack->push('V');
         data_save_stack->push(it->first);
+        additional_info_stack->push('K');
     }
 }
 
@@ -33,6 +38,7 @@ bool compareSingleNode
     std::stack <YAML::Node> iteration_list_stack_one;
 
     std::stack <char> additional_info_stack_one;
+    additional_info_stack_one.push(' ');
 
     iteration_list_stack_one.push(*compare_me_one);
     additional_info_stack_one.push('U');
@@ -42,6 +48,7 @@ bool compareSingleNode
     std::stack <YAML::Node> iteration_list_stack_two;
 
     std::stack <char> additional_info_stack_two;
+    additional_info_stack_two.push(' ');
 
     iteration_list_stack_two.push(*compare_me_two);
     additional_info_stack_two.push('U');
@@ -51,13 +58,18 @@ bool compareSingleNode
         YAML::Node base_iterator_one = iteration_list_stack_one.top();
         YAML::Node base_iterator_two = iteration_list_stack_two.top();
 
+        if (additional_info_stack_two.top() != additional_info_stack_one.top())
+        {
+            return false;
+        }
+
         iteration_list_stack_one.pop();
 
         additional_info_stack_one.pop();
 
         iteration_list_stack_two.pop();
 
-        additional_info_stack_one.pop();
+        additional_info_stack_two.pop();
 
         if ((base_iterator_one.Tag() != "?" && base_iterator_one.Tag() != "!" && 
             base_iterator_one.Tag() != "") || (base_iterator_two.Tag() != "?" && 
@@ -73,7 +85,15 @@ bool compareSingleNode
         if ((base_iterator_one.Type() == YAML::NodeType::Null) && 
             (base_iterator_two.Type() == YAML::NodeType::Null))
         {
-            
+            if ((additional_info_stack_two.top() == 'U' && additional_info_stack_one.top() == 'U') ||
+                (additional_info_stack_two.top() != 'U' && additional_info_stack_one.top() != 'U'))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         else if ((base_iterator_one.Type() == YAML::NodeType::Scalar) && 
             (base_iterator_two.Type() == YAML::NodeType::Scalar))
@@ -87,17 +107,17 @@ bool compareSingleNode
             (base_iterator_two.Type() == YAML::NodeType::Sequence))
         {
             disectSequenceNode
-                (&base_iterator_one, &iteration_list_stack_one);
+                (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
             disectSequenceNode
-                (&base_iterator_two, &iteration_list_stack_two);
+                (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
         else if ((base_iterator_one.Type() == YAML::NodeType::Map) && 
             (base_iterator_two.Type() == YAML::NodeType::Map))
         {
             disectMapNode
-                (&base_iterator_one, &iteration_list_stack_one);
+                (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
             disectMapNode
-                (&base_iterator_two, &iteration_list_stack_two);
+                (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
         else if ((base_iterator_one.Type() == YAML::NodeType::Undefined) && 
             (base_iterator_two.Type() == YAML::NodeType::Undefined))

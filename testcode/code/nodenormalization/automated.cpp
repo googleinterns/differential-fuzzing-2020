@@ -58,7 +58,7 @@ bool typicalPositiveTest(std::string name)
     std::string full_name = ("../examples/" + name);
 
     std::cerr << "+--- test: " + full_name << std::endl;
-    
+
     bool return_me = runTest(full_name, buffer);
 
     if (!return_me)
@@ -94,6 +94,7 @@ bool typicalNegativeTest(std::string name)
 // ---------------------------------------------------------------------------------
 // -------------------------------------- main -------------------------------------
 // ---------------------------------------------------------------------------------
+
 int main()
 {
 
