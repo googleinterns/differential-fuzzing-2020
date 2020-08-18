@@ -593,12 +593,12 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
 // ---------------------------------------------------------------------------------
 
 bool compareStringsCustom
-    (const std::string compareMeOne, const std::string compareMeTwo, std::string& buffer)
+    (const std::string compare_me_one, const std::string compare_me_two, std::string& buffer)
 {
-    std::string::const_iterator ptrOne = compareMeOne.begin();
-    std::string::const_iterator ptrTwo = compareMeTwo.begin();
+    std::string::const_iterator ptrOne = compare_me_one.begin();
+    std::string::const_iterator ptrTwo = compare_me_two.begin();
 
-    while (*ptrOne == *ptrTwo && ((ptrOne != compareMeOne.end()) || (ptrTwo != compareMeTwo.end())))
+    while (*ptrOne == *ptrTwo && ((ptrOne != compare_me_one.end()) || (ptrTwo != compare_me_two.end())))
     {
         if(*ptrOne == *ptrTwo)
         {
@@ -608,13 +608,144 @@ bool compareStringsCustom
         ptrTwo++;
     }
 
-    if (!((ptrOne == compareMeOne.end())  && (ptrTwo == compareMeTwo.end())))
+    if (!((ptrOne == compare_me_one.end())  && (ptrTwo == compare_me_two.end())))
     {
-         buffer += "(X)";
+        buffer += "(X)";
         return false;
     }
     else
     {
         return true;
     }
+}
+
+// ---------------------------------------------------------------------------------
+// --------------------------- node based comparison -------------------------------
+// ---------------------------------------------------------------------------------
+void disectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack)
+{
+    for (int i = disect_me->size() - 1; i >= 0; i--) 
+    {
+        data_save_stack->push((*disect_me)[i]);
+    }
+}
+
+void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack)
+{
+    std::stack <YAML::const_iterator> loca_iterators_temp_stack;
+
+    for (YAML::const_iterator it = disect_me->begin(); it != disect_me->end(); ++it) 
+    {
+        loca_iterators_temp_stack.push(it);
+    }
+
+    while (!loca_iterators_temp_stack.empty())
+    {
+        YAML::const_iterator it = loca_iterators_temp_stack.top();
+        loca_iterators_temp_stack.pop();
+
+        data_save_stack->push(it->second);
+        data_save_stack->push(it->first);
+    }
+}
+
+bool compareSingleNode
+    (const YAML::Node* compare_me_one,const YAML::Node* compare_me_two)
+{
+    std::stack <YAML::Node> iteration_list_stack_one;
+
+    std::stack <char> additional_info_stack_one;
+
+    iteration_list_stack_one.push(*compare_me_one);
+    additional_info_stack_one.push('U');
+
+    // second set of comparison
+
+    std::stack <YAML::Node> iteration_list_stack_two;
+
+    std::stack <char> additional_info_stack_two;
+
+    iteration_list_stack_two.push(*compare_me_two);
+    additional_info_stack_two.push('U');
+
+    while (!iteration_list_stack_one.empty() && !iteration_list_stack_two.empty())
+    {
+        YAML::Node base_iterator_one = iteration_list_stack_one.top();
+        YAML::Node base_iterator_two = iteration_list_stack_two.top();
+
+        iteration_list_stack_one.pop();
+
+        additional_info_stack_one.pop();
+
+        iteration_list_stack_two.pop();
+
+        additional_info_stack_one.pop();
+
+        if ((base_iterator_one.Tag() != "?" && base_iterator_one.Tag() != "!" && 
+            base_iterator_one.Tag() != "") || (base_iterator_two.Tag() != "?" && 
+            base_iterator_two.Tag() != "!" && base_iterator_two.Tag() != ""))
+        {
+            std::cout << base_iterator_two.Tag() << " vs " << base_iterator_one.Tag() << std::endl;
+            if (base_iterator_one.Tag() != base_iterator_two.Tag())
+            {
+                return false;
+            }
+        }
+
+        if ((base_iterator_one.Type() == YAML::NodeType::Null) && 
+            (base_iterator_two.Type() == YAML::NodeType::Null))
+        {
+            
+        }
+        else if ((base_iterator_one.Type() == YAML::NodeType::Scalar) && 
+            (base_iterator_two.Type() == YAML::NodeType::Scalar))
+        {
+            if (base_iterator_one.as<std::string>() != base_iterator_two.as<std::string>())
+            {
+                return false;
+            }
+        }
+        else if ((base_iterator_one.Type() == YAML::NodeType::Sequence) && 
+            (base_iterator_two.Type() == YAML::NodeType::Sequence))
+        {
+            disectSequenceNode
+                (&base_iterator_one, &iteration_list_stack_one);
+            disectSequenceNode
+                (&base_iterator_two, &iteration_list_stack_two);
+        }
+        else if ((base_iterator_one.Type() == YAML::NodeType::Map) && 
+            (base_iterator_two.Type() == YAML::NodeType::Map))
+        {
+            disectMapNode
+                (&base_iterator_one, &iteration_list_stack_one);
+            disectMapNode
+                (&base_iterator_two, &iteration_list_stack_two);
+        }
+        else if ((base_iterator_one.Type() == YAML::NodeType::Undefined) && 
+            (base_iterator_two.Type() == YAML::NodeType::Undefined))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return iteration_list_stack_one.empty() && iteration_list_stack_two.empty();
+}
+
+bool compareMultipleNodes
+    (const std::vector<YAML::Node>* compare_me_one,const std::vector<YAML::Node>* compare_me_two)
+{
+    std::vector<YAML::Node>::const_iterator iterator_one = compare_me_one->begin();
+    std::vector<YAML::Node>::const_iterator iterator_two = compare_me_two->begin();
+
+    while (iterator_one != compare_me_one->end() && iterator_two != compare_me_two->end() &&
+        compareSingleNode(&(*iterator_one), &(*iterator_two)))
+    {
+        iterator_one++;
+        iterator_two++;
+    }
+
+    return (iterator_one == compare_me_one->end() && iterator_two == compare_me_two->end());
 }

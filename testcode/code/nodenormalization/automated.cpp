@@ -22,25 +22,25 @@ bool runTest(std::string file_name, std::string& buffer)
     std::string yamlcpp_final_output;
     if (!yamlcpp_error_msg.empty())
     {
-        std::cout << "Oops" << std::endl;
         yamlcpp_final_output = yamlcpp_error_msg;
     }
     else
     {
-        std::cout << "Eeps" << std::endl;
         yamlcpp_final_output = normalizeYamlCpp
                 (&parsed_nodes, &yamlcpp_error_msg);
 
         if (!yamlcpp_error_msg.empty())
         {
-            std::cout << "Uups" << std::endl;
             yamlcpp_final_output = yamlcpp_error_msg;
         }
     }
+    
+    if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
+    {
+        return libyaml_error_string == yamlcpp_error_msg;
+    }
 
-    bool test = compareStringsCustom(libyaml_final_output, yamlcpp_final_output, buffer);
-
-    return test;
+    return compareMultipleNodes(&libyaml_final_output_nodes, &parsed_nodes);
 }
 
 // ---------------------------------------------------------------------------------

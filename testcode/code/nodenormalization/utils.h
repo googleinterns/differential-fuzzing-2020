@@ -59,4 +59,18 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
 
 bool compareStringsCustom(const std::string compareMeOne, const std::string compareMeTwo, std::string& buffer);
 
+// ---------------------------------------------------------------------------------
+// --------------------------- node based comparison -------------------------------
+// ---------------------------------------------------------------------------------
+
+void disectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack);
+
+void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack);
+
+bool compareSingleNode
+    (const YAML::Node* compare_me_one,const YAML::Node* compare_me_two);
+
+bool compareMultipleNodes
+    (const std::vector<YAML::Node>* compare_me_one,const std::vector<YAML::Node>* compare_me_two);
+
 #endif

@@ -5,8 +5,19 @@
 // ---------------------------------------------------------------------------------
 int main(int argc, char* args[])
 {
-    YAML::Node temp_test;
-    YAML::Node another_layer;
+    // YAML::Node temp_test1 = YAML::Load("%TAG !e! tag:example.com,2000:app/\n---\n[hello: [3, 34, !e!tag%21 makr]]");
+    // YAML::Node temp_test2 = YAML::Load("%TAG !e! tag:example.com,2000:app/\n---\n[hello: [3, 34, !e!tag%22 makr]]");
+    // std::string buffer;
+
+    // if (compareSingleNode(&temp_test1, &temp_test2))
+    // {
+    //     std::cout << "TRUE" << std::endl;
+    // }
+    // else
+    // {
+    //     std::cout << "FALSE" << std::endl;
+    // }
+
 
     std::string libyaml_error_string = "";
 
@@ -51,7 +62,7 @@ int main(int argc, char* args[])
 
     std::string buffer;
 
-    if (compareStringsCustom(libyaml_final_string_output, yamlcpp_final_output, buffer))
+    if (compareMultipleNodes(&libyaml_final_output, &parsed_nodes))
     {
         std::cout << buffer << std::endl;  
         std::cout << "Cases equal!" << std::endl;
