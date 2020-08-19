@@ -15,6 +15,8 @@ bool runTest(std::string file_name, std::string& buffer)
 
     std::vector<YAML::Node> parsed_nodes= parseYamlCpp(file_name, &yamlcpp_error_msg);
 
+    // normalizeYamlCpp(&parsed_nodes, &yamlcpp_error_msg);
+
     if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
     {
         return libyaml_error_string == yamlcpp_error_msg;
@@ -84,6 +86,7 @@ int main(int argc, char* args[])
             {
                 if (typicalPositiveTest(std::string(ent->d_name)))
                 {
+                    std::cout << "../examples/" << std::string(ent->d_name) << std::endl;
                     myfile << "../examples/" << std::string(ent->d_name) << std::endl;
                 }
             }

@@ -48,8 +48,15 @@ int main(int argc, char* args[])
 
     std::vector<YAML::Node> parsed_nodes = parseYamlCpp(args[1], &yamlcpp_error_msg);
 
+    std::cout << "HERE" << std::endl;
+
     std::string yamlcpp_final_output = normalizeYamlCpp
                 (&parsed_nodes, &old_error);
+
+    if (!parsed_nodes.empty())
+    {
+        std::cout << parsed_nodes.back() << std::endl;
+    }
 
     std::cout << "--------yaml-cpp Output:" << std::endl;
 
@@ -69,29 +76,8 @@ int main(int argc, char* args[])
 
     std::string buffer;
 
-    // if (libyaml_error_string == yamlcpp_error_msg)
-    // {
-    //     if (libyaml_error_string.empty())
-    //     {
-    //         if (compareMultipleNodes(&libyaml_final_output, &parsed_nodes))
-    //         {
-    //             std::cout << "Cases equal!" << std::endl;
-    //         }
-    //         else
-    //         {
-    //             std::cout << buffer << std::endl;  
-    //             std::cout << "Cases different!" << std::endl;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         std::cout << "Cases equal!" << std::endl;
-    //     }
-    // }
-    // else
-    // {
-    //     std::cout << "Cases different!" << std::endl;
-    // }
+    // normalizeYamlCpp(&parsed_nodes, &yamlcpp_error_msg);
+    // normalizeYamlCpp(&libyaml_final_output, &libyaml_error_string);
 
     if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
     {
