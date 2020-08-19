@@ -11,7 +11,9 @@ bool runTest(std::string file_name, std::string& buffer)
     std::vector<YAML::Node> libyaml_final_output_nodes = 
         normalizeLibyaml(parseLibyaml(file_name, &libyaml_error_string), &libyaml_error_string);
 
-    std::string libyaml_final_output = normalizeYamlCpp(&libyaml_final_output_nodes, &libyaml_error_string);
+    std::string old_error;
+
+    std::string libyaml_final_output = normalizeYamlCpp(&libyaml_final_output_nodes, &old_error);
 
     if (!libyaml_error_string.empty())
     {
@@ -30,7 +32,7 @@ bool runTest(std::string file_name, std::string& buffer)
     else
     {
         yamlcpp_final_output = normalizeYamlCpp
-                (&parsed_nodes, &yamlcpp_error_msg);
+                (&parsed_nodes, &old_error);
 
         if (!yamlcpp_error_msg.empty())
         {
@@ -55,19 +57,9 @@ bool typicalPositiveTest(std::string name)
 {
     std::string buffer = "";
 
-    std::string full_name = ("../examples/" + name);
-
-    std::cerr << "+--- test: " + full_name << std::endl;
+    std::string full_name = ("../../yaml-test-suite/test/" + name);
 
     bool return_me = runTest(full_name, buffer);
-
-    if (!return_me)
-    {
-        std::cerr << "+--- test: " + full_name << std::endl;
-        std::cerr << "+- FAIL" << std::endl;
-        std::cerr << buffer << std::endl;
-        std::cerr << "+---" << std::endl;
-    }
 
     return !return_me;
 }
@@ -76,17 +68,9 @@ bool typicalNegativeTest(std::string name)
 {
     std::string buffer = "";
 
-    std::string full_name = ("../examples/" + name);
+    std::string full_name = ("../../yaml-test-suite/test/" + name);
 
     bool return_me = runTest(full_name, buffer);
-
-    if (return_me)
-    {
-        std::cerr << "+--- test: " + full_name << std::endl;
-        std::cerr << "+- FAIL" << std::endl;
-        std::cerr << buffer << std::endl;
-        std::cerr << "+---" << std::endl;
-    }
 
     return return_me;
 }
@@ -95,10 +79,19 @@ bool typicalNegativeTest(std::string name)
 // -------------------------------------- main -------------------------------------
 // ---------------------------------------------------------------------------------
 
-int main()
+int main(int argc, char* args[])
 {
-
-    std::string path = "../examples/";
+    std::string path;
+    if (argc >0)
+    {
+        std::string path = args[0];
+    }
+    else
+    {
+        //../../yaml-test-suite/test/
+        //../examples/
+        path = "../../yaml-test-suite/test/";
+    }
 
     DIR *dir;
     struct dirent *ent;
@@ -107,16 +100,17 @@ int main()
 
     myfile.open ("autoreport.txt");
 
-    if ((dir = opendir ("../examples/")) != NULL) 
+    if ((dir = opendir ("../../yaml-test-suite/test/")) != NULL) 
     {
         /* print all the files and directories within directory */
         while ((ent = readdir (dir)) != NULL) 
         {
             if (ent->d_name[0] != '.')
             {
+                std::cout << "../../yaml-test-suite/test/" << std::string(ent->d_name) << std::endl;
                 if (typicalPositiveTest(std::string(ent->d_name)))
                 {
-                    myfile << "../examples/" << std::string(ent->d_name) << std::endl;
+                    myfile << "../../yaml-test-suite/test/" << std::string(ent->d_name) << std::endl;
                 }
             }
         }

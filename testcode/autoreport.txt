@@ -1,9 +1,0 @@
-../examples/tagshorthandfull.yaml
-../examples/anchorsequenceerror.yaml
-../examples/invalidtag.yaml
-../examples/questionmarksinscalars.yaml
-../examples/baredocafterend.yaml
-../examples/anchorwithcoloninname.yaml
-../examples/endthenmore.yaml
-../examples/sequencescallar.yaml
-../examples/tagdefinedonlyfirst.yaml

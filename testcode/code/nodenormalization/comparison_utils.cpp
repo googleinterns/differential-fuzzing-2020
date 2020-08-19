@@ -75,7 +75,6 @@ bool compareSingleNode
             base_iterator_one.Tag() != "") || (base_iterator_two.Tag() != "?" && 
             base_iterator_two.Tag() != "!" && base_iterator_two.Tag() != ""))
         {
-            std::cout << base_iterator_two.Tag() << " vs " << base_iterator_one.Tag() << std::endl;
             if (base_iterator_one.Tag() != base_iterator_two.Tag())
             {
                 return false;

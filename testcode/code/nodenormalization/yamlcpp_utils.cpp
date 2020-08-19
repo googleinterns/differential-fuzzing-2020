@@ -10,7 +10,6 @@ std::vector<YAML::Node> parseYamlCpp(const std::string parse_me,
     }
     catch (const std::exception& err)
     {
-        std::cout << err.what() << std::endl;
         *error_message_container = "ERROR";
     }
     return return_me;
@@ -33,7 +32,6 @@ std::string normalizeYamlCpp(const std::vector<YAML::Node>* nodes,
             it != nodes->end(); it++)
         {
             std::string temp_result_holder = normalizeYamlCppNode(&(*it), error_message_container);
-            std::cout << temp_result_holder << std::endl;
             yamlcpp_final_output += temp_result_holder;
 
             if(temp_result_holder.empty() && error_message_container->empty())
@@ -44,7 +42,6 @@ std::string normalizeYamlCpp(const std::vector<YAML::Node>* nodes,
     }
     catch (const std::exception& err)
     {
-        std::cout << err.what() << std::endl;
         *error_message_container = "ERROR";
     }
 
