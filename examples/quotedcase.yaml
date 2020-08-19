@@ -1,0 +1,5 @@
+quoted: Quoted
+block: |
+  void main() {
+  <TAB>printf("Hello, world!\n");
+  }

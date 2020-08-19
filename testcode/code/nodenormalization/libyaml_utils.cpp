@@ -46,22 +46,22 @@ void addTag(YAML::Node* current_node, yaml_char_t* tag)
 }
 
 void addToNode
-    (YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
+    (YAML::Node* addToMe, YAML::Node* add_me, std::stack<YAML::Node>* key_stack, 
     const mode_type* tracking_current_type, yaml_char_t* tag)
 {
-    addTag(addMe, tag);
+    addTag(add_me, tag);
     if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
     {
-        addToMe->push_back(*addMe);
+        addToMe->push_back(*add_me);
     }
     else if (*tracking_current_type ==  mode_type::KEY_TYPE)
     {
-        key_stack->push(*addMe);
-        (*addToMe)[*addMe];
+        key_stack->push(*add_me);
+        (*addToMe)[*add_me];
     }
     else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
     {
-        (*addToMe)[key_stack->top()] = *addMe;
+        (*addToMe)[key_stack->top()] = *add_me;
         key_stack->pop();
     }
 }
@@ -282,8 +282,8 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             {
                 std::cout << "SCL" << std::endl;
                 
-                YAML::Node addMe(std::string((char*)event.data.scalar.value, event.data.scalar.length));
-                addTag(&addMe, event.data.scalar.tag);
+                YAML::Node add_me(std::string((char*)event.data.scalar.value, event.data.scalar.length));
+                addTag(&add_me, event.data.scalar.tag);
 
                 if (event.data.scalar.anchor)
                 {
@@ -295,7 +295,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     {
                         std::cout << "scl" << std::endl;
                         
-                        anchor_map[temp_translator] = addMe;    
+                        anchor_map[temp_translator] = add_me;    
 
                         if(event.data.scalar.length != 0)
                         {
@@ -303,11 +303,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                             if (libyaml_local_output.empty())
                             {
-                                libyaml_local_output.push_back(addMe);
+                                libyaml_local_output.push_back(add_me);
                             }
                             else
                             {
-                                addToNode(&libyaml_local_output.back(), &addMe, &key_stack, &tracking_current_type, 
+                                addToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                                     event.data.scalar.tag);
                             }
                         }
@@ -328,33 +328,28 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 {
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
                     
-                    std::cout << addMe << std::endl;
+                    std::cout << add_me << std::endl;
                     
                     if (event.data.scalar.length <= 0 && !event.data.scalar.tag && 
                             event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
-                        yaml_event_delete(&event);
+                        add_me.reset();
+                        add_me = YAML::Load("");
+                        char empty_char = '~';
+                        addTag(&add_me, (yaml_char_t*)(&empty_char));
 
-                        assert(!fclose(input));
-
-                        yaml_parser_delete(&parser);
-
-                        fprintf(stderr, "ERROR: Empty node\n");
-
-                        *error_message_container = "ERROR";
-
-                        return libyaml_local_output;
+                        // return libyaml_local_output;
                     }
 
                     if (libyaml_local_output.empty())
                     {
-                        libyaml_local_output.push_back(addMe);
+                        libyaml_local_output.push_back(add_me);
                     }            
                     else
                     {
                         
-                        // addTag(&addMe, event.data.scalar.tag);
-                        addToNode(&libyaml_local_output.back(), &addMe, &key_stack, &tracking_current_type, 
+                        // addTag(&add_me, event.data.scalar.tag);
+                        addToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                             event.data.scalar.tag);
                     }
                 }

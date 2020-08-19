@@ -1,4 +1,4 @@
-rm *.o testexecutable *.h.gch
+rm *.o testexecutable
 bash build_toy_base.sh 
 bash build_toy_fuzz_parsers.sh
 

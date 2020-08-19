@@ -4,14 +4,15 @@ std::vector<YAML::Node> parseYamlCpp(const std::string parse_me,
                                             std::string* error_message_container)
 {
     std::vector<YAML::Node> return_me;
-    try
-    {
-        return_me = YAML::LoadAllFromFile(parse_me);
-    }
-    catch (const std::exception& err)
-    {
-        *error_message_container = "ERROR";
-    }
+    // try
+    // {
+    //     return_me = YAML::LoadAllFromFile(parse_me);
+    // }
+    // catch (const std::exception& err)
+    // {
+    //     *error_message_container = "ERROR";
+    // }
+    return_me = YAML::LoadAllFromFile(parse_me);
     return return_me;
 }
 

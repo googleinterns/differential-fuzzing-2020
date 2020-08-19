@@ -76,7 +76,7 @@ int main(int argc, char* args[])
 
     std::string buffer;
 
-    // normalizeYamlCpp(&parsed_nodes, &yamlcpp_error_msg);
+    normalizeYamlCpp(&parsed_nodes, &old_error);
     // normalizeYamlCpp(&libyaml_final_output, &libyaml_error_string);
 
     if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
