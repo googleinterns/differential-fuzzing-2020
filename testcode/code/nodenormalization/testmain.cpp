@@ -59,6 +59,7 @@ int main(int argc, char* args[])
     }
     else
     {
+        std::cout << yamlcpp_final_output << "(END)" << std::endl;
         std::cout << yamlcpp_error_msg << std::endl;
     }
 
@@ -68,34 +69,52 @@ int main(int argc, char* args[])
 
     std::string buffer;
 
-    if (libyaml_error_string == yamlcpp_error_msg)
+    // if (libyaml_error_string == yamlcpp_error_msg)
+    // {
+    //     if (libyaml_error_string.empty())
+    //     {
+    //         if (compareMultipleNodes(&libyaml_final_output, &parsed_nodes))
+    //         {
+    //             std::cout << "Cases equal!" << std::endl;
+    //         }
+    //         else
+    //         {
+    //             std::cout << buffer << std::endl;  
+    //             std::cout << "Cases different!" << std::endl;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         std::cout << "Cases equal!" << std::endl;
+    //     }
+    // }
+    // else
+    // {
+    //     std::cout << "Cases different!" << std::endl;
+    // }
+
+    if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
     {
-        if(libyaml_error_string.empty())
+        if (libyaml_error_string == yamlcpp_error_msg)
         {
-            if (compareMultipleNodes(&libyaml_final_output, &parsed_nodes))
-            {
-                std::cout << buffer << std::endl;  
-                std::cout << "Cases equal!" << std::endl;
-            }
-            else
-            {
-                std::cout << buffer << std::endl;  
-                std::cout << "(END)" << std::endl;
-                std::cout << "Cases different!" << std::endl;
-            }
+            std::cout << "Cases equal!" << std::endl;
         }
         else
         {
-            std::cout << "Cases equal!" << std::endl;
+            std::cout << "Cases different!" << std::endl;
         }
     }
     else
     {
-        std::cout << "Cases different!" << std::endl;
+        if (compareMultipleNodes(&libyaml_final_output, &parsed_nodes))
+        {
+            std::cout << "Cases equal!" << std::endl;
+        }
+        else
+        {
+            std::cout << "Cases different!" << std::endl;
+        }
     }
     
-
-
-
     return 0;
 }

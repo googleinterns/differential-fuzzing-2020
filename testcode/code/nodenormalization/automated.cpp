@@ -6,40 +6,15 @@
 
 bool runTest(std::string file_name, std::string& buffer)
 {
-    std::string libyaml_error_string = "";
+    std::string libyaml_error_string;
 
     std::vector<YAML::Node> libyaml_final_output_nodes = 
         normalizeLibyaml(parseLibyaml(file_name, &libyaml_error_string), &libyaml_error_string);
 
-    std::string old_error;
-
-    std::string libyaml_final_output = normalizeYamlCpp(&libyaml_final_output_nodes, &old_error);
-
-    if (!libyaml_error_string.empty())
-    {
-        libyaml_final_output = libyaml_error_string;
-    }
-
-    std::string yamlcpp_error_msg = "";
+    std::string yamlcpp_error_msg;
 
     std::vector<YAML::Node> parsed_nodes= parseYamlCpp(file_name, &yamlcpp_error_msg);
 
-    std::string yamlcpp_final_output;
-    if (!yamlcpp_error_msg.empty())
-    {
-        yamlcpp_final_output = yamlcpp_error_msg;
-    }
-    else
-    {
-        yamlcpp_final_output = normalizeYamlCpp
-                (&parsed_nodes, &old_error);
-
-        if (!yamlcpp_error_msg.empty())
-        {
-            yamlcpp_final_output = yamlcpp_error_msg;
-        }
-    }
-    
     if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
     {
         return libyaml_error_string == yamlcpp_error_msg;
@@ -57,7 +32,7 @@ bool typicalPositiveTest(std::string name)
 {
     std::string buffer = "";
 
-    std::string full_name = ("../../yaml-test-suite/test/" + name);
+    std::string full_name = ("../examples/" + name);
 
     bool return_me = runTest(full_name, buffer);
 
@@ -68,7 +43,7 @@ bool typicalNegativeTest(std::string name)
 {
     std::string buffer = "";
 
-    std::string full_name = ("../../yaml-test-suite/test/" + name);
+    std::string full_name = ("../examples/" + name);
 
     bool return_me = runTest(full_name, buffer);
 
@@ -90,7 +65,7 @@ int main(int argc, char* args[])
     {
         //../../yaml-test-suite/test/
         //../examples/
-        path = "../../yaml-test-suite/test/";
+        path = "../examples/";
     }
 
     DIR *dir;
@@ -100,17 +75,16 @@ int main(int argc, char* args[])
 
     myfile.open ("autoreport.txt");
 
-    if ((dir = opendir ("../../yaml-test-suite/test/")) != NULL) 
+    if ((dir = opendir ("../examples/")) != NULL) 
     {
         /* print all the files and directories within directory */
         while ((ent = readdir (dir)) != NULL) 
         {
             if (ent->d_name[0] != '.')
             {
-                std::cout << "../../yaml-test-suite/test/" << std::string(ent->d_name) << std::endl;
                 if (typicalPositiveTest(std::string(ent->d_name)))
                 {
-                    myfile << "../../yaml-test-suite/test/" << std::string(ent->d_name) << std::endl;
+                    myfile << "../examples/" << std::string(ent->d_name) << std::endl;
                 }
             }
         }
