@@ -8,7 +8,7 @@
 namespace yamlcpp_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ YamlCppNormalizedOutput ---------------------------------
+// ------------------------------ YamlCppNormalizedOutput --------------------------
 // ---------------------------------------------------------------------------------
 
 YamlCppNormalizedOutput::YamlCppNormalizedOutput(std::vector<YAML::Node>* info, std::string* error_code)
@@ -30,7 +30,7 @@ bool YamlCppNormalizedOutput::equivalent(NormalizedOutput* compared_object)
 {
     if (*this->getError() == *compared_object->getError())
     {
-        return compareMultipleNodes
+        return CompareMultipleNodes
             ((std::vector<YAML::Node>*)this->getData(), (std::vector<YAML::Node>*)compared_object->getData());
     }
     return false;

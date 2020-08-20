@@ -14,16 +14,16 @@
 #include "include/yaml.h"
 #include "yaml-cpp/yaml.h"
 
-void disectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack, 
+void DisectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack, 
     std::stack <char>* additional_info_stack);
 
-void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack,
+void DisectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack,
     std::stack <char>* additional_info_stack);
 
-bool compareSingleNode
+bool CompareSingleNode
     (const YAML::Node* compare_me_one,const YAML::Node* compare_me_two);
 
-bool compareMultipleNodes
+bool CompareMultipleNodes
     (const std::vector<YAML::Node>* compare_me_one,const std::vector<YAML::Node>* compare_me_two);
 
 #endif

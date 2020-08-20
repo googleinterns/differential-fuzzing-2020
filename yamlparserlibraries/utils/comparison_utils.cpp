@@ -1,6 +1,8 @@
 #include "comparison_utils.h"
 
-void disectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack, 
+// Goes through the nodes in the sequence node and adds them to stack used to transverse
+// nodes
+void DisectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack, 
     std::stack <char>* additional_info_stack)
 {
     for (int i = disect_me->size() - 1; i >= 0; i--) 
@@ -10,7 +12,9 @@ void disectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_sav
     }
 }
 
-void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack,
+// Goes through the nodes in the map node and adds them to stack used to transverse
+// nodes
+void DisectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack,
     std::stack <char>* additional_info_stack)
 {
     std::stack <YAML::const_iterator> loca_iterators_temp_stack;
@@ -32,7 +36,7 @@ void disectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_sta
     }
 }
 
-bool compareSingleNode
+bool CompareSingleNode
     (const YAML::Node* compare_me_one,const YAML::Node* compare_me_two)
 {
     std::stack <YAML::Node> iteration_list_stack_one;
@@ -75,7 +79,6 @@ bool compareSingleNode
             base_iterator_one.Tag() != "") || (base_iterator_two.Tag() != "?" && 
             base_iterator_two.Tag() != "!" && base_iterator_two.Tag() != ""))
         {
-            std::cout << base_iterator_two.Tag() << " vs " << base_iterator_one.Tag() << std::endl;
             if (base_iterator_one.Tag() != base_iterator_two.Tag())
             {
                 return false;
@@ -106,17 +109,19 @@ bool compareSingleNode
         else if ((base_iterator_one.Type() == YAML::NodeType::Sequence) && 
             (base_iterator_two.Type() == YAML::NodeType::Sequence))
         {
-            disectSequenceNode
+            DisectSequenceNode
                 (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
-            disectSequenceNode
+
+            DisectSequenceNode
                 (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
         else if ((base_iterator_one.Type() == YAML::NodeType::Map) && 
             (base_iterator_two.Type() == YAML::NodeType::Map))
         {
-            disectMapNode
+            DisectMapNode
                 (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
-            disectMapNode
+                
+            DisectMapNode
                 (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
         else if ((base_iterator_one.Type() == YAML::NodeType::Undefined) && 
@@ -132,14 +137,14 @@ bool compareSingleNode
     return iteration_list_stack_one.empty() && iteration_list_stack_two.empty();
 }
 
-bool compareMultipleNodes
+bool CompareMultipleNodes
     (const std::vector<YAML::Node>* compare_me_one,const std::vector<YAML::Node>* compare_me_two)
 {
     std::vector<YAML::Node>::const_iterator iterator_one = compare_me_one->begin();
     std::vector<YAML::Node>::const_iterator iterator_two = compare_me_two->begin();
 
     while (iterator_one != compare_me_one->end() && iterator_two != compare_me_two->end() &&
-        compareSingleNode(&(*iterator_one), &(*iterator_two)))
+        CompareSingleNode(&(*iterator_one), &(*iterator_two)))
     {
         iterator_one++;
         iterator_two++;
