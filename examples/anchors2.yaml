@@ -5,6 +5,7 @@ foo: &foo
     <<: *base
     age: 10
     <<: *bar
+    bobby: 34
 
 bar: &bar
     <<: *base

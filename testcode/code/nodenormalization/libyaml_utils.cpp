@@ -304,11 +304,13 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                             if (libyaml_local_output.empty())
                             {
                                 libyaml_local_output.push_back(add_me);
+
                             }
                             else
                             {
                                 addToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                                     event.data.scalar.tag);
+
                             }
                         }
                         else
@@ -354,9 +356,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 std::cout << "ALI" << std::endl;
 
                 std::string temp_translator = ((char*) event.data.alias.anchor);
-
-                if(anchor_map[temp_translator])
+                std::cout << "Alias: " << temp_translator << std::endl;
+                
+                if(anchor_map.find(temp_translator) != anchor_map.end())
                 {
+                    std::cout << "DONT STOP" << std::endl;
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     addToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
@@ -364,6 +368,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 }
                 else
                 {
+                    std::cout << "STOP" << std::endl;
                     yaml_event_delete(&event);
 
                     assert(!fclose(input));

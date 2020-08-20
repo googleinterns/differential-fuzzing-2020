@@ -3,7 +3,6 @@
 ../examples/explicitemptykey.yaml
 ../examples/tagshorthandfull.yaml
 ../examples/anchorsequenceerror.yaml
-../examples/anchors2.yaml
 ../examples/emptyflownodes.yaml
 ../examples/invalidtag.yaml
 ../examples/questionmarksinscalars.yaml

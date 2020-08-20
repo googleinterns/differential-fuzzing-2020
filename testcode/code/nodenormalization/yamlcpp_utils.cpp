@@ -6,13 +6,10 @@ std::vector<YAML::Node> parseYamlCpp(const std::string parse_me,
     std::vector<YAML::Node> return_me;
     try
     {
-        std::cout << "here" << std::endl;
         return_me = YAML::LoadAllFromFile(parse_me);
-        std::cout << "there" << std::endl;
     }
     catch (const std::exception& err)
     {
-        std::cout << "anywhere" << std::endl;
         *error_message_container = "ERROR";
     }
 
@@ -82,36 +79,27 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
             yamlcpp_final_output += tag_holder + " ";
         }
 
-        std::cout << "Loop!" << std::endl;
-        std::cout << yamlcpp_final_output << std::endl;
-
         switch (base_iterator.Type())
         {    
             case YAML::NodeType::Null:
             {
-                std::cout << "NULL" << std::endl;
                 if (current_mode == 'U')
                 {
-                    std::cout << "ye" << std::endl;
-                    std::cout << yamlcpp_final_output << std::endl;
                     return yamlcpp_final_output;
                 }
                 else
                 {
-                    std::cout << "neh" << std::endl;
                     yamlcpp_final_output +=  "~ \n";
                 }
                 break;
             }
             case YAML::NodeType::Scalar:
             {
-                std::cout << "SCL" << std::endl;
                 yamlcpp_final_output +=  "- " + base_iterator.as<std::string>() + "\n";
                 break;
             }
             case YAML::NodeType::Sequence:
             {
-                std::cout << "SQU" << std::endl;
                 yamlcpp_final_output += "\n";
                 for (int i = base_iterator.size() - 1; i >= 0; i--) 
                 {
@@ -123,7 +111,6 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
             }
             case YAML::NodeType::Map:
             {
-                std::cout << "MAP" << std::endl;
                 yamlcpp_final_output += "\n";
                 std::stack <YAML::const_iterator> loca_iterators_temp_stack;
 
