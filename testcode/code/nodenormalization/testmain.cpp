@@ -8,20 +8,6 @@
 // ---------------------------------------------------------------------------------
 int main(int argc, char* args[])
 {
-    // YAML::Node temp_test1 = YAML::Load("%TAG !e! tag:example.com,2000:app/\n---\n[hello: [3, 34, !e!tag%21 makr]]");
-    // YAML::Node temp_test2 = YAML::Load("%TAG !e! tag:example.com,2000:app/\n---\n[hello: [3, 34, !e!tag%22 makr]]");
-    // std::string buffer;
-
-    // if (compareSingleNode(&temp_test1, &temp_test2))
-    // {
-    //     std::cout << "TRUE" << std::endl;
-    // }
-    // else
-    // {
-    //     std::cout << "FALSE" << std::endl;
-    // }
-
-
     std::string libyaml_error_string = "";
 
     std::vector<YAML::Node> libyaml_final_output = 
@@ -75,9 +61,6 @@ int main(int argc, char* args[])
     std::cout << "- Conclusion: " << std::endl;
 
     std::string buffer;
-
-    normalizeYamlCpp(&parsed_nodes, &old_error);
-    // normalizeYamlCpp(&libyaml_final_output, &libyaml_error_string);
 
     if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
     {

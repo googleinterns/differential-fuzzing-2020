@@ -333,8 +333,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     if (event.data.scalar.length <= 0 && !event.data.scalar.tag && 
                             event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
-                        add_me.reset();
-                        add_me = YAML::Load("");
+                        add_me = YAML::Node();
                         char empty_char = '~';
                         addTag(&add_me, (yaml_char_t*)(&empty_char));
 
