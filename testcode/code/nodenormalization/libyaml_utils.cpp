@@ -334,10 +334,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                             event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
                         add_me = YAML::Node();
-                        char empty_char = '~';
-                        addTag(&add_me, (yaml_char_t*)(&empty_char));
-
-                        // return libyaml_local_output;
                     }
 
                     if (libyaml_local_output.empty())
@@ -346,8 +342,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     }            
                     else
                     {
-                        
-                        // addTag(&add_me, event.data.scalar.tag);
                         addToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                             event.data.scalar.tag);
                     }

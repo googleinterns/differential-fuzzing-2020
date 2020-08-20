@@ -32,10 +32,10 @@ int main(int argc, char* args[])
 
     std::string yamlcpp_error_msg;
 
+    std::cout << "Hip" << std::endl;
     std::vector<YAML::Node> parsed_nodes = parseYamlCpp(args[1], &yamlcpp_error_msg);
 
-    std::cout << "HERE" << std::endl;
-
+    std::cout << "Hop" << std::endl;
     std::string yamlcpp_final_output = normalizeYamlCpp
                 (&parsed_nodes, &old_error);
 

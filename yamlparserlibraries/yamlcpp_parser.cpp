@@ -61,7 +61,7 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::string*
 
     try
     {
-        *yaml_cpp_loop_temp = YAML::LoadAll(std::string((const char*)input, input_size - 1));
+        *yaml_cpp_loop_temp = YAML::LoadAll(std::string((const char*)input, input_size));
     }
     catch (const std::exception& err)
     {
