@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "differential_fuzzer.h"
+#include "logger.h"
 
 
 // ---------------------------------------------------------------------------------
@@ -196,9 +197,9 @@ bool differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser
         }
     }
 
-    PrintEquivalenceNormalizedOutputs(head);
+    TEST_NODE_PPRINT(head);
+
     DeleteEquivalenceNormalizedOutputs(head);
 
     return all_parser_are_similar;
 }
-
