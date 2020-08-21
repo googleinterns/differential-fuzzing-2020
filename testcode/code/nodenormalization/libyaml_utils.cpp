@@ -1,5 +1,5 @@
 #include "libyaml_utils.h"
-
+#include "logger.h"
 
 // ---------------------------------------------------------------------------------
 // ------------------------------- libyaml test code -------------------------------
@@ -160,7 +160,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
     if (!yaml_parser_initialize(&parser)) 
     {
-        fprintf(stderr, "ERROR: Failed to initialize\n");
+        TEST_PPRINT("ERROR: Failed to initialize\n");
 
         *error_message_container = "ERROR";
 
@@ -171,8 +171,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
     
     while (true) 
     {
-
-        std::cout << "L" << std::endl;
 
         YAML::Node new_node;
 
@@ -188,7 +186,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
             yaml_parser_delete(&parser);
 
-            fprintf(stderr, "ERROR: Bad parsing\n");
+            TEST_PPRINT("ERROR: Bad parsing\n");
 
             *error_message_container = "ERROR";
 
@@ -199,12 +197,10 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
         switch (type)
         {
             case YAML_STREAM_END_EVENT:
-                std::cout << "STR-" << std::endl;
-                
+
                 break;
             case YAML_DOCUMENT_END_EVENT:
 
-                std::cout << "DOC-" << std::endl;
                 restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
 
@@ -218,20 +214,16 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
             case YAML_MAPPING_END_EVENT:
 
-                std::cout << "MAP-" << std::endl;
-
                 map_mode = endEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
 
-                std::cout << "SQU-" << std::endl;
                 map_mode = endEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_MAPPING_START_EVENT:
                 
-                std::cout << "MAP+" << std::endl;
                 libyaml_local_output.push_back(YAML::Node());
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
@@ -250,14 +242,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 if (event.data.mapping_start.anchor)
                 {
-                    std::cout << "ANCH-M" << std::endl;
                     anchor_map[std::string((char*)event.data.mapping_start.anchor)] = libyaml_local_output.back();
                 }
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
-
-                std::cout << "SQU+" << std::endl;
 
                 libyaml_local_output.push_back(YAML::Node());
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
@@ -272,7 +261,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 if (event.data.sequence_start.anchor)
                 {
-                    std::cout << "ANCH-S" << std::endl;
                     anchor_map[std::string((char*)event.data.sequence_start.anchor)] = libyaml_local_output.back();
                 }
 
@@ -280,21 +268,18 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
             case YAML_SCALAR_EVENT:
             {
-                std::cout << "SCL" << std::endl;
                 
                 YAML::Node add_me(std::string((char*)event.data.scalar.value, event.data.scalar.length));
                 addTag(&add_me, event.data.scalar.tag);
 
                 if (event.data.scalar.anchor)
                 {
-                    std::cout << "ANCH" << std::endl;
 
                     std::string temp_translator = ((char*)event.data.scalar.anchor);
                     
                     if (event.data.scalar.value)
                     {
-                        std::cout << "scl" << std::endl;
-                        
+
                         anchor_map[temp_translator] = add_me;    
 
                         if(event.data.scalar.length != 0)
@@ -329,9 +314,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 else
                 {
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
-                    
-                    std::cout << add_me << std::endl;
-                    
+
                     if (event.data.scalar.length <= 0 && !event.data.scalar.tag && 
                             event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
@@ -353,14 +336,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             }
             case YAML_ALIAS_EVENT:
             {
-                std::cout << "ALI" << std::endl;
 
                 std::string temp_translator = ((char*) event.data.alias.anchor);
-                std::cout << "Alias: " << temp_translator << std::endl;
                 
                 if(anchor_map.find(temp_translator) != anchor_map.end())
                 {
-                    std::cout << "DONT STOP" << std::endl;
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     addToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
@@ -368,14 +348,13 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 }
                 else
                 {
-                    std::cout << "STOP" << std::endl;
                     yaml_event_delete(&event);
 
                     assert(!fclose(input));
 
                     yaml_parser_delete(&parser);
 
-                    fprintf(stderr, "ERROR: Missing anchor\n");
+                    TEST_PPRINT("ERROR: Missing anchor\n");
 
                     *error_message_container = "ERROR";
 
@@ -394,12 +373,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             break;
         }
 
-        if (!libyaml_local_output.empty())
-        {
-            std::cout << "-------" << std::endl;
-            std::cout << libyaml_local_output.back() << std::endl;
-            std::cout << "-------" << std::endl;            
-        }
     }
 
     assert(!fclose(input));
@@ -407,18 +380,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
     yaml_parser_delete(&parser);
 
     fflush(stdout);
-    
-    std::cout << "I got to the end of the parser!" << std::endl;
-
-    std::cout << "Size:" << libyaml_local_output.size() << std::endl;
-
-    if (!libyaml_local_output.empty())
-    {
-        std::cout << "Node output:" << std::endl;
-        std::cout << libyaml_local_output.back() << std::endl;
-        std::cout << "-----------------" << std::endl;
-        libyaml_final_output.push_back(libyaml_local_output.back());
-    }
 
     return libyaml_final_output;
 }
