@@ -32,7 +32,7 @@ bool typicalPositiveTest(std::string name)
 {
     std::string buffer = "";
 
-    std::string full_name = ("../../yaml-test-suite/test/" + name);
+    std::string full_name = ("../examples/" + name);
 
     bool return_me = runTest(full_name, buffer);
 
@@ -43,7 +43,7 @@ bool typicalNegativeTest(std::string name)
 {
     std::string buffer = "";
 
-    std::string full_name = ("../../yaml-test-suite/test/" + name);
+    std::string full_name = ("../examples/" + name);
 
     bool return_me = runTest(full_name, buffer);
 
@@ -65,7 +65,7 @@ int main(int argc, char* args[])
     {
         //../../yaml-test-suite/test/
         //../examples/
-        path = "../../yaml-test-suite/test/";
+        path = "../examples/";
     }
 
     DIR *dir;
@@ -75,17 +75,17 @@ int main(int argc, char* args[])
 
     myfile.open ("autoreport.txt");
 
-    if ((dir = opendir ("../../yaml-test-suite/test/")) != NULL) 
+    if ((dir = opendir ("../examples/")) != NULL) 
     {
         /* print all the files and directories within directory */
         while ((ent = readdir (dir)) != NULL) 
         {
             if (ent->d_name[0] != '.')
             {
-                std::cout << "../../yaml-test-suite/test/" << std::string(ent->d_name) << std::endl;
                 if (typicalPositiveTest(std::string(ent->d_name)))
                 {
-                    myfile << "../../yaml-test-suite/test/" << std::string(ent->d_name) << std::endl;
+                    std::cout << "../examples/" << std::string(ent->d_name) << std::endl;
+                    myfile << "../examples/" << std::string(ent->d_name) << std::endl;
                 }
             }
         }

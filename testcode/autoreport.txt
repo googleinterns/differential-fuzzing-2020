@@ -1,0 +1,15 @@
+../examples/singlepai.yaml
+../examples/errormapping.yaml
+../examples/explicitemptykey.yaml
+../examples/tagshorthandfull.yaml
+../examples/anchorsequenceerror.yaml
+../examples/emptyflownodes.yaml
+../examples/anchorsequence.yaml
+../examples/invalidtag.yaml
+../examples/emptylist.yaml
+../examples/questionmarksinscalars.yaml
+../examples/baredocafterend.yaml
+../examples/anchorwithcoloninname.yaml
+../examples/endthenmore.yaml
+../examples/sequencescallar.yaml
+../examples/emptydocs.yaml
