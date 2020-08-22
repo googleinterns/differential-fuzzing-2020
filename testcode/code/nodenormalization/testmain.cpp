@@ -11,17 +11,13 @@
 int main(int argc, char* args[])
 {
     std::string libyaml_error_string = "";
-
-    TEST_PPRINT("Check1\n");
     std::vector<YAML::Node> libyaml_final_output = 
         normalizeLibyaml(parseLibyaml(args[1], &libyaml_error_string), &libyaml_error_string);
 
-    TEST_PPRINT("Check2\n");
     std::string old_error;
 
     std::string libyaml_final_string_output = normalizeYamlCpp(&libyaml_final_output, &old_error);
 
-    TEST_PPRINT("Check3\n");
     std::cout << "----------- libyaml tests -----------" << std::endl;
 
     if (!libyaml_final_output.empty())

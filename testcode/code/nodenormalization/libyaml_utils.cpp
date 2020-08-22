@@ -198,14 +198,20 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
         {
             case YAML_STREAM_END_EVENT:
 
+                TEST_PPRINT("STR-\n");
+
                 break;
             case YAML_DOCUMENT_END_EVENT:
+
+                TEST_PPRINT("DOC-\n");
 
                 restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
 
                 break;        
             case YAML_DOCUMENT_START_EVENT:
+
+                TEST_PPRINT("DOC+\n");
 
                 restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
@@ -214,16 +220,22 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
             case YAML_MAPPING_END_EVENT:
 
+                TEST_PPRINT("MAP-\n");
+
                 map_mode = endEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
 
+                TEST_PPRINT("SQU-\n");
+
                 map_mode = endEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_MAPPING_START_EVENT:
-                
+
+                TEST_PPRINT("MAP+\n");
+
                 libyaml_local_output.push_back(YAML::Node());
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
@@ -242,11 +254,14 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 if (event.data.mapping_start.anchor)
                 {
+                    TEST_PPRINT("ANCH-map+\n");
                     anchor_map[std::string((char*)event.data.mapping_start.anchor)] = libyaml_local_output.back();
                 }
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
+
+                TEST_PPRINT("SQU+\n");
 
                 libyaml_local_output.push_back(YAML::Node());
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
@@ -261,6 +276,8 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 if (event.data.sequence_start.anchor)
                 {
+                    TEST_PPRINT("ANCH-squ+\n");
+
                     anchor_map[std::string((char*)event.data.sequence_start.anchor)] = libyaml_local_output.back();
                 }
 
@@ -268,18 +285,20 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
             case YAML_SCALAR_EVENT:
             {
-                
+                TEST_PPRINT("SCL\n");
+
                 YAML::Node add_me(std::string((char*)event.data.scalar.value, event.data.scalar.length));
                 addTag(&add_me, event.data.scalar.tag);
 
                 if (event.data.scalar.anchor)
                 {
-
+                    TEST_PPRINT("ANCH-scl\n");
                     std::string temp_translator = ((char*)event.data.scalar.anchor);
                     
                     if (event.data.scalar.value)
                     {
 
+                        TEST_PPRINT("scl\n");
                         anchor_map[temp_translator] = add_me;    
 
                         if(event.data.scalar.length != 0)
@@ -295,11 +314,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                             {
                                 addToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                                     event.data.scalar.tag);
-
                             }
                         }
                         else
                         {
+                            TEST_PPRINT("empty\n");
                             mode_stack.pop();
 
                             if (mode_stack.top() ==  mode_type::MAP_TYPE)
@@ -308,7 +327,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                                 map_mode_stack.pop();
                             }
                             libyaml_local_output.pop_back();
+
+                            // anchor_map[temp_translator] = add_me;
+                            // libyaml_local_output.push_back(add_me);
                         }
+
                     }
                 }
                 else
@@ -336,6 +359,8 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
             }
             case YAML_ALIAS_EVENT:
             {
+
+                TEST_PPRINT("ALI\n");
 
                 std::string temp_translator = ((char*) event.data.alias.anchor);
                 

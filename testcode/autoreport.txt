@@ -13,3 +13,4 @@
 ../examples/endthenmore.yaml
 ../examples/sequencescallar.yaml
 ../examples/emptydocs.yaml
+../examples/tagdefinedonlyfirst.yaml
