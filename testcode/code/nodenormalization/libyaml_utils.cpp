@@ -1,3 +1,4 @@
+ 
 #include "libyaml_utils.h"
 #include "logger.h"
 
@@ -302,11 +303,12 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     if (event.data.scalar.value)
                     {
 
-                        TEST_PPRINT("scl\n");
-                        anchor_map[temp_translator] = add_me;    
+                        TEST_PPRINT("value\n");
 
                         if(event.data.scalar.length != 0)
                         {
+                            anchor_map[temp_translator] = add_me;
+                            
                             map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                             if (libyaml_local_output.empty())
@@ -323,26 +325,41 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                         else
                         {
                             TEST_PPRINT("empty\n");
+                            if (mode_stack.top() ==  mode_type::SEQUENCE_TYPE)
+                            {
+                                if (libyaml_local_output.back().size() <= 0)
+                                {
+                                    TEST_PPRINT("sequence\n");
+                                    add_me = YAML::Node(YAML::NodeType::Null);
+
+                                    libyaml_local_output.back().push_back(add_me);
+
+                                    break;
+                                }
+                            }
+                            
                             mode_stack.pop();
 
                             if (mode_stack.top() ==  mode_type::MAP_TYPE)
                             {
+                                TEST_PPRINT("map\n");
                                 map_mode = map_mode_stack.top();
                                 map_mode_stack.pop();
                             }
+
                             libyaml_local_output.pop_back();
-
                         }
-
                     }
                 }
                 else
                 {
+                    TEST_PPRINT("normal\n");
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     if (event.data.scalar.length <= 0 && !event.data.scalar.tag && 
                             event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
+                        TEST_PPRINT("Begin from nothing\n");
                         add_me = YAML::Node();
                     }
 

@@ -47,6 +47,7 @@ int main(int argc, char* args[])
 
     if (!parsed_nodes.empty())
     {
+        std::cout << "Number of nodes: "<< parsed_nodes.size() << std::endl;
         std::cout << parsed_nodes.back() << std::endl;
     }
 
