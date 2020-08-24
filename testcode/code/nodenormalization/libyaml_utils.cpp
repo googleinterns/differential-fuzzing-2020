@@ -327,15 +327,12 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                             TEST_PPRINT("empty\n");
                             if (mode_stack.top() ==  mode_type::SEQUENCE_TYPE)
                             {
-                                if (libyaml_local_output.back().size() <= 0)
-                                {
-                                    TEST_PPRINT("sequence\n");
-                                    add_me = YAML::Node(YAML::NodeType::Null);
+                                TEST_PPRINT("sequence\n");
+                                add_me = YAML::Node(YAML::NodeType::Null);
 
-                                    libyaml_local_output.back().push_back(add_me);
+                                libyaml_local_output.back().push_back(add_me);
 
-                                    break;
-                                }
+                                break;
                             }
                             
                             mode_stack.pop();

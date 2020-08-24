@@ -1,5 +1,8 @@
 - &a
 - "bob"
 - "marks"
-- {"tic": tok}
+- &e
+- &bob: lies
+- &bob robert: truth
+- {"tic": *bob}
 # - *a
