@@ -6,7 +6,6 @@
 ../examples/emptyflownodes.yaml
 ../examples/anchorsequence.yaml
 ../examples/invalidtag.yaml
-../examples/emptylist.yaml
 ../examples/questionmarksinscalars.yaml
 ../examples/baredocafterend.yaml
 ../examples/anchorwithcoloninname.yaml

@@ -88,6 +88,11 @@ bool endEventAddition
 
         libyaml_local_output->pop_back();
 
+        if (temp_node.size() <= 0)
+        {
+            TEST_PPRINT("interesting\n");
+        }
+
         addToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
     }
 
@@ -236,7 +241,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 TEST_PPRINT("MAP+\n");
 
-                libyaml_local_output.push_back(YAML::Node());
+                libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Map));
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
                 if (!mode_stack.empty())
@@ -263,7 +268,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 TEST_PPRINT("SQU+\n");
 
-                libyaml_local_output.push_back(YAML::Node());
+                libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
                 if (mode_stack.top() ==  mode_type::MAP_TYPE)
@@ -271,7 +276,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     map_mode_stack.push(!map_mode);
                 }
 
-            
                 mode_stack.push(mode_type::SEQUENCE_TYPE);
 
                 if (event.data.sequence_start.anchor)
@@ -328,8 +332,6 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                             }
                             libyaml_local_output.pop_back();
 
-                            // anchor_map[temp_translator] = add_me;
-                            // libyaml_local_output.push_back(add_me);
                         }
 
                     }

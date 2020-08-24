@@ -49,7 +49,6 @@ std::string normalizeYamlCpp(const std::vector<YAML::Node>* nodes,
     return yamlcpp_final_output;
 }
 
-
 std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_message_container)
 {
     std::stack <YAML::Node> iteration_list_stack;
@@ -57,6 +56,7 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
     std::stack <std::string> additional_info_stack;
 
     iteration_list_stack.push(*head);
+
     additional_info_stack.push("U");
 
     std::string yamlcpp_final_output = "";
