@@ -1,7 +1,5 @@
 #include "comparison_utils.h"
 
-// Goes through the nodes in the sequence node and adds them to stack used to transverse
-// nodes
 void DisectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack, 
     std::stack <char>* additional_info_stack)
 {
@@ -12,8 +10,6 @@ void DisectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_sav
     }
 }
 
-// Goes through the nodes in the map node and adds them to stack used to transverse
-// nodes
 void DisectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack,
     std::stack <char>* additional_info_stack)
 {
@@ -111,7 +107,6 @@ bool CompareSingleNode
         {
             DisectSequenceNode
                 (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
-
             DisectSequenceNode
                 (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
@@ -120,7 +115,6 @@ bool CompareSingleNode
         {
             DisectMapNode
                 (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
-                
             DisectMapNode
                 (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
@@ -145,6 +139,41 @@ bool CompareMultipleNodes
 
     while (iterator_one != compare_me_one->end() && iterator_two != compare_me_two->end() &&
         CompareSingleNode(&(*iterator_one), &(*iterator_two)))
+    {
+        iterator_one++;
+        iterator_two++;
+    }
+
+    return (iterator_one == compare_me_one->end() && iterator_two == compare_me_two->end());
+}
+
+// ---------------------------------------------------------------------------------
+// --------------------------- emitter based comparison ----------------------------
+// ---------------------------------------------------------------------------------
+
+bool CompareSingleNodeEmitterBased
+    (YAML::Node* compare_me_one,YAML::Node* compare_me_two)
+{
+    std::stringstream stream_node_one;
+    std::stringstream stream_node_two;
+
+    compare_me_one->SetStyle(YAML::EmitterStyle::Flow);
+    compare_me_two->SetStyle(YAML::EmitterStyle::Flow);
+
+    stream_node_one << *compare_me_one;
+    stream_node_two << *compare_me_two;
+
+    return stream_node_one.str() == stream_node_two.str();
+}
+
+bool CompareMultipleNodesEmitterBased
+    (std::vector<YAML::Node>* compare_me_one, std::vector<YAML::Node>* compare_me_two)
+{
+    std::vector<YAML::Node>::iterator iterator_one = compare_me_one->begin();
+    std::vector<YAML::Node>::iterator iterator_two = compare_me_two->begin();
+
+    while (iterator_one != compare_me_one->end() && iterator_two != compare_me_two->end() &&
+        CompareSingleNodeEmitterBased(&(*iterator_one), &(*iterator_two)))
     {
         iterator_one++;
         iterator_two++;
