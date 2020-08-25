@@ -20,7 +20,7 @@ bool runTest(std::string file_name, std::string& buffer)
         return libyaml_error_string == yamlcpp_error_msg;
     }
 
-    return compareMultipleNodes(&libyaml_final_output_nodes, &parsed_nodes);
+    return compareMultipleNodesEmitterBased(&libyaml_final_output_nodes, &parsed_nodes);
 }
 
 // ---------------------------------------------------------------------------------

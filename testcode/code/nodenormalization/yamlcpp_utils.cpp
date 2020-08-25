@@ -65,7 +65,7 @@ std::string normalizeYamlCppNode(const YAML::Node* head, std::string* error_mess
     {
         YAML::Node base_iterator = iteration_list_stack.top();
         iteration_list_stack.pop();
-
+        
         yamlcpp_final_output +=  additional_info_stack.top() + ": ";
 
         char current_mode =  additional_info_stack.top().front();

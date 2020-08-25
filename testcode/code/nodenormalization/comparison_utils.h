@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include <string>
+#include <sstream>
 
 #include <stack>
 #include <map>
@@ -25,5 +26,11 @@ bool compareSingleNode
 
 bool compareMultipleNodes
     (const std::vector<YAML::Node>* compare_me_one,const std::vector<YAML::Node>* compare_me_two);
+
+bool compareSingleNodeEmitterBased
+    (YAML::Node* compare_me_one,YAML::Node* compare_me_two);
+
+bool compareMultipleNodesEmitterBased
+    (std::vector<YAML::Node>* compare_me_one, std::vector<YAML::Node>* compare_me_two);
 
 #endif

@@ -16,24 +16,15 @@ int main(int argc, char* args[])
 
     std::string old_error;
 
-    std::string libyaml_final_string_output = normalizeYamlCpp(&libyaml_final_output, &old_error);
-
     std::cout << "----------- libyaml tests -----------" << std::endl;
 
     if (!libyaml_final_output.empty())
     {
+        
         std::cout << libyaml_final_output.back() << std::endl;
-    }
-
-    std::cout << "-------- libyaml Output:" << std::endl;
-
-    if (libyaml_error_string.empty())
-    {
-        std::cout << libyaml_final_string_output << "(END)" << std::endl;
-    }
-    else
-    {
-        std::cout << libyaml_error_string << std::endl;
+        std::cout << "------------ vs -----------"<< std::endl;
+        libyaml_final_output.back().SetStyle(YAML::EmitterStyle::Flow);
+        std::cout << libyaml_final_output.back() << std::endl;
     }
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
@@ -42,26 +33,15 @@ int main(int argc, char* args[])
 
     std::vector<YAML::Node> parsed_nodes = parseYamlCpp(args[1], &yamlcpp_error_msg);
 
-    std::string yamlcpp_final_output = normalizeYamlCpp
-                (&parsed_nodes, &old_error);
-
     if (!parsed_nodes.empty())
     {
         std::cout << "Number of nodes: "<< parsed_nodes.size() << std::endl;
+        parsed_nodes.back().SetStyle(YAML::EmitterStyle::Flow);
         std::cout << parsed_nodes.back() << std::endl;
     }
 
     std::cout << "--------yaml-cpp Output:" << std::endl;
 
-    if (yamlcpp_error_msg.empty())
-    {
-        std::cout << yamlcpp_final_output << "(END)" << std::endl;
-    }
-    else
-    {
-        std::cout << yamlcpp_final_output << "(END)" << std::endl;
-        std::cout << yamlcpp_error_msg << std::endl;
-    }
 
     std::cout << "--------" << std::endl;
 
@@ -82,7 +62,9 @@ int main(int argc, char* args[])
     }
     else
     {
-        if (compareMultipleNodes(&libyaml_final_output, &parsed_nodes))
+        std::cout << "----------- compare -----------" << std::endl;
+
+        if (compareMultipleNodesEmitterBased(&libyaml_final_output, &parsed_nodes))
         {
             std::cout << "Cases equal!" << std::endl;
         }

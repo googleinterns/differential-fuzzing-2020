@@ -113,7 +113,7 @@ void restartVariables (std::stack<YAML::Node>* key_stack,
     while (!mode_stack->empty())
     {
         mode_stack->pop();
-    };
+    }
     mode_stack->push(mode_type::UNKNOWN_TYPE);
 
     while (!map_mode_stack->empty())
@@ -211,7 +211,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 TEST_PPRINT("DOC-\n");
 
-                restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                restartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
 
                 break;        
@@ -219,7 +219,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
                 TEST_PPRINT("DOC+\n");
 
-                restartVariables (&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                restartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     &libyaml_final_output, &map_mode, &anchor_map);
 
                 break;
