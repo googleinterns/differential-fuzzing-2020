@@ -29,12 +29,15 @@ YamlCppNormalizedOutput::~YamlCppNormalizedOutput()
 
 bool YamlCppNormalizedOutput::equivalent(NormalizedOutput* compared_object)
 {
-    if (*this->getError() == *compared_object->getError())
+    if (!(*this->getError()).empty() || !(*compared_object->getError()).empty())
+    {
+        return (*this->getError() == *compared_object->getError());
+    }
+    else
     {
         return CompareMultipleNodes
             ((std::vector<YAML::Node>*)this->getData(), (std::vector<YAML::Node>*)compared_object->getData());
     }
-    return false;
 }
 
 void* YamlCppNormalizedOutput::getData()

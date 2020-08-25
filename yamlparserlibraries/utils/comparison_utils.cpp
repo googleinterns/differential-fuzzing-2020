@@ -1,21 +1,21 @@
 #include "comparison_utils.h"
 
-void DisectSequenceNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack, 
+void DissectSequenceNode(YAML::Node* Dissect_me, std::stack <YAML::Node>* data_save_stack, 
     std::stack <char>* additional_info_stack)
 {
-    for (int i = disect_me->size() - 1; i >= 0; i--) 
+    for (int i = Dissect_me->size() - 1; i >= 0; i--) 
     {
-        data_save_stack->push((*disect_me)[i]);
+        data_save_stack->push((*Dissect_me)[i]);
         additional_info_stack->push('L');
     }
 }
 
-void DisectMapNode(YAML::Node* disect_me, std::stack <YAML::Node>* data_save_stack,
+void DissectMapNode(YAML::Node* Dissect_me, std::stack <YAML::Node>* data_save_stack,
     std::stack <char>* additional_info_stack)
 {
     std::stack <YAML::const_iterator> loca_iterators_temp_stack;
 
-    for (YAML::const_iterator it = disect_me->begin(); it != disect_me->end(); ++it) 
+    for (YAML::const_iterator it = Dissect_me->begin(); it != Dissect_me->end(); ++it) 
     {
         loca_iterators_temp_stack.push(it);
     }
@@ -42,8 +42,6 @@ bool CompareSingleNode
 
     iteration_list_stack_one.push(*compare_me_one);
     additional_info_stack_one.push('U');
-
-    // second set of comparison
 
     std::stack <YAML::Node> iteration_list_stack_two;
 
@@ -105,17 +103,17 @@ bool CompareSingleNode
         else if ((base_iterator_one.Type() == YAML::NodeType::Sequence) && 
             (base_iterator_two.Type() == YAML::NodeType::Sequence))
         {
-            DisectSequenceNode
+            DissectSequenceNode
                 (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
-            DisectSequenceNode
+            DissectSequenceNode
                 (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
         else if ((base_iterator_one.Type() == YAML::NodeType::Map) && 
             (base_iterator_two.Type() == YAML::NodeType::Map))
         {
-            DisectMapNode
+            DissectMapNode
                 (&base_iterator_one, &iteration_list_stack_one, &additional_info_stack_one);
-            DisectMapNode
+            DissectMapNode
                 (&base_iterator_two, &iteration_list_stack_two, &additional_info_stack_two);
         }
         else if ((base_iterator_one.Type() == YAML::NodeType::Undefined) && 
