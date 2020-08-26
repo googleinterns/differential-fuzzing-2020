@@ -9,48 +9,6 @@
 namespace yamlcpp_differential_parser
 {
 // ---------------------------------------------------------------------------------
-// ------------------------------ YamlCppNormalizedOutput --------------------------
-// ---------------------------------------------------------------------------------
-
-YamlCppNormalizedOutput::YamlCppNormalizedOutput(std::vector<YAML::Node>* info, std::string* error_code)
-{
-    this->data = info;
-    this->error = error_code;
-}
-
-YamlCppNormalizedOutput::~YamlCppNormalizedOutput()
-{
-    if (this->data != nullptr)
-    {
-        delete this->data;
-    }
-    delete this->error;
-}
-
-bool YamlCppNormalizedOutput::equivalent(NormalizedOutput* compared_object)
-{
-    if (!(*this->getError()).empty() || !(*compared_object->getError()).empty())
-    {
-        return (*this->getError() == *compared_object->getError());
-    }
-    else
-    {
-        return CompareMultipleNodes
-            ((std::vector<YAML::Node>*)this->getData(), (std::vector<YAML::Node>*)compared_object->getData());
-    }
-}
-
-void* YamlCppNormalizedOutput::getData()
-{
-    return static_cast<void*>(this->data);
-}
-
-std::string* YamlCppNormalizedOutput::getError()
-{
-    return this->error;
-}
-
-// ---------------------------------------------------------------------------------
 // ---------------------------------- YamlCppParser --------------------------------
 // ---------------------------------------------------------------------------------
 
@@ -75,11 +33,11 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::string*
     return (void*) yaml_cpp_loop_temp;
 }
 
-differential_parser::NormalizedOutput* YamlCppParser::normalize
+yaml_normalization::YamlNormalizedOutput* YamlCppParser::normalize
     (void* input, std::string* error_code)
 {   
-    differential_parser::NormalizedOutput* returnMe = new
-        YamlCppNormalizedOutput((std::vector<YAML::Node>*)input, error_code);
+    yaml_normalization::YamlNormalizedOutput* returnMe = new
+        yaml_normalization::YamlNormalizedOutput((std::vector<YAML::Node>*)input, error_code);
     
     return returnMe;
 }
