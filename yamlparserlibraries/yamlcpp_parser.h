@@ -4,6 +4,7 @@
 #include "base_parser.h"
 #include "yaml-cpp/yaml.h"
 #include "yaml_normalized_output.h"
+
 #include <string>
 
 namespace yamlcpp_differential_parser

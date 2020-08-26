@@ -8,7 +8,7 @@ namespace toy_int_differential_parser
 // ------------------------------ ToyIntParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-ToyIntParserOutput::ToyIntParserOutput(int* info, std::string* error_code)
+ToyIntParserOutput::ToyIntParserOutput(int* info,std::unique_ptr<std::string>* error_code)
 {
     this->data = info;
     this->error = error_code;
@@ -63,7 +63,7 @@ std::string ToyIntParser::getName()
 }
 
 
-void* ToyIntParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
+void* ToyIntParser::parse(const uint8_t* input, size_t input_size,std::unique_ptr<std::string>* error_code)
 {
     int* toy_output = new int;
 
@@ -73,7 +73,7 @@ void* ToyIntParser::parse(const uint8_t* input, size_t input_size, std::string* 
 }
 
 differential_parser::NormalizedOutput* ToyIntParser::normalize
-    (void* input, std::string* error_code)
+    (void* input,std::unique_ptr<std::string>* error_code)
 {
     differential_parser::NormalizedOutput* returnMe = new
         ToyIntParserOutput((int*)input, error_code);

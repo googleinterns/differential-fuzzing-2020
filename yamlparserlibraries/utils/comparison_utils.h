@@ -7,9 +7,6 @@
 #include <string>
 #include <sstream>
 
-#include <stack>
-#include <map>
-
 #include "include/yaml.h"
 #include "yaml-cpp/yaml.h"
 

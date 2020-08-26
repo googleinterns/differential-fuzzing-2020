@@ -13,7 +13,9 @@ void SmokeTest(const uint8_t* Data)
     std::cout << "----- Simple Test -----" << std::endl;
     std::cout << "----- Testing: " << yaml_cpp_case.getName() << std::endl;
 
-    std::string *error_string = new std::string();
+    // std::unique_ptr<std::string> error_string(new std::string());
+
+    std::string* error_string = (new std::string());
 
     differential_parser::NormalizedOutput* test_normalized_output = 
         yaml_cpp_case.normalize(yaml_cpp_case.parse(Data, size, error_string), error_string);
