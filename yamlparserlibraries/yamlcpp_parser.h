@@ -23,5 +23,4 @@ class YamlCppParser : virtual public differential_parser::Parser
 };
 } // namespace yaml_differential_parser
 
-
 #endif

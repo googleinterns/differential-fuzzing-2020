@@ -16,9 +16,6 @@
 namespace compare_utils
 {
 bool CompareMultipleNodes
-    (const std::vector<YAML::Node>* compare_me_one,const std::vector<YAML::Node>* compare_me_two);
-
-bool CompareMultipleNodesEmitterBased
     (std::vector<YAML::Node>* compare_me_one, std::vector<YAML::Node>* compare_me_two);
 }
 
