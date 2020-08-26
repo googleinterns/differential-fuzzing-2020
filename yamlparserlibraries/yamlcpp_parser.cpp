@@ -1,10 +1,6 @@
 #include "yamlcpp_parser.h"
 
-#include "yaml-cpp/yaml.h"
-
 #include "./utils/comparison_utils.h"
-#include <iostream>
-#include <string>
 
 namespace yamlcpp_differential_parser
 {
@@ -30,15 +26,20 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::string*
         *error_code = "ERROR";
     }
 
-    return (void*) yaml_cpp_loop_temp;
+    return static_cast<void*>(yaml_cpp_loop_temp);
 }
 
 yaml_normalization::YamlNormalizedOutput* YamlCppParser::normalize
     (void* input, std::string* error_code)
-{   
-    yaml_normalization::YamlNormalizedOutput* returnMe = new
-        yaml_normalization::YamlNormalizedOutput((std::vector<YAML::Node>*)input, error_code);
-    
-    return returnMe;
+{
+    yaml_normalization::YamlNormalizedOutput* return_me = nullptr;
+
+    if (std::vector<YAML::Node>* casted_input = static_cast<std::vector<YAML::Node>*>(input))
+    {
+        return_me = new
+            yaml_normalization::YamlNormalizedOutput(casted_input, error_code);        
+    }
+
+    return return_me;
 }
 }

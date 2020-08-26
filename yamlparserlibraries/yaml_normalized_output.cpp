@@ -30,8 +30,18 @@ bool YamlNormalizedOutput::equivalent(NormalizedOutput* compared_object)
     }
     else
     {
-        return CompareMultipleNodes
-            ((std::vector<YAML::Node>*)this->getData(), (std::vector<YAML::Node>*)compared_object->getData());
+        std::vector<YAML::Node>* data_one = static_cast<std::vector<YAML::Node>*>(this->getData());
+
+        std::vector<YAML::Node>* data_two = static_cast<std::vector<YAML::Node>*>(compared_object->getData());
+
+        if (data_one && data_two)
+        {
+            return CompareMultipleNodes(data_one, data_two);
+        }
+        else
+        {
+            return data_one == data_two;
+        }
     }
 }
 

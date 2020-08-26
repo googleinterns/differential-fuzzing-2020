@@ -18,6 +18,6 @@ class YamlNormalizedOutput
         void* getData();
         std::string* getError();
 };
-}
+} // namespace yaml_normalization
 
 #endif

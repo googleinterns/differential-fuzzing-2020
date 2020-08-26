@@ -10,8 +10,6 @@
 #include <stack>
 #include <map>
 
-#include <assert.h>
-
 #include "include/yaml.h"
 #include "yaml-cpp/yaml.h"
 
