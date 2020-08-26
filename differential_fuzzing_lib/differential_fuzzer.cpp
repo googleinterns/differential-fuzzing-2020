@@ -143,35 +143,46 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
 
     void* temp_parse_holder = parser->parse(input_data, size_of_input, local_error);
 
-    differential_parser::NormalizedOutput* parser_output = 
-        parser->normalize(temp_parse_holder, local_error);
-
-    // Iterate through the different EquivalenceNormalizedOutputs
-    while (ptr != nullptr)
+    if (temp_parse_holder == nullptr)
     {
-        if (parser_output->equivalent(ptr->representative))
-        {
-            AddToAssociatedParserName(&ptr->container_basket, parser->getName());
-
-            delete parser_output;     
-
-            return true;
-        }
-        ptr = ptr->next;
+        delete local_error;
+        return false;
     }
-    
-    bool is_first = (*head == nullptr);
 
-    ptr = new EquivalenceNormalizedOutputs;
-    ptr->representative = parser_output;
-    ptr->container_basket = new AssociatedParserName;
-    ptr->container_basket->name = parser->getName();
-    ptr->container_basket->next_parser = nullptr;
-    ptr->next = *head;
+    if (differential_parser::NormalizedOutput* parser_output = 
+        parser->normalize(temp_parse_holder, local_error))
+    {
+        // Iterate through the different EquivalenceNormalizedOutputs
+        while (ptr != nullptr)
+        {
+            if (parser_output->equivalent(ptr->representative))
+            {
+                AddToAssociatedParserName(&ptr->container_basket, parser->getName());
 
-    *head = ptr;
+                delete parser_output;     
 
-    return is_first;
+                return true;
+            }
+            ptr = ptr->next;
+        }
+
+        bool is_first = (*head == nullptr);
+
+        ptr = new EquivalenceNormalizedOutputs;
+        ptr->representative = parser_output;
+        ptr->container_basket = new AssociatedParserName;
+        ptr->container_basket->name = parser->getName();
+        ptr->container_basket->next_parser = nullptr;
+        ptr->next = *head;
+
+        *head = ptr;
+
+        return is_first;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool differential_fuzzer::fuzzer::DifferentiallyFuzz(differential_parser::Parser** parser_array, 

@@ -17,15 +17,22 @@ void SmokeTest(const uint8_t* Data)
 
     differential_parser::NormalizedOutput* test_normalized_output = 
         yaml_cpp_case.normalize(yaml_cpp_case.parse(Data, size, error_string), error_string);
-
-    std::cerr << "---Error: "<< *test_normalized_output->getError() << std::endl;
-
-    std::vector<YAML::Node>* test_normalized_output_data 
-        = (std::vector<YAML::Node>*) test_normalized_output->getData();
-
-    if (!test_normalized_output_data->empty())
+    
+    if (test_normalized_output != nullptr)
     {
-        std::cerr << "--- Result: "  << std::endl << test_normalized_output_data->back() << std::endl;
+        std::cerr << "---Error: "<< *test_normalized_output->getError() << std::endl;
+
+        std::vector<YAML::Node>* test_normalized_output_data 
+            = (std::vector<YAML::Node>*) test_normalized_output->getData();
+
+        if (!test_normalized_output_data->empty())
+        {
+            std::cerr << "--- Result: "  << std::endl << test_normalized_output_data->back() << std::endl;
+        }
+    }
+    else
+    {
+        delete error_string;
     }
     delete test_normalized_output;
 }
