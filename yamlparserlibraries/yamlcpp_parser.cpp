@@ -50,4 +50,4 @@ yaml_normalization::YamlNormalizedOutput* YamlCppParser::normalize
 
     return return_me;
 }
-}
+} // namespace yamlcpp_differential_parser

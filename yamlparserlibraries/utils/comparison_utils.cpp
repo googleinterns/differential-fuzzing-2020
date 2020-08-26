@@ -1,5 +1,7 @@
 #include "comparison_utils.h"
 
+namespace compare_utils
+{
 void DissectSequenceNode(YAML::Node* Dissect_me, std::stack <YAML::Node>* data_save_stack, 
     std::stack <char>* additional_info_stack)
 {
@@ -179,3 +181,5 @@ bool CompareMultipleNodesEmitterBased
 
     return (iterator_one == compare_me_one->end() && iterator_two == compare_me_two->end());
 }
+
+} // namespace compare_utils

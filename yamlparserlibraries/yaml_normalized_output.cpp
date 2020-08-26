@@ -36,7 +36,7 @@ bool YamlNormalizedOutput::equivalent(NormalizedOutput* compared_object)
 
         if (data_one && data_two)
         {
-            return CompareMultipleNodes(data_one, data_two);
+            return compare_utils::CompareMultipleNodes(data_one, data_two);
         }
         else
         {
@@ -54,4 +54,4 @@ std::string* YamlNormalizedOutput::getError()
 {
     return this->error;
 }
-}
+} // namespace yaml_normalization

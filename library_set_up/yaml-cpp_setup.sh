@@ -4,6 +4,9 @@
 git clone https://github.com/jbeder/yaml-cpp.git
 cd yaml-cpp
 
+# Version worked on:
+git checkout 97d1ae547cc9935cf851801ba0a247b4be2191de
+
 # Build:
 mkdir build
 cd build
