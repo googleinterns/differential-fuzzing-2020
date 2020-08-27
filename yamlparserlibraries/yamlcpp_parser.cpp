@@ -40,14 +40,12 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::string*
 yaml_normalization::YamlNormalizedOutput* YamlCppParser::normalize
     (void* input, std::string* error_code)
 {
-    yaml_normalization::YamlNormalizedOutput* return_me = nullptr;
-
     if (std::vector<YAML::Node>* casted_input = static_cast<std::vector<YAML::Node>*>(input))
     {
-        return_me = new
-            yaml_normalization::YamlNormalizedOutput(casted_input, error_code);        
+        return new
+            yaml_normalization::YamlNormalizedOutput(casted_input, error_code);
     }
 
-    return return_me;
+    return nullptr;
 }
 } // namespace yamlcpp_differential_parser

@@ -1,12 +1,8 @@
 #include "comparison_utils.h"
 
-namespace compare_utils
+namespace
 {
-// ---------------------------------------------------------------------------------
-// --------------------------- emitter based comparison ----------------------------
-// ---------------------------------------------------------------------------------
-
-bool CompareSingleNode
+static bool CompareSingleNode
     (YAML::Node* compare_me_one,YAML::Node* compare_me_two)
 {
     std::stringstream stream_node_one;
@@ -19,7 +15,17 @@ bool CompareSingleNode
     stream_node_two << *compare_me_two;
 
     return stream_node_one.str() == stream_node_two.str();
+
 }
+} // namespace
+
+namespace compare_utils
+{
+// ---------------------------------------------------------------------------------
+// --------------------------- emitter based comparison ----------------------------
+// ---------------------------------------------------------------------------------
+
+
 
 bool CompareMultipleNodes
     (std::vector<YAML::Node>* compare_me_one, std::vector<YAML::Node>* compare_me_two)

@@ -8,10 +8,10 @@ namespace yaml_normalization
 class YamlNormalizedOutput 
     : virtual public differential_parser::NormalizedOutput
 {
-    private:
+    public:
         std::vector<YAML::Node>* data;
         std::string* error;
-    public:
+
         YamlNormalizedOutput(std::vector<YAML::Node>* info, std::string* error_code);
         ~YamlNormalizedOutput();
         bool equivalent(NormalizedOutput* compared_object);

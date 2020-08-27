@@ -30,9 +30,10 @@ bool YamlNormalizedOutput::equivalent(NormalizedOutput* compared_object)
     }
     else
     {
-        std::vector<YAML::Node>* data_one = static_cast<std::vector<YAML::Node>*>(this->getData());
+        std::vector<YAML::Node>* data_one = this->data;
 
-        std::vector<YAML::Node>* data_two = static_cast<std::vector<YAML::Node>*>(compared_object->getData());
+        std::vector<YAML::Node>* data_two = 
+            dynamic_cast<yaml_normalization::YamlNormalizedOutput*>(compared_object)->data;
 
         if (data_one && data_two)
         {
