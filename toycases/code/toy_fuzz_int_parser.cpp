@@ -11,7 +11,10 @@ namespace toy_int_differential_parser
 ToyIntParserOutput::ToyIntParserOutput(int* info,std::unique_ptr<std::string>* error_code)
 {
     this->data = info;
-    this->error = error_code;
+
+    this->error = std::unique_ptr<std::string>(new std::string());
+
+    this->error = std::move(*error_code);
 }
 
 ToyIntParserOutput::~ToyIntParserOutput()
@@ -20,14 +23,13 @@ ToyIntParserOutput::~ToyIntParserOutput()
     {
         delete this->data;
     }
-    delete this->error;
 }
 
 bool ToyIntParserOutput::equivalent(NormalizedOutput* compared_object)
 {
-    if (!this->getError()->empty() && !compared_object->getError()->empty())
+    if (!(this->getError()->get()->empty()) && !(compared_object->getError()->get()->empty()))
     {
-        if (*this->getError() == *compared_object->getError())
+        if (*this->getError()->get() == *compared_object->getError()->get())
         {
             return true;
         }
@@ -36,7 +38,7 @@ bool ToyIntParserOutput::equivalent(NormalizedOutput* compared_object)
             return false;
         }
     }
-    else if (!this->getError()->empty() || !compared_object->getError()->empty())
+    else if (!(this->getError()->get()->empty() || !(compared_object->getError()->get()->empty())))
     {
         return false;
     }
@@ -48,9 +50,9 @@ void* ToyIntParserOutput::getData()
     return static_cast<void*>(this->data);
 }
 
-std::string* ToyIntParserOutput::getError()
+std::unique_ptr<std::string>* ToyIntParserOutput::getError()
 {
-    return this->error;
+    return &this->error;
 }
 
 // ---------------------------------------------------------------------------------

@@ -15,7 +15,7 @@ std::string ToySwitchParser::getName()
 }
 
 
-void* ToySwitchParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
+void* ToySwitchParser::parse(const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_code)
 {
     char deciding_factor = input[0];
     std::string* toy_output = new std::string;
@@ -33,7 +33,7 @@ void* ToySwitchParser::parse(const uint8_t* input, size_t input_size, std::strin
 }
 
 differential_parser::NormalizedOutput* ToySwitchParser::normalize
-    (void* input, std::string* error_code)
+    (void* input, std::unique_ptr<std::string>* error_code)
 {   
     *(std::string*)input = *(std::string*)input + "pair of glasses";
     differential_parser::NormalizedOutput* returnMe = new

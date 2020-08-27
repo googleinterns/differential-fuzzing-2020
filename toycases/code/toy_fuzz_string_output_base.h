@@ -16,14 +16,14 @@ class ToyFuzzGenericStringOutput
 {
     private:
         std::string* data;
-        std::unique_ptr<std::string>* error;
+        std::unique_ptr<std::string> error;
 
     public:
         ToyFuzzGenericStringOutput(std::string* info, std::unique_ptr<std::string>* error_code);
         ~ToyFuzzGenericStringOutput();
         bool equivalent(NormalizedOutput* compared_object);
         void* getData();
-       std::unique_ptr<std::string>* getError();
+        std::unique_ptr<std::string>* getError();
 };
 
 // ---------------------------------------------------------------------------------

@@ -16,7 +16,7 @@ class ToyIntParserOutput
 {
     private:
         int* data;
-        std::unique_ptr<std::string>* error;
+        std::unique_ptr<std::string> error;
     public:
         ToyIntParserOutput(int* info, std::unique_ptr<std::string>* error_code);
         ~ToyIntParserOutput();
