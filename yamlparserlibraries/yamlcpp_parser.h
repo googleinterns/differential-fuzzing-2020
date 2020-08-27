@@ -12,14 +12,14 @@ namespace yamlcpp_differential_parser
 // ---------------------------------------------------------------------------------
 // ---------------------------------- YamlCppParser -----------------------------------
 // ---------------------------------------------------------------------------------
-
 class YamlCppParser : virtual public differential_parser::Parser
 {
-    
     public:
         std::string getName();
         void* parse(const uint8_t* input, size_t input_size, std::string* error_code);
         yaml_normalization::YamlNormalizedOutput* normalize(void* input, std::string* error_code);
+        static YamlCppParser* GetStaticInstance();
+        static YamlCppParser* instance;
 };
 } // namespace yaml_differential_parser
 
