@@ -8,7 +8,7 @@ namespace yaml_normalization
 class YamlNormalizedOutput 
     : virtual public differential_parser::NormalizedOutput
 {
-    private:
+    public:
         std::vector<YAML::Node>* data;
         std::unique_ptr<std::string> error;
     public:

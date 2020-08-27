@@ -8,17 +8,19 @@
 void SmokeTest(const uint8_t* data)
 {
     size_t size = strlen((const char*)data);
-    yamlcpp_differential_parser::YamlCppParser yaml_cpp_case;
+    yamlcpp_differential_parser::YamlCppParser* temp_instance =
+        yamlcpp_differential_parser::YamlCppParser::GetStaticInstance();
 
     std::cout << "----- Simple Test -----" << std::endl;
-    std::cout << "----- Testing: " << yaml_cpp_case.getName() << std::endl;
+    std::cout << "----- Testing: " << temp_instance->getName() << std::endl;
+    std::cout << "----- Memory of instance: " << temp_instance << std::endl;
 
     std::unique_ptr<std::string> error_string;
     error_string = std::unique_ptr<std::string>(new std::string());
 
-    differential_parser::NormalizedOutput* test_normalized_output = 
-        yaml_cpp_case.normalize(yaml_cpp_case.parse(data, size, &error_string), &error_string);
-
+    differential_parser::NormalizedOutput* test_normalized_output = temp_instance->normalize
+            (temp_instance->parse(data, size, &error_string), &error_string);
+    
     if (test_normalized_output != nullptr)
     {
         std::cerr << "---Error: "<< *test_normalized_output->getError()->get() << std::endl;

@@ -40,14 +40,29 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::unique_
 yaml_normalization::YamlNormalizedOutput* YamlCppParser::normalize
     (void* input, std::unique_ptr<std::string>* error_code)
 {
-    yaml_normalization::YamlNormalizedOutput* return_me = nullptr;
-
     if (std::vector<YAML::Node>* casted_input = static_cast<std::vector<YAML::Node>*>(input))
     {
-        return_me = new
-            yaml_normalization::YamlNormalizedOutput(casted_input, error_code);        
+        return new
+            yaml_normalization::YamlNormalizedOutput(casted_input, error_code);
     }
 
-    return return_me;
+    return nullptr;
+}
+
+// ---------------------------------------------------------------------------------
+// ---------------------------------- Static Parts ---------------------------------
+// ---------------------------------------------------------------------------------
+
+yamlcpp_differential_parser::YamlCppParser* 
+    yamlcpp_differential_parser::YamlCppParser::instance = nullptr;
+
+yamlcpp_differential_parser::YamlCppParser* YamlCppParser::GetStaticInstance()
+{
+    if (instance == nullptr)
+    {
+        instance = 
+            new yamlcpp_differential_parser::YamlCppParser();
+    }
+    return instance;
 }
 } // namespace yamlcpp_differential_parser
