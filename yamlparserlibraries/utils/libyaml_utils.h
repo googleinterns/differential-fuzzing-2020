@@ -14,6 +14,8 @@
 #include "include/yaml.h"
 #include "yaml-cpp/yaml.h"
 
+namespace
+{
 enum class mode_type 
 {
     MAP_TYPE = 0, 
@@ -34,8 +36,11 @@ void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* k
 bool endEventAddition
     (std::vector<YAML::Node>* libyaml_final_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack);
+} // namespace
 
-std::vector<YAML::Node> normalizeLibyaml
-        (std::string name_of_file, std::string* error_message_container);
-
+namespace libyaml_parsing
+{
+std::vector<YAML::Node>& parseLibyaml
+        (const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_message_container);
+} // namespace libyaml_parsing
 #endif

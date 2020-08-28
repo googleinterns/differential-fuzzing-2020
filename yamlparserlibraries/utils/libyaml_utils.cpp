@@ -1,11 +1,11 @@
- 
 #include "libyaml_utils.h"
 #include "logger.h"
 
 // ---------------------------------------------------------------------------------
 // ------------------------------- libyaml test code -------------------------------
 // ---------------------------------------------------------------------------------
-
+namespace
+{
 bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character, const bool map_mode)
 {
     if (reference_character ==  mode_type::MAP_TYPE)
@@ -132,16 +132,17 @@ void restartVariables (std::stack<YAML::Node>* key_stack,
 
     anchor_map->clear();
 }
+}
 
-std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* error_message_container)
+std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
+    (const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_message_container)
 {
-    FILE *input;
     yaml_parser_t parser;
     yaml_event_t event;
 
     std::vector<YAML::Node> libyaml_local_output;
 
-    std::vector<YAML::Node> libyaml_final_output;
+    std::vector<YAML::Node>* libyaml_final_output = new std::vector<YAML::Node>;
 
     std::stack<YAML::Node> key_stack;
 
@@ -154,21 +155,17 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
     bool map_mode = true;
     
     std::map<std::string, YAML::Node> anchor_map;
-    
-    input = fopen(name_of_file.c_str(), "rb");
-
-    assert(input);
 
     if (!yaml_parser_initialize(&parser)) 
     {
         TEST_PPRINT("ERROR: Failed to initialize\n");
 
-        *error_message_container = "ERROR";
+        *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
         return libyaml_local_output;
     }
 
-    yaml_parser_set_input_file(&parser, input);
+    yaml_parser_set_input_string(&parser, input, input_size);
     
     while (true) 
     {
@@ -183,13 +180,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
         {
             yaml_event_delete(&event);
 
-            assert(!fclose(input));
-
             yaml_parser_delete(&parser);
 
             TEST_PPRINT("ERROR: Bad parsing\n");
 
-            *error_message_container = "ERROR";
+            *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
             return libyaml_local_output;
         }
@@ -207,7 +202,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 TEST_PPRINT("DOC-\n");
 
                 restartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
-                    &libyaml_final_output, &map_mode, &anchor_map);
+                    libyaml_final_output, &map_mode, &anchor_map);
 
                 break;        
             case YAML_DOCUMENT_START_EVENT:
@@ -215,7 +210,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 TEST_PPRINT("DOC+\n");
 
                 restartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
-                    &libyaml_final_output, &map_mode, &anchor_map);
+                    libyaml_final_output, &map_mode, &anchor_map);
 
                 break;
 
@@ -386,13 +381,11 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 {
                     yaml_event_delete(&event);
 
-                    assert(!fclose(input));
-
                     yaml_parser_delete(&parser);
 
                     TEST_PPRINT("ERROR: Missing anchor\n");
 
-                    *error_message_container = "ERROR";
+                    *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
                     return libyaml_local_output;
                 }
@@ -411,11 +404,9 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
 
     }
 
-    assert(!fclose(input));
-
     yaml_parser_delete(&parser);
 
     fflush(stdout);
 
-    return libyaml_final_output;
+    return *libyaml_final_output;
 }
