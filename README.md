@@ -12,6 +12,6 @@ Contains files used for the differential fuzzing library. in particular:
 
     differential_fuzzer.cpp: code for differentialfuzzer.h
 
-- *toy_cases*:
-Directory contains toy cases, and code used for executing, and testing it. 
-More information found in ./testcode/README.txt
+- *tests*:
+Includes several tests related to the differential fuzzer library of methods,
+and differential fuzzing with the yaml parsing libraries
