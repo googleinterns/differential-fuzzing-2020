@@ -24,15 +24,10 @@ namespace differential_fuzzer
         };
 
         void DeleteAssociatedParserName(AssociatedParserName* delete_me);
-
         void DeleteEquivalenceNormalizedOutputs(EquivalenceNormalizedOutputs* delete_me);
-
         void PrintParserList(AssociatedParserName* head);
-
         void PrintEquivalenceNormalizedOutputs(EquivalenceNormalizedOutputs* head);
-
         void AddToAssociatedParserName(AssociatedParserName** head, std::string name);
-
         bool CheckAndAdd(differential_parser::Parser* parser, EquivalenceNormalizedOutputs** head, 
             const uint8_t* input_data, size_t size_of_input);
     }// namespace parser
