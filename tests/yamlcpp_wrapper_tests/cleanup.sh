@@ -1,0 +1,1 @@
+rm *.o yamlcpp_wrapper_check yamlcpp_test_executable

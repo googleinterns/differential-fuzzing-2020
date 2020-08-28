@@ -1,1 +1,0 @@
-rm *.o yaml_wrapper_check yaml_test_executable

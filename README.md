@@ -12,6 +12,8 @@ Contains files used for the differential fuzzing library. in particular:
 
     differential_fuzzer.cpp: code for differentialfuzzer.h
 
+    logger.h: allows for debug mode to be activated for the differential fuzzer
+
 - *tests*:
 Includes several tests related to the differential fuzzer library of methods,
 and differential fuzzing with the yaml parsing libraries
