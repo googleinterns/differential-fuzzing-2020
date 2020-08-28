@@ -162,7 +162,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
         *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
-        return libyaml_local_output;
+        return *libyaml_final_output;
     }
 
     yaml_parser_set_input_string(&parser, input, input_size);
@@ -186,7 +186,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
             *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
-            return libyaml_local_output;
+            return *libyaml_final_output;
         }
         type = event.type;
         
@@ -387,7 +387,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
                     *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
-                    return libyaml_local_output;
+                    return *libyaml_final_output;
                 }
                 break;
             }
