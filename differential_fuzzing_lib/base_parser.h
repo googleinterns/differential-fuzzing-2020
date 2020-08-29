@@ -10,11 +10,8 @@ class NormalizedOutput
 {
     public:
         virtual ~NormalizedOutput() {};
-        
         virtual bool equivalent(NormalizedOutput* compared_object) = 0;
-
         virtual void* getData() = 0;
-
         virtual std::unique_ptr<std::string>* getError() = 0;
 };
 

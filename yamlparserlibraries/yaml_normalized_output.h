@@ -11,7 +11,7 @@ class YamlNormalizedOutput
     public:
         std::vector<YAML::Node>* data;
         std::unique_ptr<std::string> error;
-    public:
+        
         YamlNormalizedOutput(std::vector<YAML::Node>* info, std::unique_ptr<std::string>* error_code);
         ~YamlNormalizedOutput();
         bool equivalent(NormalizedOutput* compared_object);
