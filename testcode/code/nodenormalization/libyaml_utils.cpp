@@ -1,4 +1,3 @@
- 
 #include "libyaml_utils.h"
 #include "logger.h"
 
@@ -8,41 +7,46 @@
 
 bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character, const bool map_mode)
 {
-    if (reference_character ==  mode_type::MAP_TYPE)
+    if (add_to_me != nullptr)
     {
-        if (map_mode)
+        if (reference_character ==  mode_type::MAP_TYPE)
         {
-            *add_to_me =  mode_type::KEY_TYPE;
+            if (map_mode)
+            {
+                *add_to_me =  mode_type::KEY_TYPE;
+            }
+            else
+            {
+                *add_to_me =  mode_type::VALUE_TYPE;
+            }
+            return !map_mode;
+        }
+        else if (reference_character ==  mode_type::SEQUENCE_TYPE)
+        {
+            *add_to_me =  mode_type::SEQUENCE_TYPE;
         }
         else
         {
-            *add_to_me =  mode_type::VALUE_TYPE;
+            *add_to_me =  mode_type::UNKNOWN_TYPE;
         }
-        return !map_mode;
     }
-    else if (reference_character ==  mode_type::SEQUENCE_TYPE)
-    {
-        *add_to_me =  mode_type::SEQUENCE_TYPE;
-    }
-    else
-    {
-        *add_to_me =  mode_type::UNKNOWN_TYPE;
-    }
-
     return map_mode;
 }
 
 void addTag(YAML::Node* current_node, yaml_char_t* tag)
 {
-    if (tag)
+    if (current_node != nullptr)
     {
-        std::string temp_tag_translator = ((char*)tag);
+        if (tag)
+        {
+            std::string temp_tag_translator = ((char*)tag);
 
-        current_node->SetTag(temp_tag_translator);                    
-    }
-    else if(current_node->Tag().empty())
-    {
-        current_node->SetTag("?");
+            current_node->SetTag(temp_tag_translator);                    
+        }
+        else if(current_node->Tag().empty())
+        {
+            current_node->SetTag("?");
+        }
     }
 }
 
@@ -52,29 +56,32 @@ void addToNode
 {
     addTag(add_me, tag);
     
-    if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
+    if (tracking_current_type != nullptr && addToMe != nullptr)
     {
-        TEST_PPRINT("squ type\n")
-        addToMe->push_back(*add_me);
-    }
-    else if (*tracking_current_type ==  mode_type::KEY_TYPE)
-    {
-        TEST_PPRINT("key type\n")
-        key_stack->push(*add_me);
-        (*addToMe)[*add_me];
-    }
-    else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
-    {
-        TEST_PPRINT("map type\n")
-        if (!key_stack->empty())
+        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
         {
-            (*addToMe)[key_stack->top()] = *add_me;
-            key_stack->pop();
+            TEST_PPRINT("squ type\n")
+            addToMe->push_back(*add_me);
         }
-    }
-    else
-    {
-        TEST_PPRINT("? type\n")
+        else if (*tracking_current_type ==  mode_type::KEY_TYPE)
+        {
+            TEST_PPRINT("key type\n")
+            key_stack->push(*add_me);
+            (*addToMe)[*add_me];
+        }
+        else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
+        {
+            TEST_PPRINT("map type\n")
+            if (!key_stack->empty())
+            {
+                (*addToMe)[key_stack->top()] = *add_me;
+                key_stack->pop();
+            }
+        }
+        else
+        {
+            TEST_PPRINT("? type\n")
+        }
     }
 }
 
@@ -82,12 +89,11 @@ bool endEventAddition
     (std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack)
 {
-
-    if (libyaml_local_output->size() > 1)
+    if (libyaml_local_output->size() > 1 && !mode_stack->empty())
     {
         mode_stack->pop();
-        
-        if (mode_stack->top() ==  mode_type::MAP_TYPE)
+
+        if (mode_stack->top() ==  mode_type::MAP_TYPE && !map_mode_stack->empty())
         {
             map_mode = map_mode_stack->top();
             map_mode_stack->pop();
@@ -101,9 +107,7 @@ bool endEventAddition
         libyaml_local_output->pop_back();
 
         addToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
-
     }
-
     return map_mode;
 }
 
@@ -362,6 +366,10 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 else
                 {
                     TEST_PPRINT("normal\n");
+                    if (mode_stack.empty()) // (NEW)
+                    {
+                        break;
+                    }
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     if (event.data.scalar.length <= 0 && !event.data.scalar.tag && 
