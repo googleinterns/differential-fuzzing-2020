@@ -51,19 +51,30 @@ void addToNode
     const mode_type* tracking_current_type, yaml_char_t* tag)
 {
     addTag(add_me, tag);
+    
     if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
     {
+        TEST_PPRINT("squ type\n")
         addToMe->push_back(*add_me);
     }
     else if (*tracking_current_type ==  mode_type::KEY_TYPE)
     {
+        TEST_PPRINT("key type\n")
         key_stack->push(*add_me);
         (*addToMe)[*add_me];
     }
     else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
     {
-        (*addToMe)[key_stack->top()] = *add_me;
-        key_stack->pop();
+        TEST_PPRINT("map type\n")
+        if (!key_stack->empty())
+        {
+            (*addToMe)[key_stack->top()] = *add_me;
+            key_stack->pop();
+        }
+    }
+    else
+    {
+        TEST_PPRINT("? type\n")
     }
 }
 
@@ -88,11 +99,6 @@ bool endEventAddition
         YAML::Node temp_node = libyaml_local_output->back();
 
         libyaml_local_output->pop_back();
-
-        if (temp_node.size() <= 0)
-        {
-            TEST_PPRINT("interesting\n");
-        }
 
         addToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
     }
