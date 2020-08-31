@@ -10,22 +10,9 @@
 // ---------------------------------------------------------------------------------
 int main(int argc, char* args[])
 {
-    std::string libyaml_error_string = "";
-    std::vector<YAML::Node> libyaml_final_output = 
-        normalizeLibyaml(parseLibyaml(args[1], &libyaml_error_string), &libyaml_error_string);
+
 
     std::string old_error;
-
-    std::cout << "----------- libyaml tests -----------" << std::endl;
-
-    if (!libyaml_final_output.empty())
-    {
-        
-        std::cout << libyaml_final_output.back() << std::endl;
-        std::cout << "------------ vs -----------"<< std::endl;
-        libyaml_final_output.back().SetStyle(YAML::EmitterStyle::Flow);
-        std::cout << libyaml_final_output.back() << std::endl;
-    }
 
     std::cout << "----------- yaml-cpp tests -----------" << std::endl;
 
@@ -39,11 +26,20 @@ int main(int argc, char* args[])
         parsed_nodes.back().SetStyle(YAML::EmitterStyle::Flow);
         std::cout << parsed_nodes.back() << std::endl;
     }
+    std::cout << "----------- libyaml tests -----------" << std::endl;
 
-    std::cout << "--------yaml-cpp Output:" << std::endl;
-
-
-    std::cout << "--------" << std::endl;
+    std::string libyaml_error_string = "";
+    std::vector<YAML::Node> libyaml_final_output = 
+        normalizeLibyaml(parseLibyaml(args[1], &libyaml_error_string), &libyaml_error_string);
+    
+    if (!libyaml_final_output.empty())
+    {
+        std::cout << libyaml_final_output.back() << std::endl;
+    }
+    else
+    {
+        std::cout << "Empty output" << std::endl;
+    }
 
     std::cout << "- Conclusion: " << std::endl;
 
