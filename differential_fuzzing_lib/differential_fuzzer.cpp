@@ -15,7 +15,7 @@ void differential_fuzzer::parser::DeleteAssociatedParserName(AssociatedParserNam
     while (delete_me != nullptr)
     {
         AssociatedParserName* next = delete_me->next_parser;
-        
+
         delete delete_me;
 
         delete_me = next;

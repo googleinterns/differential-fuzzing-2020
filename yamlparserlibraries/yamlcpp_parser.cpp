@@ -25,13 +25,13 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::unique_
         }
         else
         {
-            *error_code = std::unique_ptr<std::string>(new std::string("ERROR"));;
+            *error_code = std::unique_ptr<std::string>(new std::string("ERROR"));
             return nullptr;
         }
     }
     catch (const std::exception& err)
     {
-        *error_code = std::unique_ptr<std::string>(new std::string("ERROR"));;
+        *error_code = std::unique_ptr<std::string>(new std::string("ERROR"));
     }
 
     return static_cast<void*>(yaml_cpp_loop_temp);
