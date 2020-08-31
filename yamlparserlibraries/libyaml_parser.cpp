@@ -32,16 +32,11 @@ yaml_normalization::YamlNormalizedOutput* LibyamlParser::normalize
 // ---------------------------------- Static Parts ---------------------------------
 // ---------------------------------------------------------------------------------
 
-libyaml_differential_parser::LibyamlParser* 
-    libyaml_differential_parser::LibyamlParser::instance = nullptr;
+libyaml_differential_parser::LibyamlParser
+    libyaml_differential_parser::LibyamlParser::instance;
 
 libyaml_differential_parser::LibyamlParser* LibyamlParser::GetStaticInstance()
 {
-    if (instance == nullptr)
-    {
-        instance = 
-            new libyaml_differential_parser::LibyamlParser();
-    }
-    return instance;
+    return &instance;
 }
 } // namespace yamlcpp_differential_parser

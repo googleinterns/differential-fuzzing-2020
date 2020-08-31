@@ -96,7 +96,6 @@ bool endEventAddition
 
         addToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
     }
-
     return map_mode;
 }
 
