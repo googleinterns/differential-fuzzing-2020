@@ -327,14 +327,20 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                             
                             mode_stack.pop();
 
-                            if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                            if (!mode_stack.empty())
                             {
-                                TEST_PPRINT("map\n");
-                                map_mode = map_mode_stack.top();
-                                map_mode_stack.pop();
+                                if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                                {
+                                    TEST_PPRINT("map\n");
+                                    map_mode = map_mode_stack.top();
+                                    map_mode_stack.pop();
+                                }
+                                libyaml_local_output.pop_back();
                             }
-
-                            libyaml_local_output.pop_back();
+                            else
+                            {
+                                libyaml_local_output.push_back(YAML::Node());
+                            }
                         }
                     }
                 }
