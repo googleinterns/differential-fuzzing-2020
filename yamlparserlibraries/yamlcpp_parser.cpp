@@ -53,16 +53,11 @@ yaml_normalization::YamlNormalizedOutput* YamlCppParser::normalize
 // ---------------------------------- Static Parts ---------------------------------
 // ---------------------------------------------------------------------------------
 
-yamlcpp_differential_parser::YamlCppParser* 
-    yamlcpp_differential_parser::YamlCppParser::instance = nullptr;
+yamlcpp_differential_parser::YamlCppParser 
+    yamlcpp_differential_parser::YamlCppParser::instance;
 
 yamlcpp_differential_parser::YamlCppParser* YamlCppParser::GetStaticInstance()
 {
-    if (instance == nullptr)
-    {
-        instance = 
-            new yamlcpp_differential_parser::YamlCppParser();
-    }
-    return instance;
+    return &instance;
 }
 } // namespace yamlcpp_differential_parser
