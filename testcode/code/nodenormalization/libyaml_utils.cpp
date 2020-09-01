@@ -259,9 +259,12 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                     positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
                 }
 
-                if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                if (!mode_stack.empty()) // (new)
                 {
-                    map_mode_stack.push(!map_mode);
+                    if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                    {
+                        map_mode_stack.push(!map_mode);
+                    }
                 }
 
                 mode_stack.push(mode_type::MAP_TYPE);
@@ -281,9 +284,12 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
-                if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                if (!mode_stack.empty()) // (new)
                 {
-                    map_mode_stack.push(!map_mode);
+                    if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                    {
+                        map_mode_stack.push(!map_mode);
+                    }
                 }
 
                 mode_stack.push(mode_type::SEQUENCE_TYPE);
@@ -344,7 +350,10 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                                 break;
                             }
 
-                            mode_stack.pop();
+                            if (!mode_stack.empty()) // (new)
+                            {
+                                mode_stack.pop();
+                            }
 
                             if (!mode_stack.empty())
                             {
@@ -366,7 +375,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 else
                 {
                     TEST_PPRINT("normal\n");
-                    if (mode_stack.empty()) // (NEW)
+                    if (mode_stack.empty())
                     {
                         break;
                     }
