@@ -381,12 +381,10 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                 else
                 {
                     TEST_PPRINT("normal\n");
-
                     if (mode_stack.empty())
                     {
                         break;
                     }
-
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     if (event.data.scalar.length <= 0 && !event.data.scalar.tag && 
