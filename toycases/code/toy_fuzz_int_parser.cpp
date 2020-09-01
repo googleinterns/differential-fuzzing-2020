@@ -8,7 +8,7 @@ namespace toy_int_differential_parser
 // ------------------------------ ToyIntParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-ToyIntParserOutput::ToyIntParserOutput(int* info,std::unique_ptr<std::string> error_code)
+ToyIntParserOutput::ToyIntParserOutput(int* info, std::unique_ptr<std::string> error_code)
 {
     this->data = info;
 
