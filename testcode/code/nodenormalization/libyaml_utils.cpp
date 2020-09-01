@@ -100,6 +100,10 @@ bool endEventAddition
         }
         mode_type temp_position_info;
 
+        if (mode_stack->empty())
+        {
+            return map_mode;
+        }
         positionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
 
         YAML::Node temp_node = libyaml_local_output->back();
