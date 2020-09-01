@@ -89,10 +89,12 @@ bool endEventAddition
     (std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack)
 {
-    if (libyaml_local_output->size() > 1 && !mode_stack->empty())
+    if (libyaml_local_output->size() > 1 && mode_stack->size() > 1)
     {
         mode_stack->pop();
 
+        TEST_PPRINT("CHECK\n")
+        
         if (mode_stack->top() ==  mode_type::MAP_TYPE && !map_mode_stack->empty())
         {
             map_mode = map_mode_stack->top();
@@ -100,10 +102,6 @@ bool endEventAddition
         }
         mode_type temp_position_info;
 
-        if (mode_stack->empty())
-        {
-            return map_mode;
-        }
         positionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
 
         YAML::Node temp_node = libyaml_local_output->back();
@@ -261,10 +259,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 if (!mode_stack.empty())
                 {
                     positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
-                }
 
-                if (!mode_stack.empty()) // (new)
-                {
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
                         map_mode_stack.push(!map_mode);
@@ -288,7 +283,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
-                if (!mode_stack.empty()) // (new)
+                if (!mode_stack.empty()) 
                 {
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
@@ -345,7 +340,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                         {
                             TEST_PPRINT("empty\n");
 
-                            if (mode_stack.empty()) // (new)
+                            if (mode_stack.empty()) 
                             {
                                 break;
                             }
@@ -421,7 +416,7 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 
                 if(anchor_map.find(temp_translator) != anchor_map.end())
                 {
-                    if (mode_stack.empty()) // (new)
+                    if (mode_stack.empty()) 
                     {
                         break;
                     }
