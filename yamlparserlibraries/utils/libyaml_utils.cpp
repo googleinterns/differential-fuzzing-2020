@@ -258,9 +258,12 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                     positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
                 }
 
-                if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                if (!mode_stack.empty())
                 {
-                    map_mode_stack.push(!map_mode);
+                    if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                    {
+                        map_mode_stack.push(!map_mode);
+                    }
                 }
 
                 mode_stack.push(mode_type::MAP_TYPE);
@@ -280,9 +283,12 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
                 addTag(&libyaml_local_output.back(), event.data.sequence_start.tag);
 
-                if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                if (!mode_stack.empty())
                 {
-                    map_mode_stack.push(!map_mode);
+                    if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                    {
+                        map_mode_stack.push(!map_mode);
+                    }
                 }
 
                 mode_stack.push(mode_type::SEQUENCE_TYPE);
@@ -342,8 +348,11 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
                                 break;
                             }
-                            
-                            mode_stack.pop();
+
+                            if (!mode_stack.empty())
+                            {
+                                mode_stack.pop();
+                            }
 
                             if (!mode_stack.empty())
                             {
