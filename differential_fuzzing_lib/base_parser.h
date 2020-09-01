@@ -20,7 +20,7 @@ class Parser
     public:
         virtual std::string getName() = 0;
         virtual void* parse(const uint8_t* input, size_t input_size, std::string* error_code) = 0;
-        virtual differential_parser::NormalizedOutput* normalize(void* input, std::unique_ptr<std::string>* error_code) = 0;
+        virtual differential_parser::NormalizedOutput* normalize(void* input, std::unique_ptr<std::string> error_code) = 0;
 };
 } // namespace differential_parser
 

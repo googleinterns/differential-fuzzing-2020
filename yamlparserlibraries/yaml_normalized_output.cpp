@@ -7,13 +7,11 @@
 
 namespace yaml_normalization
 {
-YamlNormalizedOutput::YamlNormalizedOutput(std::vector<YAML::Node>* info, std::unique_ptr<std::string>* error_code)
+YamlNormalizedOutput::YamlNormalizedOutput(std::vector<YAML::Node>* info, std::unique_ptr<std::string> error_code)
 {
     this->data = info;
 
-    this->error = std::unique_ptr<std::string>(new std::string());
-
-    this->error = std::move(*error_code);
+    this->error = std::move(error_code);
 }
 
 YamlNormalizedOutput::~YamlNormalizedOutput()

@@ -20,7 +20,7 @@ class YamlCppParser : virtual public differential_parser::Parser
     public:
         std::string getName();
         void* parse(const uint8_t* input, size_t input_size, std::string* error_code);
-        yaml_normalization::YamlNormalizedOutput* normalize(void* input, std::unique_ptr<std::string>* error_code);
+        yaml_normalization::YamlNormalizedOutput* normalize(void* input, std::unique_ptr<std::string> error_code);
         static YamlCppParser* GetStaticInstance();
 
 };

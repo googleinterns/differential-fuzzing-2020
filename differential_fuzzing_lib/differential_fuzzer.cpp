@@ -148,7 +148,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
     }
 
     if (differential_parser::NormalizedOutput* parser_output = 
-        parser->normalize(temp_parse_holder, &local_error))
+        parser->normalize(temp_parse_holder, std::move(local_error)))
     {
         // Iterate through the different EquivalenceNormalizedOutputs
         while (ptr != nullptr)

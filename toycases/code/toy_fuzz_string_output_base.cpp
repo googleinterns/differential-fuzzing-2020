@@ -8,13 +8,11 @@ namespace toy_generic_string_helper
 // ------------------------- ToyFuzzGenericStringOutput ----------------------------
 // ---------------------------------------------------------------------------------
 
-ToyFuzzGenericStringOutput::ToyFuzzGenericStringOutput(std::string* info, std::unique_ptr<std::string>* error_code)
+ToyFuzzGenericStringOutput::ToyFuzzGenericStringOutput(std::string* info, std::unique_ptr<std::string> error_code)
 {
     this->data = info;
 
-    this->error = std::unique_ptr<std::string>(new std::string());
-
-    this->error = std::move(*error_code);
+    this->error = std::move(error_code);
 }
 
 ToyFuzzGenericStringOutput::~ToyFuzzGenericStringOutput()
@@ -72,11 +70,11 @@ void* ToyFuzzGenericStringParser::parse(const uint8_t* input, size_t input_size,
 }
 
 differential_parser::NormalizedOutput* ToyFuzzGenericStringParser::normalize
-    (void* input,  std::unique_ptr<std::string>* error_code)
+    (void* input,  std::unique_ptr<std::string> error_code)
 {
     *(std::string*)input = *(std::string*)input + this->normalizer_modifier;
     differential_parser::NormalizedOutput* returnMe = new
-        toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, error_code);
+        toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, std::move(error_code));
     
     return returnMe;
 }
