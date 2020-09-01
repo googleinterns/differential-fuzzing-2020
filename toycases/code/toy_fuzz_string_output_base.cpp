@@ -35,9 +35,9 @@ void* ToyFuzzGenericStringOutput::getData()
     return static_cast<void*>(this->data);
 }
 
-std::unique_ptr<std::string>* ToyFuzzGenericStringOutput::getError()
+std::string* ToyFuzzGenericStringOutput::getError()
 {
-    return &this->error;
+    return this->error.get();
 }
 
 // ---------------------------------------------------------------------------------
@@ -88,9 +88,9 @@ differential_parser::NormalizedOutput* ToyFuzzGenericStringParser::normalize
 bool compareStrings(differential_parser::NormalizedOutput* compared_object_one, 
     differential_parser::NormalizedOutput* compared_object_two)
 {
-    if (!compared_object_two->getError()->get()->empty() && !(compared_object_one->getError()->get()->empty()))
+    if (!compared_object_two->getError()->empty() && !(compared_object_one->getError()->empty()))
     {
-        if ((*compared_object_two->getError()->get()) == (*compared_object_one->getError()->get()))
+        if ((*compared_object_two->getError()) == (*compared_object_one->getError()))
         {
             return true;
         }
@@ -99,8 +99,8 @@ bool compareStrings(differential_parser::NormalizedOutput* compared_object_one,
             return false;
         }
     }
-    else if (!compared_object_two->getError()->get()->empty()
-        || !compared_object_one->getError()->get()->empty())
+    else if (!compared_object_two->getError()->empty()
+        || !compared_object_one->getError()->empty())
     {
         return false;
     }

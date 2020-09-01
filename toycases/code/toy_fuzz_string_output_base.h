@@ -23,7 +23,7 @@ class ToyFuzzGenericStringOutput
         ~ToyFuzzGenericStringOutput();
         bool equivalent(NormalizedOutput* compared_object);
         void* getData();
-        std::unique_ptr<std::string>* getError();
+        std::string* getError();
 };
 
 // ---------------------------------------------------------------------------------

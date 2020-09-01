@@ -23,7 +23,7 @@ void SmokeTest(const uint8_t* data)
     
     if (test_normalized_output != nullptr)
     {
-        std::cerr << "---Error: "<< *test_normalized_output->getError()->get() << std::endl;
+        std::cerr << "---Error: "<< *test_normalized_output->getError() << std::endl;
 
         std::vector<YAML::Node>* test_normalized_output_data 
             = (std::vector<YAML::Node>*) test_normalized_output->getData();
@@ -52,8 +52,8 @@ differential_parser::NormalizedOutput* ParseInfo(const uint8_t* data, std::strin
         std::vector<YAML::Node>* test_normalized_output_data 
             = (std::vector<YAML::Node>*) test_normalized_output->getData();
     }
-    *test_normalized_output->getError() = 
-        std::unique_ptr<std::string>(new std::string(error));
+
+    *test_normalized_output->getError() = std::string(error);
 
     return test_normalized_output;
 }
