@@ -60,18 +60,18 @@ void addToNode
     
     if (tracking_current_type != nullptr && addToMe != nullptr)
     {
-        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
+        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE && addToMe->IsSequence())
         {
             TEST_PPRINT("squ type\n")
             addToMe->push_back(*add_me);
         }
-        else if (*tracking_current_type ==  mode_type::KEY_TYPE)
+        else if (*tracking_current_type ==  mode_type::KEY_TYPE && addToMe->IsMap())
         {
             TEST_PPRINT("key type\n")
             key_stack->push(*add_me);
             (*addToMe)[*add_me];
         }
-        else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
+        else if (*tracking_current_type ==  mode_type::VALUE_TYPE && addToMe->IsMap())
         {
             TEST_PPRINT("map type\n")
             if (!key_stack->empty())
@@ -102,6 +102,10 @@ bool endEventAddition
         }
         mode_type temp_position_info;
 
+        if (mode_stack->empty())
+        {
+            return map_mode;
+        }
         positionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
 
         YAML::Node temp_node = libyaml_local_output->back();
@@ -362,7 +366,10 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                                     map_mode = map_mode_stack.top();
                                     map_mode_stack.pop();
                                 }
-                                libyaml_local_output.pop_back();
+                                if (!libyaml_local_output.empty())
+                                {
+                                    libyaml_local_output.pop_back();
+                                }
                             }
                             else
                             {
@@ -411,6 +418,12 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                 
                 if(anchor_map.find(temp_translator) != anchor_map.end())
                 {
+
+                    if (mode_stack.empty()) // (new)
+                    {
+                        break;
+                    }
+
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     addToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
