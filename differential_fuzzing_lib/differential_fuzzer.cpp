@@ -141,7 +141,7 @@ bool differential_fuzzer::parser::CheckAndAdd(differential_parser::Parser* parse
     
     std::unique_ptr<std::string> local_error(new std::string());
 
-    void* temp_parse_holder = parser->parse(input_data, size_of_input, &local_error);
+    void* temp_parse_holder = parser->parse(input_data, size_of_input, local_error.get());
     if (temp_parse_holder == nullptr)
     {
         return false;

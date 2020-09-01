@@ -65,7 +65,7 @@ std::string ToyIntParser::getName()
 }
 
 
-void* ToyIntParser::parse(const uint8_t* input, size_t input_size,std::unique_ptr<std::string>* error_code)
+void* ToyIntParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     int* toy_output = new int;
 

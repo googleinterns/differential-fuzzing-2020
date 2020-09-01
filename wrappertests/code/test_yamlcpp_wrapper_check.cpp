@@ -19,7 +19,7 @@ void SmokeTest(const uint8_t* data)
     error_string = std::unique_ptr<std::string>(new std::string());
 
     differential_parser::NormalizedOutput* test_normalized_output = temp_instance->normalize
-            (temp_instance->parse(data, size, &error_string), &error_string);
+            (temp_instance->parse(data, size, error_string.get()), &error_string);
     
     if (test_normalized_output != nullptr)
     {
@@ -45,7 +45,7 @@ differential_parser::NormalizedOutput* ParseInfo(const uint8_t* data, std::strin
     error_string = std::unique_ptr<std::string>(new std::string());
 
     differential_parser::NormalizedOutput* test_normalized_output = 
-        yaml_cpp_case->normalize(yaml_cpp_case->parse(data, size, &error_string), &error_string);
+        yaml_cpp_case->normalize(yaml_cpp_case->parse(data, size, error_string.get()), &error_string);
 
     if (test_normalized_output != nullptr)
     {

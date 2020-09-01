@@ -13,7 +13,7 @@ std::string YamlCppParser::getName()
     return "yaml-cpp";
 }
 
-void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_code)
+void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     std::vector<YAML::Node>* yaml_cpp_loop_temp = new std::vector<YAML::Node>;
 
@@ -25,13 +25,13 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::unique_
         }
         else
         {
-            *error_code = std::unique_ptr<std::string>(new std::string("ERROR"));
+            *error_code = std::string("ERROR");
             return nullptr;
         }
     }
     catch (const std::exception& err)
     {
-        *error_code = std::unique_ptr<std::string>(new std::string("ERROR"));
+        *error_code = std::string("ERROR");
     }
 
     return static_cast<void*>(yaml_cpp_loop_temp);

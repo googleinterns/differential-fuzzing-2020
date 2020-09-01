@@ -33,7 +33,7 @@ class ToyIntParser : virtual public differential_parser::Parser
 {
     public:
         std::string getName();
-        void* parse(const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_code);
+        void* parse(const uint8_t* input, size_t input_size, std::string* error_code);
         differential_parser::NormalizedOutput* normalize(void* input, std::unique_ptr<std::string>* error_code);
 };
 } // namespace toy_int_differential_parser

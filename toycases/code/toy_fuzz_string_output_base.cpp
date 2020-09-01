@@ -60,13 +60,13 @@ std::string ToyFuzzGenericStringParser::getName()
 }
 
 
-void* ToyFuzzGenericStringParser::parse(const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_code)
+void* ToyFuzzGenericStringParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     std::string* toy_output = new std::string();
 
     *toy_output = std::string((const char*)input, input_size) + this->parser_modifier;
 
-    *error_code = std::unique_ptr<std::string>(new std::string(this->error_modifier));
+    *error_code = this->error_modifier;
 
     return (void*)toy_output;
 }
