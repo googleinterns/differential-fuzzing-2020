@@ -91,7 +91,7 @@ bool endEventAddition
     (std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack)
 {
-    if (libyaml_local_output->size() > 1 && !mode_stack->empty())
+    if (libyaml_local_output->size() > 1 && mode_stack->size() > 1)
     {
         mode_stack->pop();
 
@@ -260,10 +260,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                 if (!mode_stack.empty())
                 {
                     positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
-                }
 
-                if (!mode_stack.empty())
-                {
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
                         map_mode_stack.push(!map_mode);
@@ -317,7 +314,11 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                 {
                     TEST_PPRINT("ANCH-scl\n");
                     std::string temp_translator = ((char*)event.data.scalar.anchor);
-                    
+                    if (mode_stack.empty())
+                    {
+                        break;
+                    }
+
                     if (event.data.scalar.value)
                     {
 
@@ -353,10 +354,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                                 break;
                             }
 
-                            if (!mode_stack.empty())
-                            {
-                                mode_stack.pop();
-                            }
+                            mode_stack.pop();
 
                             if (!mode_stack.empty())
                             {
@@ -366,6 +364,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                                     map_mode = map_mode_stack.top();
                                     map_mode_stack.pop();
                                 }
+
                                 if (!libyaml_local_output.empty())
                                 {
                                     libyaml_local_output.pop_back();
