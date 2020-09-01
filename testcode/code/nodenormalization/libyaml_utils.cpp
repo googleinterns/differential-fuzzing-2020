@@ -58,18 +58,18 @@ void addToNode
     
     if (tracking_current_type != nullptr && addToMe != nullptr)
     {
-        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE)
+        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE && addToMe->IsSequence())
         {
             TEST_PPRINT("squ type\n")
             addToMe->push_back(*add_me);
         }
-        else if (*tracking_current_type ==  mode_type::KEY_TYPE)
+        else if (*tracking_current_type ==  mode_type::KEY_TYPE && addToMe->IsMap())
         {
             TEST_PPRINT("key type\n")
             key_stack->push(*add_me);
             (*addToMe)[*add_me];
         }
-        else if (*tracking_current_type ==  mode_type::VALUE_TYPE)
+        else if (*tracking_current_type ==  mode_type::VALUE_TYPE && addToMe->IsMap())
         {
             TEST_PPRINT("map type\n")
             if (!key_stack->empty())
@@ -340,6 +340,12 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                         else
                         {
                             TEST_PPRINT("empty\n");
+
+                            if (mode_stack.empty()) // (new)
+                            {
+                                break;
+                            }
+
                             if (mode_stack.top() ==  mode_type::SEQUENCE_TYPE)
                             {
                                 TEST_PPRINT("sequence\n");
@@ -350,20 +356,21 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                                 break;
                             }
 
-                            if (!mode_stack.empty()) // (new)
-                            {
-                                mode_stack.pop();
-                            }
+                            mode_stack.pop();
 
                             if (!mode_stack.empty())
                             {
-                                if (mode_stack.top() ==  mode_type::MAP_TYPE)
+                                if (mode_stack.top() ==  mode_type::MAP_TYPE && 
+                                    !map_mode_stack.empty())
                                 {
                                     TEST_PPRINT("map\n");
                                     map_mode = map_mode_stack.top();
                                     map_mode_stack.pop();
                                 }
-                                libyaml_local_output.pop_back();
+                                if (!libyaml_local_output.empty())
+                                {
+                                    libyaml_local_output.pop_back();
+                                }
                             }
                             else
                             {
@@ -410,6 +417,10 @@ std::vector<YAML::Node> normalizeLibyaml(std::string name_of_file, std::string* 
                 
                 if(anchor_map.find(temp_translator) != anchor_map.end())
                 {
+                    if (mode_stack.empty()) // (new)
+                    {
+                        break;
+                    }
                     map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     addToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
