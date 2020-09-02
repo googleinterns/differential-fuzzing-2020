@@ -349,7 +349,10 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
                                 TEST_PPRINT("sequence\n");
                                 add_me = YAML::Node(YAML::NodeType::Null);
 
-                                libyaml_local_output.back().push_back(add_me);
+                                if (!libyaml_local_output.empty())
+                                {
+                                    libyaml_local_output.back().push_back(add_me);
+                                }
 
                                 break;
                             }
