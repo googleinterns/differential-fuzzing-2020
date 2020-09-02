@@ -8,10 +8,13 @@ namespace toy_int_differential_parser
 // ------------------------------ ToyIntParserOutput ---------------------------------
 // ---------------------------------------------------------------------------------
 
-ToyIntParserOutput::ToyIntParserOutput(int* info, std::string* error_code)
+ToyIntParserOutput::ToyIntParserOutput(int* info, std::unique_ptr<std::string> error_code)
 {
     this->data = info;
-    this->error = error_code;
+
+    this->error = std::unique_ptr<std::string>(new std::string());
+
+    this->error = std::move(error_code);
 }
 
 ToyIntParserOutput::~ToyIntParserOutput()
@@ -20,12 +23,11 @@ ToyIntParserOutput::~ToyIntParserOutput()
     {
         delete this->data;
     }
-    delete this->error;
 }
 
 bool ToyIntParserOutput::equivalent(NormalizedOutput* compared_object)
 {
-    if (!this->getError()->empty() && !compared_object->getError()->empty())
+    if (!(this->getError()->empty()) && !(compared_object->getError()->empty()))
     {
         if (*this->getError() == *compared_object->getError())
         {
@@ -36,7 +38,7 @@ bool ToyIntParserOutput::equivalent(NormalizedOutput* compared_object)
             return false;
         }
     }
-    else if (!this->getError()->empty() || !compared_object->getError()->empty())
+    else if (!(this->getError()->empty() || !(compared_object->getError()->empty())))
     {
         return false;
     }
@@ -50,7 +52,7 @@ void* ToyIntParserOutput::getData()
 
 std::string* ToyIntParserOutput::getError()
 {
-    return this->error;
+    return this->error.get();
 }
 
 // ---------------------------------------------------------------------------------
@@ -73,10 +75,10 @@ void* ToyIntParser::parse(const uint8_t* input, size_t input_size, std::string* 
 }
 
 differential_parser::NormalizedOutput* ToyIntParser::normalize
-    (void* input, std::string* error_code)
+    (void* input,std::unique_ptr<std::string> error_code)
 {
     differential_parser::NormalizedOutput* returnMe = new
-        ToyIntParserOutput((int*)input, error_code);
+        ToyIntParserOutput((int*)input, std::move(error_code));
     
     return returnMe;
 }

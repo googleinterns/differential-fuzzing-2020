@@ -4,6 +4,7 @@
 #include "base_parser.h"
 #include "yaml-cpp/yaml.h"
 #include "yaml_normalized_output.h"
+
 #include <string>
 
 namespace yamlcpp_differential_parser
@@ -19,8 +20,9 @@ class YamlCppParser : virtual public differential_parser::Parser
     public:
         std::string getName();
         void* parse(const uint8_t* input, size_t input_size, std::string* error_code);
-        yaml_normalization::YamlNormalizedOutput* normalize(void* input, std::string* error_code);
+        yaml_normalization::YamlNormalizedOutput* normalize(void* input, std::unique_ptr<std::string> error_code);
         static YamlCppParser* GetStaticInstance();
+
 };
 } // namespace yaml_differential_parser
 

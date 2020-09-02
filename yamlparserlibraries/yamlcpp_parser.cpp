@@ -25,25 +25,25 @@ void* YamlCppParser::parse(const uint8_t* input, size_t input_size, std::string*
         }
         else
         {
-            *error_code = "ERROR";
+            *error_code = std::string("ERROR");
             return nullptr;
         }
     }
     catch (const std::exception& err)
     {
-        *error_code = "ERROR";
+        *error_code = std::string("ERROR");
     }
 
     return static_cast<void*>(yaml_cpp_loop_temp);
 }
 
 yaml_normalization::YamlNormalizedOutput* YamlCppParser::normalize
-    (void* input, std::string* error_code)
+    (void* input, std::unique_ptr<std::string> error_code)
 {
     if (std::vector<YAML::Node>* casted_input = static_cast<std::vector<YAML::Node>*>(input))
     {
         return new
-            yaml_normalization::YamlNormalizedOutput(casted_input, error_code);
+            yaml_normalization::YamlNormalizedOutput(casted_input, std::move(error_code));
     }
 
     return nullptr;

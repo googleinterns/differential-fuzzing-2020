@@ -1,1 +1,1 @@
-rm *.o *.h.gch toytestexecutable
+rm *.o toy_test_executable

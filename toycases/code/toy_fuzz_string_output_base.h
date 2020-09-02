@@ -16,10 +16,10 @@ class ToyFuzzGenericStringOutput
 {
     private:
         std::string* data;
-        std::string* error;
+        std::unique_ptr<std::string> error;
 
     public:
-        ToyFuzzGenericStringOutput(std::string* info, std::string* error_code);
+        ToyFuzzGenericStringOutput(std::string* info, std::unique_ptr<std::string> error_code);
         ~ToyFuzzGenericStringOutput();
         bool equivalent(NormalizedOutput* compared_object);
         void* getData();
@@ -45,7 +45,7 @@ class ToyFuzzGenericStringParser : virtual public differential_parser::Parser
         ~ToyFuzzGenericStringParser() {};
         std::string getName();
         void* parse(const uint8_t* input, size_t input_size, std::string* error_code);
-        differential_parser::NormalizedOutput* normalize(void* input, std::string* error_code);
+        differential_parser::NormalizedOutput* normalize(void* input, std::unique_ptr<std::string> error_code);
 };
 
 // ---------------------------------------------------------------------------------
