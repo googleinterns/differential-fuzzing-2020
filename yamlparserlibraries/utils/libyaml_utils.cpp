@@ -156,7 +156,7 @@ std::string parseLibyaml(const std::string name_of_file, std::string* error_mess
 }
 }
 
-std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
+std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
     (const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_message_container)
 {
     yaml_parser_t parser;
@@ -184,7 +184,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
         *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
-        return *libyaml_final_output;
+        return libyaml_final_output;
     }
 
     yaml_parser_set_input_string(&parser, input, input_size);
@@ -208,7 +208,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
             *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
-            return *libyaml_final_output;
+            return libyaml_final_output;
         }
         type = event.type;
         
@@ -442,7 +442,7 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
                     *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
 
-                    return *libyaml_final_output;
+                    return libyaml_final_output;
                 }
                 break;
             }
@@ -463,5 +463,5 @@ std::vector<YAML::Node>& libyaml_parsing::parseLibyaml
 
     fflush(stdout);
 
-    return *libyaml_final_output;
+    return libyaml_final_output;
 }

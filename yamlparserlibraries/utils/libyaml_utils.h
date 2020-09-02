@@ -40,7 +40,7 @@ bool endEventAddition
 
 namespace libyaml_parsing
 {
-std::vector<YAML::Node>& parseLibyaml
+std::vector<YAML::Node>* parseLibyaml
         (const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_message_container);
 } // namespace libyaml_parsing
 #endif
