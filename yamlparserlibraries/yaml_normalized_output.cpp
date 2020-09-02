@@ -7,13 +7,11 @@
 
 namespace yaml_normalization
 {
-YamlNormalizedOutput::YamlNormalizedOutput(std::vector<YAML::Node>* info, std::unique_ptr<std::string>* error_code)
+YamlNormalizedOutput::YamlNormalizedOutput(std::vector<YAML::Node>* info, std::unique_ptr<std::string> error_code)
 {
     this->data = info;
 
-    this->error = std::unique_ptr<std::string>(new std::string());
-
-    this->error = std::move(*error_code);
+    this->error = std::move(error_code);
 }
 
 YamlNormalizedOutput::~YamlNormalizedOutput()
@@ -26,9 +24,9 @@ YamlNormalizedOutput::~YamlNormalizedOutput()
 
 bool YamlNormalizedOutput::equivalent(NormalizedOutput* compared_object)
 {
-    if (!this->getError()->get()->empty() || !compared_object->getError()->get()->empty())
+    if (!this->getError()->empty() || !compared_object->getError()->empty())
     {
-        return (*this->getError()->get() == *compared_object->getError()->get());
+        return (*this->getError() == *compared_object->getError());
     }
     else
     {
@@ -53,8 +51,8 @@ void* YamlNormalizedOutput::getData()
     return static_cast<void*>(this->data);
 }
 
-std::unique_ptr<std::string>* YamlNormalizedOutput::getError()
+std::string* YamlNormalizedOutput::getError()
 {
-    return &this->error;
+    return this->error.get();
 }
 } // namespace yaml_normalization

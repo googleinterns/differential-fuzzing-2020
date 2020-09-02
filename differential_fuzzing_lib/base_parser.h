@@ -12,15 +12,15 @@ class NormalizedOutput
         virtual ~NormalizedOutput() {};
         virtual bool equivalent(NormalizedOutput* compared_object) = 0;
         virtual void* getData() = 0;
-        virtual std::unique_ptr<std::string>* getError() = 0;
+        virtual std::string* getError() = 0;
 };
 
 class Parser
 {
     public:
         virtual std::string getName() = 0;
-        virtual void* parse(const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_code) = 0;
-        virtual differential_parser::NormalizedOutput* normalize(void* input, std::unique_ptr<std::string>* error_code) = 0;
+        virtual void* parse(const uint8_t* input, size_t input_size, std::string* error_code) = 0;
+        virtual differential_parser::NormalizedOutput* normalize(void* input, std::unique_ptr<std::string> error_code) = 0;
 };
 } // namespace differential_parser
 

@@ -8,13 +8,11 @@ namespace toy_generic_string_helper
 // ------------------------- ToyFuzzGenericStringOutput ----------------------------
 // ---------------------------------------------------------------------------------
 
-ToyFuzzGenericStringOutput::ToyFuzzGenericStringOutput(std::string* info, std::unique_ptr<std::string>* error_code)
+ToyFuzzGenericStringOutput::ToyFuzzGenericStringOutput(std::string* info, std::unique_ptr<std::string> error_code)
 {
     this->data = info;
 
-    this->error = std::unique_ptr<std::string>(new std::string());
-
-    this->error = std::move(*error_code);
+    this->error = std::move(error_code);
 }
 
 ToyFuzzGenericStringOutput::~ToyFuzzGenericStringOutput()
@@ -35,9 +33,9 @@ void* ToyFuzzGenericStringOutput::getData()
     return static_cast<void*>(this->data);
 }
 
-std::unique_ptr<std::string>* ToyFuzzGenericStringOutput::getError()
+std::string* ToyFuzzGenericStringOutput::getError()
 {
-    return &this->error;
+    return this->error.get();
 }
 
 // ---------------------------------------------------------------------------------
@@ -60,23 +58,23 @@ std::string ToyFuzzGenericStringParser::getName()
 }
 
 
-void* ToyFuzzGenericStringParser::parse(const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_code)
+void* ToyFuzzGenericStringParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     std::string* toy_output = new std::string();
 
     *toy_output = std::string((const char*)input, input_size) + this->parser_modifier;
 
-    *error_code = std::unique_ptr<std::string>(new std::string(this->error_modifier));
+    *error_code = this->error_modifier;
 
     return (void*)toy_output;
 }
 
 differential_parser::NormalizedOutput* ToyFuzzGenericStringParser::normalize
-    (void* input,  std::unique_ptr<std::string>* error_code)
+    (void* input,  std::unique_ptr<std::string> error_code)
 {
     *(std::string*)input = *(std::string*)input + this->normalizer_modifier;
     differential_parser::NormalizedOutput* returnMe = new
-        toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, error_code);
+        toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, std::move(error_code));
     
     return returnMe;
 }
@@ -88,9 +86,9 @@ differential_parser::NormalizedOutput* ToyFuzzGenericStringParser::normalize
 bool compareStrings(differential_parser::NormalizedOutput* compared_object_one, 
     differential_parser::NormalizedOutput* compared_object_two)
 {
-    if (!compared_object_two->getError()->get()->empty() && !(compared_object_one->getError()->get()->empty()))
+    if (!compared_object_two->getError()->empty() && !(compared_object_one->getError()->empty()))
     {
-        if ((*compared_object_two->getError()->get()) == (*compared_object_one->getError()->get()))
+        if ((*compared_object_two->getError()) == (*compared_object_one->getError()))
         {
             return true;
         }
@@ -99,8 +97,8 @@ bool compareStrings(differential_parser::NormalizedOutput* compared_object_one,
             return false;
         }
     }
-    else if (!compared_object_two->getError()->get()->empty()
-        || !compared_object_one->getError()->get()->empty())
+    else if (!compared_object_two->getError()->empty()
+        || !compared_object_one->getError()->empty())
     {
         return false;
     }
