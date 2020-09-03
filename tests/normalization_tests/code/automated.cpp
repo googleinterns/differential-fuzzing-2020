@@ -2,52 +2,68 @@
 #include "yamlcpp_parser.h"
 
 #include <dirent.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <stdio.h>
 
-// bool runTest(std::string file_name, std::string& buffer)
-// {
-//     std::string libyaml_error_string;
+bool runTest(const char* file_path)
+{
+    FILE * file_descriptor = fopen(file_path, "rb");
 
-//     std::vector<YAML::Node> libyaml_final_output_nodes = 
-//         normalizeLibyaml(parseLibyaml(file_name, &libyaml_error_string), &libyaml_error_string);
+    struct stat file_stat;
 
-//     std::string yamlcpp_error_msg;
+    if (fstat(fileno(file_descriptor), &file_stat) == 0)
+    {   
+        char buffer[file_stat.st_size + 1];
 
-//     std::vector<YAML::Node> parsed_nodes= parseYamlCpp(file_name, &yamlcpp_error_msg);
+        if (fread(&buffer, sizeof(char), file_stat.st_size, file_descriptor))
+        {
+            std::vector<YAML::Node>* yamlcpp_test_normalized_output_data;
 
-//     if( (!libyaml_error_string.empty() || !yamlcpp_error_msg.empty()))
-//     {
-//         return libyaml_error_string == yamlcpp_error_msg;
-//     }
+            yamlcpp_differential_parser::YamlCppParser* yamlcpp_case =
+                yamlcpp_differential_parser::YamlCppParser::GetStaticInstance();
 
-//     return compareMultipleNodesEmitterBased(&libyaml_final_output_nodes, &parsed_nodes);
-// }
+            std::unique_ptr<std::string> yamlcpp_error_string;
+                yamlcpp_error_string = std::unique_ptr<std::string>(new std::string());
 
-// // ---------------------------------------------------------------------------------
-// // --------------------------- typical test helper ---------------------------------
-// // ---------------------------------------------------------------------------------
+            void* yamlcpp_parsed_data = yamlcpp_case->parse((uint8_t*) buffer, file_stat.st_size, yamlcpp_error_string.get());
 
+            differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = yamlcpp_case->normalize
+                (yamlcpp_parsed_data, std::move(yamlcpp_error_string));
 
-// bool typicalPositiveTest(std::string name)
-// {
-//     std::string buffer = "";
+            std::vector<YAML::Node>* libyaml_test_normalized_output_data;
 
-//     std::string full_name = ("../examples/" + name);
+            libyaml_differential_parser::LibyamlParser* libyaml_case =
+                libyaml_differential_parser::LibyamlParser::GetStaticInstance();
 
-//     bool return_me = runTest(full_name, buffer);
+            std::unique_ptr<std::string> libyaml_error_string;
+                libyaml_error_string = std::unique_ptr<std::string>(new std::string());
 
-//     return !return_me;
-// }
+            void* libyaml_parsed_data = libyaml_case->parse((uint8_t*) buffer, file_stat.st_size, libyaml_error_string.get());
 
-// bool typicalNegativeTest(std::string name)
-// {
-//     std::string buffer = "";
+            differential_parser::NormalizedOutput* libyaml_test_normalized_output = libyaml_case->normalize
+                (libyaml_parsed_data, std::move(libyaml_error_string));
 
-//     std::string full_name = ("../examples/" + name);
+            bool return_me = (libyaml_test_normalized_output->equivalent(yamlcpp_test_normalized_output));
 
-//     bool return_me = runTest(full_name, buffer);
+            delete yamlcpp_test_normalized_output;
+            delete libyaml_test_normalized_output;
 
-//     return return_me;
-// }
+            return return_me;
+        }
+        else
+        {
+            std::cerr << "Failure reading to buffer" << std::endl;
+        }
+    }
+    else
+    {
+        std::cerr << "Failure reading file" << std::endl;
+    }
+    return true;
+}
 
 // ---------------------------------------------------------------------------------
 // -------------------------------------- main -------------------------------------
@@ -55,41 +71,29 @@
 
 int main(int argc, char* args[])
 {
-    std::cout << "auto run" << std::endl;
-    // std::string path;
-    // if (argc >0)
-    // {
-    //     std::string path = args[0];
-    // }
-    // else
-    // {
-    //     //../../yaml-test-suite/test/
-    //     //../examples/
-    //     path = "../examples/";
-    // }
+    DIR *dir;
+    struct dirent *ent;
 
-    // DIR *dir;
-    // struct dirent *ent;
+    std::ofstream myfile;
 
-    // std::ofstream myfile;
+    myfile.open("autoreport.txt");
 
-    // myfile.open ("autoreport.txt");
-
-    // if ((dir = opendir ("../examples/")) != NULL) 
-    // {
-    //     /* print all the files and directories within directory */
-    //     while ((ent = readdir (dir)) != NULL) 
-    //     {
-    //         if (ent->d_name[0] != '.')
-    //         {
-    //             if (typicalPositiveTest(std::string(ent->d_name)))
-    //             {
-    //                 std::cout << "../examples/" << std::string(ent->d_name) << std::endl;
-    //                 myfile << "../examples/" << std::string(ent->d_name) << std::endl;
-    //             }
-    //         }
-    //     }
-    //     closedir (dir);
-    // }
+    if ((dir = opendir (args[1])) != NULL) 
+    {
+        /* print all the files and directories within directory */
+        while ((ent = readdir (dir)) != NULL) 
+        {
+            if (ent->d_name[0] != '.')
+            {
+                
+                if (!runTest(std::string(std::string(args[1]) + std::string(ent->d_name)).c_str()))
+                {
+                    std::cout << std::string(std::string(args[1]) + std::string(ent->d_name)) << std::endl;
+                    myfile << std::string(std::string(args[1]) + std::string(ent->d_name)) << std::endl;
+                }
+            }
+        }
+        closedir (dir);
+    }
     return 0;
 }
