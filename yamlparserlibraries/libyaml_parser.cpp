@@ -14,17 +14,20 @@ std::string LibyamlParser::getName()
 }
 
 
-void* LibyamlParser::parse(const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_code)
+void* LibyamlParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     return static_cast<void*>
-        (new yaml_normalization::YamlNormalizedOutput
-            (libyaml_parsing::parseLibyaml(input, input_size, error_code), error_code));
+            (libyaml_parsing::parseLibyaml(input, input_size, error_code));
 }
 
 yaml_normalization::YamlNormalizedOutput* LibyamlParser::normalize
-    (void* input, std::unique_ptr<std::string>* error_code)
-{   
-    return static_cast<yaml_normalization::YamlNormalizedOutput*>(input);
+    (void* input, std::unique_ptr<std::string> error_code)
+{
+    if (std::vector<YAML::Node>* casted_input = static_cast<std::vector<YAML::Node>*>(input))
+    {
+        return new yaml_normalization::YamlNormalizedOutput(casted_input, std::move(error_code));
+    }
+    return nullptr;
 }
 
 

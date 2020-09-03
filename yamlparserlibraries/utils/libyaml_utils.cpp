@@ -157,7 +157,7 @@ std::string parseLibyaml(const std::string name_of_file, std::string* error_mess
 }
 
 std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
-    (const uint8_t* input, size_t input_size, std::unique_ptr<std::string>* error_message_container)
+    (const uint8_t* input, size_t input_size, std::string* error_message_container)
 {
     yaml_parser_t parser;
     yaml_event_t event;
@@ -182,7 +182,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
     {
         TEST_PPRINT("ERROR: Failed to initialize\n");
 
-        *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
+        *error_message_container = std::string("ERROR");
 
         return libyaml_final_output;
     }
@@ -203,7 +203,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
 
             TEST_PPRINT("ERROR: Bad parsing\n");
 
-            *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
+            *error_message_container = std::string("ERROR");
 
             return libyaml_final_output;
         }
@@ -428,7 +428,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
 
                     TEST_PPRINT("ERROR: Missing anchor\n");
 
-                    *error_message_container = std::unique_ptr<std::string>(new std::string("ERROR"));
+                    *error_message_container = std::string("ERROR");
 
                     return libyaml_final_output;
                 }

@@ -18,12 +18,14 @@ void SmokeTest(const uint8_t* data)
     std::unique_ptr<std::string> error_string;
     error_string = std::unique_ptr<std::string>(new std::string());
 
+    void* parsed_data = temp_instance->parse(data, size, error_string.get());
+    
     differential_parser::NormalizedOutput* test_normalized_output = temp_instance->normalize
-            (temp_instance->parse(data, size, &error_string), &error_string);
+            (parsed_data, std::move(error_string));
     
     if (test_normalized_output != nullptr)
     {
-        std::cerr << "---Error: "<< *test_normalized_output->getError()->get() << std::endl;
+        std::cerr << "---Error: "<< *test_normalized_output->getError() << std::endl;
 
         std::vector<YAML::Node>* test_normalized_output_data 
             = (std::vector<YAML::Node>*) test_normalized_output->getData();
@@ -37,23 +39,24 @@ void SmokeTest(const uint8_t* data)
 }
 
 differential_parser::NormalizedOutput* ParseInfo(const uint8_t* data, std::string error, 
-    libyaml_differential_parser::LibyamlParser* yaml_cpp_case)
+    libyaml_differential_parser::LibyamlParser* libyaml_case)
 {
     size_t size = strlen((const char*)data);
 
     std::unique_ptr<std::string> error_string;
     error_string = std::unique_ptr<std::string>(new std::string());
 
-    differential_parser::NormalizedOutput* test_normalized_output = 
-        yaml_cpp_case->normalize(yaml_cpp_case->parse(data, size, &error_string), &error_string);
+    void* parsed_data = libyaml_case->parse(data, size, error_string.get());
+    
+    differential_parser::NormalizedOutput* test_normalized_output = libyaml_case->normalize
+            (parsed_data, std::move(error_string));
 
     if (test_normalized_output != nullptr)
     {
         std::vector<YAML::Node>* test_normalized_output_data 
             = (std::vector<YAML::Node>*) test_normalized_output->getData();
     }
-    *test_normalized_output->getError() = 
-        std::unique_ptr<std::string>(new std::string(error));
+    *test_normalized_output->getError() = std::string(error);
 
     return test_normalized_output;
 }
@@ -61,17 +64,17 @@ differential_parser::NormalizedOutput* ParseInfo(const uint8_t* data, std::strin
 void InternalComparisonMechanismTest(const uint8_t* data_one, const uint8_t* data_two,
     std::string error_one, std::string error_two)
 {
-    libyaml_differential_parser::LibyamlParser yaml_cpp_case_one;
-    libyaml_differential_parser::LibyamlParser yaml_cpp_case_two;
+    libyaml_differential_parser::LibyamlParser libyaml_case_one;
+    libyaml_differential_parser::LibyamlParser libyaml_case_two;
 
     differential_parser::NormalizedOutput* point_one = 
-        ParseInfo(data_one, error_one, &yaml_cpp_case_one);
+        ParseInfo(data_one, error_one, &libyaml_case_one);
 
     differential_parser::NormalizedOutput* point_two = 
-        ParseInfo(data_two, error_two, &yaml_cpp_case_two);
+        ParseInfo(data_two, error_two, &libyaml_case_two);
 
     std::cout << "---- Mechanism Test ----" << std::endl;
-    std::cout << "----- Testing: " << yaml_cpp_case_one.getName() << std::endl;
+    std::cout << "----- Testing: " << libyaml_case_one.getName() << std::endl;
 
     if (point_one->equivalent(point_two) == point_two->equivalent(point_one))
     {
