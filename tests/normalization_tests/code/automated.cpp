@@ -18,45 +18,40 @@ bool runTest(const char* file_path)
     {   
         char buffer[file_stat.st_size + 1];
 
-        if (fread(&buffer, sizeof(char), file_stat.st_size, file_descriptor))
-        {
-            std::vector<YAML::Node>* yamlcpp_test_normalized_output_data;
+        fread(&buffer, sizeof(char), file_stat.st_size, file_descriptor);
 
-            yamlcpp_differential_parser::YamlCppParser* yamlcpp_case =
-                yamlcpp_differential_parser::YamlCppParser::GetStaticInstance();
+        std::vector<YAML::Node>* yamlcpp_test_normalized_output_data;
 
-            std::unique_ptr<std::string> yamlcpp_error_string;
-                yamlcpp_error_string = std::unique_ptr<std::string>(new std::string());
+        yamlcpp_differential_parser::YamlCppParser* yamlcpp_case =
+            yamlcpp_differential_parser::YamlCppParser::GetStaticInstance();
 
-            void* yamlcpp_parsed_data = yamlcpp_case->parse((uint8_t*) buffer, file_stat.st_size, yamlcpp_error_string.get());
+        std::unique_ptr<std::string> yamlcpp_error_string;
+            yamlcpp_error_string = std::unique_ptr<std::string>(new std::string());
 
-            differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = yamlcpp_case->normalize
-                (yamlcpp_parsed_data, std::move(yamlcpp_error_string));
+        void* yamlcpp_parsed_data = yamlcpp_case->parse((uint8_t*) buffer, file_stat.st_size, yamlcpp_error_string.get());
 
-            std::vector<YAML::Node>* libyaml_test_normalized_output_data;
+        differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = yamlcpp_case->normalize
+            (yamlcpp_parsed_data, std::move(yamlcpp_error_string));
 
-            libyaml_differential_parser::LibyamlParser* libyaml_case =
-                libyaml_differential_parser::LibyamlParser::GetStaticInstance();
+        std::vector<YAML::Node>* libyaml_test_normalized_output_data;
 
-            std::unique_ptr<std::string> libyaml_error_string;
-                libyaml_error_string = std::unique_ptr<std::string>(new std::string());
+        libyaml_differential_parser::LibyamlParser* libyaml_case =
+            libyaml_differential_parser::LibyamlParser::GetStaticInstance();
 
-            void* libyaml_parsed_data = libyaml_case->parse((uint8_t*) buffer, file_stat.st_size, libyaml_error_string.get());
+        std::unique_ptr<std::string> libyaml_error_string;
+            libyaml_error_string = std::unique_ptr<std::string>(new std::string());
 
-            differential_parser::NormalizedOutput* libyaml_test_normalized_output = libyaml_case->normalize
-                (libyaml_parsed_data, std::move(libyaml_error_string));
+        void* libyaml_parsed_data = libyaml_case->parse((uint8_t*) buffer, file_stat.st_size, libyaml_error_string.get());
 
-            bool return_me = (libyaml_test_normalized_output->equivalent(yamlcpp_test_normalized_output));
+        differential_parser::NormalizedOutput* libyaml_test_normalized_output = libyaml_case->normalize
+            (libyaml_parsed_data, std::move(libyaml_error_string));
 
-            delete yamlcpp_test_normalized_output;
-            delete libyaml_test_normalized_output;
+        bool return_me = (libyaml_test_normalized_output->equivalent(yamlcpp_test_normalized_output));
 
-            return return_me;
-        }
-        else
-        {
-            std::cerr << "Failure reading to buffer" << std::endl;
-        }
+        delete yamlcpp_test_normalized_output;
+        delete libyaml_test_normalized_output;
+
+        return return_me;
     }
     else
     {
