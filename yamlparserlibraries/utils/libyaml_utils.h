@@ -36,6 +36,11 @@ void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* k
 bool endEventAddition
     (std::vector<YAML::Node>* libyaml_final_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack);
+
+std::unique_ptr<std::vector<yaml_event_t>> GetEvents
+    (const uint8_t* input, size_t input_size, std::string* error_message_container);
+
+void WipeEventList(std::vector<yaml_event_t>* event_list);
 } // namespace
 
 namespace libyaml_parsing
