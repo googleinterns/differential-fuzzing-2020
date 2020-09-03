@@ -1,8 +1,8 @@
 This file presents a guide for creating tests for the differential fuzzer classes when you 
 implement your own. A good sample of how to test your own wrappers can be seen in the 
-'./tamlcpp_wrapper_tests'.
+*./tamlcpp_wrapper_tests*.
 
-test_yamlcpp_wrapper_check.cpp contains methods that make smoke testing, and logical testing
+*./test_yamlcpp_wrapper_check.cpp* contains methods that make smoke testing, and logical testing
 of the equivalence method.
 
 While this will change from application to application, for smoke testing you can follow these
