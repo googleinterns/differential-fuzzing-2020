@@ -25,17 +25,22 @@ enum class mode_type
     UNKNOWN_TYPE = 4
 };
 
-bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character, 
+bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_character, 
     const bool map_mode);
 
-std::string addTag(std::string* tag);
+std::string AddTag(std::string* tag);
 
-void addToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
+void AddToNode(YAML::Node* addToMe, YAML::Node* addMe, std::stack<YAML::Node>* key_stack, 
     const mode_type* tracking_current_type, yaml_char_t* tag);
 
-bool endEventAddition
+bool EndEventAddition
     (std::vector<YAML::Node>* libyaml_final_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack);
+
+void RestartVariables (std::stack<YAML::Node>* key_stack,
+    std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
+    std::vector<YAML::Node>* libyaml_local_output, std::vector<YAML::Node>* libyaml_final_output,
+    bool* map_mode, std::map<std::string, YAML::Node>* anchor_map);
 
 std::unique_ptr<std::vector<yaml_event_t>> GetEvents
     (const uint8_t* input, size_t input_size, std::string* error_message_container);
@@ -45,7 +50,7 @@ void WipeEventList(std::vector<yaml_event_t>* event_list);
 
 namespace libyaml_parsing
 {
-std::vector<YAML::Node>* parseLibyaml
+std::vector<YAML::Node>* ParseLibyaml
         (const uint8_t* input, size_t input_size, std::string* error_message_container);
 } // namespace libyaml_parsing
 #endif

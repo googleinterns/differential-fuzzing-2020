@@ -7,7 +7,7 @@
 namespace
 {
 
-bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character, const bool map_mode)
+bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_character, const bool map_mode)
 {
     if (add_to_me != nullptr)
     {
@@ -35,7 +35,7 @@ bool positionAnalysis(mode_type* add_to_me, const mode_type reference_character,
     return map_mode;
 }
 
-void addTag(YAML::Node* current_node, yaml_char_t* tag)
+void AddTag(YAML::Node* current_node, yaml_char_t* tag)
 {
     if (current_node != nullptr)
     {
@@ -52,11 +52,11 @@ void addTag(YAML::Node* current_node, yaml_char_t* tag)
     }
 }
 
-void addToNode
+void AddToNode
     (YAML::Node* addToMe, YAML::Node* add_me, std::stack<YAML::Node>* key_stack, 
     const mode_type* tracking_current_type, yaml_char_t* tag)
 {
-    addTag(add_me, tag);
+    AddTag(add_me, tag);
     
     if (tracking_current_type != nullptr && addToMe != nullptr)
     {
@@ -87,7 +87,7 @@ void addToNode
     }
 }
 
-bool endEventAddition
+bool EndEventAddition
     (std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack)
 {
@@ -106,18 +106,18 @@ bool endEventAddition
         {
             return map_mode;
         }
-        positionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
+        PositionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
 
         YAML::Node temp_node = libyaml_local_output->back();
 
         libyaml_local_output->pop_back();
 
-        addToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
+        AddToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
     }
     return map_mode;
 }
 
-void restartVariables (std::stack<YAML::Node>* key_stack,
+void RestartVariables (std::stack<YAML::Node>* key_stack,
     std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
     std::vector<YAML::Node>* libyaml_local_output, std::vector<YAML::Node>* libyaml_final_output,
     bool* map_mode, std::map<std::string, YAML::Node>* anchor_map)
@@ -150,15 +150,11 @@ void restartVariables (std::stack<YAML::Node>* key_stack,
     anchor_map->clear();
 }
 
-std::string parseLibyaml(const std::string name_of_file, std::string* error_message_container)
-{
-    return name_of_file;
-}
-
 std::unique_ptr<std::vector<yaml_event_t>> GetEvents
     (const uint8_t* input, size_t input_size, std::string* error_message_container)
 {
     std::unique_ptr<std::vector<yaml_event_t>> event_list(new std::vector<yaml_event_t>);
+
     yaml_parser_t parser;
     yaml_event_t event;
 
@@ -185,15 +181,13 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents
         {
             yaml_event_delete(&event);
 
-            yaml_parser_delete(&parser);
-
             TEST_PPRINT("ERROR: Bad parsing\n");
 
             *error_message_container = std::string("ERROR");
 
             WipeEventList(event_list.get());
 
-            return std::move(event_list);
+            break;
         }
 
         event_list.get()->push_back(event);
@@ -220,10 +214,9 @@ void WipeEventList(std::vector<yaml_event_t>* event_list)
     }
     event_list->clear();
 }
-
 }
 
-std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
+std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
     (const uint8_t* input, size_t input_size, std::string* error_message_container)
 {
     std::vector<YAML::Node> libyaml_local_output;
@@ -248,13 +241,9 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
     for (std::vector<yaml_event_t>::iterator event = event_list.get()->begin();
         event != event_list.get()->end(); ++ event) 
     {
-        yaml_event_type_t type;
-
         mode_type tracking_current_type;
-
-        type = event->type;
         
-        switch (type)
+        switch (event->type)
         {
             case YAML_STREAM_END_EVENT:
                 TEST_PPRINT("STR-\n");
@@ -263,14 +252,14 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
             case YAML_DOCUMENT_END_EVENT:
                 TEST_PPRINT("DOC-\n");
 
-                restartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                RestartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     libyaml_final_output, &map_mode, &anchor_map);
 
                 break;        
             case YAML_DOCUMENT_START_EVENT:
                 TEST_PPRINT("DOC+\n");
 
-                restartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                RestartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     libyaml_final_output, &map_mode, &anchor_map);
 
                 break;
@@ -278,24 +267,24 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
             case YAML_MAPPING_END_EVENT:
                 TEST_PPRINT("MAP-\n");
 
-                map_mode = endEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
+                map_mode = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
                 TEST_PPRINT("SQU-\n");
 
-                map_mode = endEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
+                map_mode = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
 
                 break;
             case YAML_MAPPING_START_EVENT:
                 TEST_PPRINT("MAP+\n");
 
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Map));
-                addTag(&libyaml_local_output.back(), event->data.sequence_start.tag);
+                AddTag(&libyaml_local_output.back(), event->data.sequence_start.tag);
 
                 if (!mode_stack.empty())
                 {
-                    positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
@@ -315,9 +304,8 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
                 break;
             case YAML_SEQUENCE_START_EVENT:
                 TEST_PPRINT("SQU+\n");
-
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
-                addTag(&libyaml_local_output.back(), event->data.sequence_start.tag);
+                AddTag(&libyaml_local_output.back(), event->data.sequence_start.tag);
 
                 if (!mode_stack.empty())
                 {
@@ -343,7 +331,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
                 TEST_PPRINT("SCL\n");
 
                 YAML::Node add_me(std::string((char*)event->data.scalar.value, event->data.scalar.length));
-                addTag(&add_me, event->data.scalar.tag);
+                AddTag(&add_me, event->data.scalar.tag);
 
                 if (event->data.scalar.anchor)
                 {
@@ -362,7 +350,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
                         {
                             anchor_map[temp_translator] = add_me;
                             
-                            map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                            map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                             if (libyaml_local_output.empty())
                             {
@@ -371,7 +359,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
                             }
                             else
                             {
-                                addToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
+                                AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                                     event->data.scalar.tag);
                             }
                         }
@@ -424,7 +412,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
                     {
                         break;
                     }
-                    map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                     if (event->data.scalar.length <= 0 && !event->data.scalar.tag && 
                             event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
@@ -439,7 +427,7 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
                     }            
                     else
                     {
-                        addToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
+                        AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                             event->data.scalar.tag);
                     }
                 }
@@ -454,15 +442,14 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
                 
                 if(anchor_map.find(temp_translator) != anchor_map.end())
                 {
-
-                    if (mode_stack.empty()) // (new)
+                    if (mode_stack.empty())
                     {
                         break;
                     }
 
-                    map_mode = positionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
-                    addToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
+                    AddToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
                         &key_stack, &tracking_current_type, nullptr);
                 }
                 else
@@ -480,12 +467,6 @@ std::vector<YAML::Node>* libyaml_parsing::parseLibyaml
             default: 
                 break;
         }
-
-        if (type == YAML_STREAM_END_EVENT)
-        {
-            break;
-        }
-
     }
 
     WipeEventList(event_list.get());

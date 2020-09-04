@@ -17,7 +17,7 @@ std::string LibyamlParser::getName()
 void* LibyamlParser::parse(const uint8_t* input, size_t input_size, std::string* error_code)
 {
     return static_cast<void*>
-            (libyaml_parsing::parseLibyaml(input, input_size, error_code));
+            (libyaml_parsing::ParseLibyaml(input, input_size, error_code));
 }
 
 yaml_normalization::YamlNormalizedOutput* LibyamlParser::normalize
