@@ -46,6 +46,8 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents
     (const uint8_t* input, size_t input_size, std::string* error_message_container);
 
 void WipeEventList(std::vector<yaml_event_t>* event_list);
+
+bool RelevantTag(yaml_char_t* check_tag);
 } // namespace
 
 namespace libyaml_parsing

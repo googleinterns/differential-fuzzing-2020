@@ -41,7 +41,7 @@ void AddTag(YAML::Node* current_node, yaml_char_t* tag)
     {
         if (tag)
         {
-            std::string temp_tag_translator = ((char*)tag);
+            std::string temp_tag_translator = ((char*) tag);
 
             current_node->SetTag(temp_tag_translator);                    
         }
@@ -214,6 +214,18 @@ void WipeEventList(std::vector<yaml_event_t>* event_list)
     }
     event_list->clear();
 }
+
+bool RelevantTag(yaml_char_t* check_tag)
+{
+    if (check_tag != nullptr)
+    {
+        std::string temp_tag_translator = ((char*) check_tag);
+
+        return temp_tag_translator != "!" && temp_tag_translator != "?";
+    }
+    return false;
+}
+
 }
 
 std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
@@ -414,7 +426,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                     }
                     map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
-                    if (event->data.scalar.length <= 0 && !event->data.scalar.tag && 
+                    if (event->data.scalar.length <= 0 && !RelevantTag(event->data.scalar.tag) && 
                             event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
                         TEST_PPRINT("Begin from nothing\n");
@@ -467,6 +479,12 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
             default: 
                 break;
         }
+        // if (!libyaml_local_output.empty())
+        // {
+        //     std::cout << "------------------" << std::endl;
+        //     std::cout << libyaml_local_output.back() << std::endl;
+        //     std::cout << "------------------" << std::endl;
+        // }
     }
 
     WipeEventList(event_list.get());
