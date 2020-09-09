@@ -3,6 +3,20 @@
 #include "libyaml_parser.h"
 #include "yamlcpp_parser.h"
 
+#include <time.h>       /* time */
+
+void StackCallTrick1(const uint8_t *Data, size_t size)
+{
+    bool thing_mcthing = false;
+    assert(thing_mcthing);
+}
+
+void StackCallTrick2(const uint8_t *Data, size_t size)
+{        
+    bool hibbidy_hobbidy_here_is_my_hobby = false;
+    assert(hibbidy_hobbidy_here_is_my_hobby);
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t size) 
 {
     differential_parser::Parser* array_of_parsers[2] = {
@@ -14,5 +28,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t size)
 
     assert(fuzzers_are_equal);
 
+    // srand(time(NULL));
+    
+    // if(rand() % 100 < 50)
+    // {
+    //     StackCallTrick1(Data, size);
+    // }
+    // else
+    // {
+    //     StackCallTrick2(Data, size);
+    // }
     return 0;
 }
+

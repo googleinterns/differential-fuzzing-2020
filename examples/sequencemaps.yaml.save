@@ -1,5 +1,0 @@
-                    yaml_event_delete(&event);
-
-                    assert(!fclose(input));
-
-                    yaml_parser_delete(&parser);

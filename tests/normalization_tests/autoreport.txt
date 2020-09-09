@@ -11,5 +11,7 @@
 ../../../differential-fuzzing-2020-savebox/examples/anchorwithcoloninname.yaml
 ../../../differential-fuzzing-2020-savebox/examples/endthenmore.yaml
 ../../../differential-fuzzing-2020-savebox/examples/sequencescallar.yaml
+../../../differential-fuzzing-2020-savebox/examples/tagsontags.yaml
 ../../../differential-fuzzing-2020-savebox/examples/emptydocs.yaml
+../../../differential-fuzzing-2020-savebox/examples/taginemptyarray.yaml
 ../../../differential-fuzzing-2020-savebox/examples/tagdefinedonlyfirst.yaml

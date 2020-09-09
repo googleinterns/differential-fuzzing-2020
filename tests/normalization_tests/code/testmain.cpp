@@ -49,6 +49,7 @@ int main(int argc, char* args[])
 
         if( !yamlcpp_data->empty())
         {
+            std::cout << "----- Size:"<< yamlcpp_data->size() << std::endl;
             std::cout << yamlcpp_data->back() << std::endl;
         }
         std::cout << "----------- libyaml tests -----------" << std::endl;
@@ -77,11 +78,10 @@ int main(int argc, char* args[])
 
         if( !libyaml_data->empty())
         {
+            std::cout << "----- Size:"<< libyaml_data->size() << std::endl;
             std::cout << libyaml_data->back() << std::endl;
         }
         std::cout << "----------- compare manual -----------" << std::endl;
-
-        // yamlcpp_test_normalized_output->getData()
 
         if (libyaml_test_normalized_output->equivalent(yamlcpp_test_normalized_output))
         {
@@ -91,33 +91,8 @@ int main(int argc, char* args[])
         {
             std::cout << "Cases different!" << std::endl;
         }
-
-        // differential_parser::Parser* array_of_parsers[2] = {
-        //     (differential_parser::Parser*)(libyaml_differential_parser::LibyamlParser::GetStaticInstance()), 
-        //     (differential_parser::Parser*)(yamlcpp_differential_parser::YamlCppParser ::GetStaticInstance())};
-
-        // bool fuzzers_are_different = 
-        //     differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, (uint8_t*) buffer, file_stat.st_size);
-
-        // std::cout << "----------- compare diff fuzz -----------" << std::endl;
-
-        // // yamlcpp_test_normalized_output->getData()
-
-        // if (fuzzers_are_different)
-        // {
-        //     std::cout << "Cases equal!" << std::endl;
-        // }
-        // else
-        // {
-        //     std::cout << "Cases different!" << std::endl;
-        // }
-
         delete yamlcpp_test_normalized_output;
         delete libyaml_test_normalized_output;
-    }
-    else
-    {
-        std::cerr << "Failure reading file" << std::endl;
     }
     
     return 0;
