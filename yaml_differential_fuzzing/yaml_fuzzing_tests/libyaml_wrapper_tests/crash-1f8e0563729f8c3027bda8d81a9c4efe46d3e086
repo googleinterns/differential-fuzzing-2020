@@ -1,0 +1,21 @@
+tnode4val7op1: &node1
+  &k1 key1: one
+top2: &noagedcoolioe2 # comment
+  key2: two
+top3:
+  &k3 kp8: *k1
+top9: 
+  &k5 [2 ,3]: boe
+top6: &val6
+  six
+topey3: three
+top4: &node4
+  &k4 key4: four
+y2: two
+top3:
+  &k3 key3: three
+top4: &node4
+  &k4 key4: foursix
+top7:p8: *k1
+top9: 
+  &k5 [2 ,3]:  !!tWto &rb
