@@ -7,4 +7,4 @@ clang++ "$YAML_LIBRARY_PATHS"libyaml/src/.libs/libyaml.a "$YAML_LIBRARY_PATHS"ya
 ./code/normalization_test_utils.cpp differential_fuzzer.o \
 -I "$YAML_LIBRARY_PATHS"yaml-cpp/include -I "$YAML_LIBRARY_PATHS"libyaml/include \
 -I ../../differential_fuzzing_lib -I ./../../yamlparserlibraries -I ../../ \
--g -fsanitize=address,fuzzer -DDEBUG_MODE
+-g -fsanitize=address,fuzzer

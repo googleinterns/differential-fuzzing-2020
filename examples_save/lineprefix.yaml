@@ -1,0 +1,7 @@
+plain: text
+  lines
+quoted: "text
+  <TAB>lines"
+block: |
+  text
+   <TAB>lines
