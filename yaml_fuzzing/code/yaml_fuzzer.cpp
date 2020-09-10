@@ -28,16 +28,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t size)
 
     assert(fuzzers_are_equal);
 
-    // srand(time(NULL));
-    
-    // if(rand() % 100 < 50)
-    // {
-    //     StackCallTrick1(Data, size);
-    // }
-    // else
-    // {
-    //     StackCallTrick2(Data, size);
-    // }
     return 0;
 }
 

@@ -7,17 +7,10 @@ static bool CompareSingleNode
 {
     std::stringstream stream_node_one;
     std::stringstream stream_node_two;
+
     compare_me_one->SetStyle(YAML::EmitterStyle::Flow);
     compare_me_two->SetStyle(YAML::EmitterStyle::Flow);
-    if(compare_me_one==nullptr)
-    {
-        std::cerr << "Howeven" << std::endl;
-    }
 
-        if(compare_me_two==nullptr)
-    {
-        std::cerr << "Howeven2" << std::endl;
-    }
     stream_node_one << *compare_me_one;
     stream_node_two << *compare_me_two;
 

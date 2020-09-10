@@ -1,0 +1,84 @@
+- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &bblor : bob &e
+- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies"
+- "marks"
+- &e
+- &bob: lies
+- &bblor : bob &e
+- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &bb:  brloob &e
+- &bob: lies
+- &bob rob# l- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &e
+- &bob:- &a
+- "bks"
+- &e
+- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &bblor : bob &e
+- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies"
+- "marks"
+- &e
+- &bob: lies
+- &bblor : b lies"
+- "marks"
+- &e
+- &bob: lies
+- &bblor : bob &e
+- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &bb:  brloob &e
+- &bob: lies
+- &bob rob# l- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &bb:  br &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies"
+- "marks"
+- &e
+- &bob: lies
+- &bblor : bob &e
+- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &bb:  brloob &e
+- &bob: lies
+- &bob rob# l- &bob:- &a
+- "bob"
+- "marks"
+- &e
+- &bob: lies
+- &e

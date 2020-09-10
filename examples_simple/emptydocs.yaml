@@ -1,0 +1,9 @@
+%YAML 1.2
+--- |
+%!PS-Adobe-2.0
+...
+%YAML 1.2
+# see also https://github.com/yaml/yaml-test-suite/issues/34
+---
+# Empty
+...

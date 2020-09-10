@@ -1,0 +1,8 @@
+tnode5one: &no
+  &k6 {4, 5}:
+top4: &node4
+  &k4 key4: fo
+  &k3k4 ka4:
+  key6: *k6
+op3:  
+&1:: bk

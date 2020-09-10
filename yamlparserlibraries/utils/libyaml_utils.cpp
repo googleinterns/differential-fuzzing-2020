@@ -479,12 +479,12 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
             default: 
                 break;
         }
-        // if (!libyaml_local_output.empty())
-        // {
-        //     std::cout << "------------------" << std::endl;
-        //     std::cout << libyaml_local_output.back() << std::endl;
-        //     std::cout << "------------------" << std::endl;
-        // }
+        if (!libyaml_local_output.empty())
+        {
+            std::cout << "------------------" << std::endl;
+            std::cout << libyaml_local_output.back() << std::endl;
+            std::cout << "------------------" << std::endl;
+        }
     }
 
     WipeEventList(event_list.get());

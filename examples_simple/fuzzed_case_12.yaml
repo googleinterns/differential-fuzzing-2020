@@ -1,0 +1,32 @@
+base: &base
+    name: Everyonese
+    name: Everyone has same name
+Afoo: &foo
+    <<: *base
+    age: 10
+
+bar: &bar
+    <<: *base
+    age:e: &base
+    name: Everyonese
+    name: Everyone has same name
+Afoo: &foo
+    <<: *base
+    age: 10
+
+bar: &bar
+    <<: *base
+    age: 2 has same name
+Afoo: &foo
+    <<: *base
+    age: 10
+
+bar: &bar
+    <<:  2 has same name
+Afoo: &foo
+    <<: *base
+    age: 10
+
+bar: &bar
+    <<: *base
+    age: 20
