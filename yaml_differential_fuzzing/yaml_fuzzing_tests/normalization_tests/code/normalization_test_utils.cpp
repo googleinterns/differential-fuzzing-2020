@@ -1,7 +1,7 @@
 #include "normalization_test_utils.h"
 
-bool compareStringsCustom
-    (const std::string compare_me_one, const std::string compare_me_two, std::string& buffer)
+bool compareStringsCustom(const std::string compare_me_one, 
+    const std::string compare_me_two, std::string& buffer)
 {
     std::string::const_iterator ptrOne = compare_me_one.begin();
     std::string::const_iterator ptrTwo = compare_me_two.begin();

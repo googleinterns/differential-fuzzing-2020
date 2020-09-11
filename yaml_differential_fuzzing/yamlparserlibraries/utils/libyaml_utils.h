@@ -16,7 +16,7 @@
 
 namespace libyaml_parsing
 {
-std::vector<YAML::Node>* ParseLibyaml
-        (const uint8_t* input, size_t input_size, std::string* error_message_container);
+std::vector<YAML::Node>* ParseLibyaml(const uint8_t* input, 
+    size_t input_size, std::string* error_message_container);
 } // namespace libyaml_parsing
 #endif

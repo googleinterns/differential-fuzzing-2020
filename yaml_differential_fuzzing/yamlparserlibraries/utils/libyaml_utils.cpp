@@ -60,9 +60,9 @@ void AddTag(YAML::Node* current_node, yaml_char_t* tag)
     }
 }
 
-void AddToNode
-    (YAML::Node* add_to_me, YAML::Node* add_me, std::stack<YAML::Node>* key_stack, 
-    const mode_type* tracking_current_type, yaml_char_t* tag)
+void AddToNode(YAML::Node* add_to_me, YAML::Node* add_me, 
+    std::stack<YAML::Node>* key_stack, const mode_type* tracking_current_type, 
+    yaml_char_t* tag)
 {
     AddTag(add_me, tag);
 
@@ -95,8 +95,7 @@ void AddToNode
     }
 }
 
-bool EndEventAddition
-    (std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
+bool EndEventAddition(std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, bool is_map_key, std::stack<YAML::Node>* key_stack)
 {
     if (libyaml_local_output->size() > 1 && mode_stack->size() > 1)
@@ -125,7 +124,7 @@ bool EndEventAddition
     return is_map_key;
 }
 
-void RestartVariables (std::stack<YAML::Node>* key_stack,
+void RestartVariables(std::stack<YAML::Node>* key_stack,
     std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
     std::vector<YAML::Node>* libyaml_local_output, std::vector<YAML::Node>* libyaml_final_output,
     bool* is_map_key, std::map<std::string, YAML::Node>* anchor_map)
@@ -168,8 +167,8 @@ void WipeEventList(std::vector<yaml_event_t>* event_list)
     event_list->clear();
 }
 
-std::unique_ptr<std::vector<yaml_event_t>> GetEvents
-    (const uint8_t* input, size_t input_size, std::string* error_message_container)
+std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input, 
+    size_t input_size, std::string* error_message_container)
 {
     std::unique_ptr<std::vector<yaml_event_t>> event_list(new std::vector<yaml_event_t>);
 
@@ -234,8 +233,8 @@ bool RelevantTag(yaml_char_t* check_tag)
 
 } // anonymous namespace
 
-std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
-    (const uint8_t* input, size_t input_size, std::string* error_message_container)
+std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input, 
+    size_t input_size, std::string* error_message_container)
 {
     std::vector<YAML::Node> libyaml_local_output;
 

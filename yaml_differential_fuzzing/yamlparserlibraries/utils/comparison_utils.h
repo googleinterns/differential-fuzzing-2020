@@ -12,8 +12,8 @@
 
 namespace compare_utils
 {
-bool CompareMultipleNodes
-    (std::vector<YAML::Node>* compare_me_one, std::vector<YAML::Node>* compare_me_two);
+bool CompareMultipleNodes(std::vector<YAML::Node>* compare_me_one, 
+    std::vector<YAML::Node>* compare_me_two);
 }
 
 #endif

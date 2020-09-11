@@ -2,8 +2,8 @@
 
 namespace
 {
-static bool CompareSingleNode
-    (YAML::Node* compare_me_one,YAML::Node* compare_me_two)
+static bool CompareSingleNode(YAML::Node* compare_me_one,
+    YAML::Node* compare_me_two)
 {
     std::stringstream stream_node_one;
     std::stringstream stream_node_two;
@@ -32,8 +32,8 @@ namespace compare_utils
 // --------------------------- emitter based comparison ----------------------------
 // ---------------------------------------------------------------------------------
 
-bool CompareMultipleNodes
-    (std::vector<YAML::Node>* compare_me_one, std::vector<YAML::Node>* compare_me_two)
+bool CompareMultipleNodes(std::vector<YAML::Node>* compare_me_one, 
+    std::vector<YAML::Node>* compare_me_two)
 {
     std::vector<YAML::Node>::iterator iterator_one = compare_me_one->begin();
     std::vector<YAML::Node>::iterator iterator_two = compare_me_two->begin();
