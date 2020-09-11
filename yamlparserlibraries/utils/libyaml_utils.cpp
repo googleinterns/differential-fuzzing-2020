@@ -378,6 +378,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                         else
                         {
                             TEST_PPRINT("empty\n");
+
                             if (mode_stack.top() ==  mode_type::SEQUENCE_TYPE)
                             {
                                 TEST_PPRINT("sequence\n");
@@ -387,6 +388,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                                 {
                                     if (libyaml_local_output.back().IsSequence())
                                     {
+                                        TEST_PPRINT("insert\n");
                                         libyaml_local_output.back().push_back(add_me);
                                     }
                                 }
@@ -394,6 +396,17 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                                 break;
                             }
 
+                            if (mode_stack.top() ==  mode_type::MAP_TYPE && !map_mode)
+                            {
+                                map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+
+                                add_me = YAML::Node(YAML::NodeType::Null);
+
+                                AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
+                                    event->data.scalar.tag);
+                                
+                                break;
+                            }
                             mode_stack.pop();
 
                             if (!mode_stack.empty())
@@ -407,11 +420,13 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
 
                                 if (!libyaml_local_output.empty())
                                 {
+                                    TEST_PPRINT("pop\n");
                                     libyaml_local_output.pop_back();
                                 }
                             }
                             else
                             {
+                                TEST_PPRINT("insert\n");
                                 libyaml_local_output.push_back(YAML::Node());
                             }
                         }
@@ -439,6 +454,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                     }            
                     else
                     {
+                        TEST_PPRINT("Add to node\n");
                         AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                             event->data.scalar.tag);
                     }
@@ -479,12 +495,13 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
             default: 
                 break;
         }
-        if (!libyaml_local_output.empty())
-        {
-            std::cout << "------------------" << std::endl;
-            std::cout << libyaml_local_output.back() << std::endl;
-            std::cout << "------------------" << std::endl;
-        }
+        // if (!libyaml_local_output.empty())
+        // {
+        //     std::cout << "------------------" << std::endl;
+        //     std::cout << libyaml_local_output.back() << std::endl;
+        //     std::cout << "------------------" << std::endl;
+        // }
+        TEST_PPRINT("---------\n");
     }
 
     WipeEventList(event_list.get());

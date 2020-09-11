@@ -15,11 +15,29 @@ enum class comparison_type_results
     SAME = 0, 
     DIFFERENT_ERROR = 1,
     DIFFERENT_DATA = 2,
+    ERROR_IN_ONE = 3,
 };
+
+// bool OneEmptyTranslator(differential_parser::NormalizedOutput* check_me_1) 
+// {
+//     if (static_cast<std::vector<YAML::Node>*>(check_me_1->getData())->size() == 1)
+//     {
+//         if (static_cast<std::vector<YAML::Node>*>(check_me_1->getData())->back().IsScalar())
+//         {
+
+//         }
+//     }
+//     return false;
+// }
 
 comparison_type_results CustomEquivalent(differential_parser::NormalizedOutput* compare_point_one, 
     differential_parser::NormalizedOutput* compare_point_two)
 {
+    std::vector<YAML::Node>* data_one = 
+        static_cast<std::vector<YAML::Node>*>(compare_point_one->getData());
+
+    std::vector<YAML::Node>* data_two = 
+        static_cast<std::vector<YAML::Node>*>(compare_point_two->getData());
     if (!compare_point_one->getError()->empty() || !compare_point_two->getError()->empty())
     {
         if (*compare_point_one->getError() == *compare_point_two->getError())
