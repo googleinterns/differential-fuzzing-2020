@@ -361,7 +361,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                         if(event->data.scalar.length != 0)
                         {
                             anchor_map[temp_translator] = add_me;
-                            
+
                             map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                             if (libyaml_local_output.empty())
