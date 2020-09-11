@@ -46,10 +46,18 @@ bool runTest(const char* file_path)
         differential_parser::NormalizedOutput* libyaml_test_normalized_output = libyaml_case->normalize
             (libyaml_parsed_data, std::move(libyaml_error_string));
 
-        bool return_me = (libyaml_test_normalized_output->equivalent(yamlcpp_test_normalized_output));
+        bool return_me = false;
+        if (yamlcpp_test_normalized_output != nullptr)
+        {
+            return_me = (yamlcpp_test_normalized_output->equivalent(libyaml_test_normalized_output));
+            delete yamlcpp_test_normalized_output;
+        }
+        else
+        {
+            return_me = libyaml_test_normalized_output == nullptr;
+        }
 
-        delete yamlcpp_test_normalized_output;
-        delete libyaml_test_normalized_output;
+        if (libyaml_test_normalized_output != nullptr) delete libyaml_test_normalized_output;
 
         return return_me;
     }

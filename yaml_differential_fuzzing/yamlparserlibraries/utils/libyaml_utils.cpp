@@ -60,8 +60,8 @@ void AddTag(const yaml_char_t* tag, YAML::Node* current_node)
     }
 }
 
-void AddToNode(YAML::Node* add_to_me, YAML::Node* add_me, 
-    std::stack<YAML::Node>* key_stack, const mode_type* tracking_current_type, 
+void AddToNode(const mode_type* tracking_current_type, YAML::Node* add_to_me, YAML::Node* add_me, 
+    std::stack<YAML::Node>* key_stack, 
     yaml_char_t* tag)
 {
     AddTag(tag, add_me);
@@ -119,7 +119,7 @@ bool EndEventAddition(bool is_map_key, std::vector<YAML::Node>* libyaml_local_ou
 
         libyaml_local_output->pop_back();
 
-        AddToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
+        AddToNode(&temp_position_info, &libyaml_local_output->back(), &temp_node, key_stack, nullptr);
     }
     return is_map_key;
 }
@@ -376,7 +376,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                             }
                             else
                             {
-                                AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
+                                AddToNode(&tracking_current_type, &libyaml_local_output.back(), &add_me, &key_stack, 
                                     event->data.scalar.tag);
                             }
                         }
@@ -407,7 +407,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                                 add_me = YAML::Node(YAML::NodeType::Null);
 
-                                AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
+                                AddToNode(&tracking_current_type, &libyaml_local_output.back(), &add_me, &key_stack, 
                                     event->data.scalar.tag);
                                 
                                 break;
@@ -460,11 +460,10 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                     else
                     {
                         TEST_PPRINT("Add to node\n");
-                        AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
+                        AddToNode(&tracking_current_type, &libyaml_local_output.back(), &add_me, &key_stack,
                             event->data.scalar.tag);
                     }
                 }
-
                 break;
             }
             case YAML_ALIAS_EVENT:
@@ -482,8 +481,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                     is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
-                    AddToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
-                        &key_stack, &tracking_current_type, nullptr);
+                    AddToNode(&tracking_current_type, &libyaml_local_output.back(), &anchor_map[temp_translator], 
+                        &key_stack, nullptr);
                 }
                 else
                 {
@@ -493,7 +492,9 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                     *error_message_container = std::string("ERROR");
 
-                    return libyaml_final_output;
+                    delete libyaml_final_output;
+
+                    return nullptr;
                 }
                 break;
             }
