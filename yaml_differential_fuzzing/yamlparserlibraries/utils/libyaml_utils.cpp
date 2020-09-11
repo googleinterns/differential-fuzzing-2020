@@ -15,7 +15,7 @@ enum class mode_type
     UNKNOWN_TYPE = 4
 };
 
-bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_type, const bool is_map_key)
+bool FindModeType(const mode_type reference_type, const bool is_map_key, mode_type* add_to_me)
 {
     if (add_to_me != nullptr)
     {
@@ -43,7 +43,7 @@ bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_type, cons
     return is_map_key;
 }
 
-void AddTag(YAML::Node* current_node, yaml_char_t* tag)
+void AddTag(const yaml_char_t* tag, YAML::Node* current_node)
 {
     if (current_node != nullptr)
     {
@@ -64,7 +64,7 @@ void AddToNode(YAML::Node* add_to_me, YAML::Node* add_me,
     std::stack<YAML::Node>* key_stack, const mode_type* tracking_current_type, 
     yaml_char_t* tag)
 {
-    AddTag(add_me, tag);
+    AddTag(tag, add_me);
 
     if (tracking_current_type != nullptr && add_to_me != nullptr)
     {
@@ -95,8 +95,8 @@ void AddToNode(YAML::Node* add_to_me, YAML::Node* add_me,
     }
 }
 
-bool EndEventAddition(std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
-    std::stack<bool>* map_mode_stack, bool is_map_key, std::stack<YAML::Node>* key_stack)
+bool EndEventAddition(bool is_map_key, std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
+    std::stack<bool>* map_mode_stack, std::stack<YAML::Node>* key_stack)
 {
     if (libyaml_local_output->size() > 1 && mode_stack->size() > 1)
     {
@@ -113,7 +113,7 @@ bool EndEventAddition(std::vector<YAML::Node>* libyaml_local_output, std::stack<
         {
             return is_map_key;
         }
-        PositionAnalysis(&temp_position_info, (mode_stack->top()), !is_map_key);
+        FindModeType(mode_stack->top(), !is_map_key, &temp_position_info);
 
         YAML::Node temp_node = libyaml_local_output->back();
 
@@ -168,7 +168,7 @@ void WipeEventList(std::vector<yaml_event_t>* event_list)
 }
 
 std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input, 
-    size_t input_size, std::string* error_message_container)
+    const size_t input_size, std::string* error_message_container)
 {
     std::unique_ptr<std::vector<yaml_event_t>> event_list(new std::vector<yaml_event_t>);
 
@@ -284,24 +284,24 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             case YAML_MAPPING_END_EVENT:
                 TEST_PPRINT("MAP-\n");
 
-                is_map_key = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, is_map_key, &key_stack);
+                is_map_key = EndEventAddition(is_map_key, &libyaml_local_output, &mode_stack, &map_mode_stack, &key_stack);
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
                 TEST_PPRINT("SQU-\n");
 
-                is_map_key = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, is_map_key, &key_stack);
+                is_map_key = EndEventAddition(is_map_key, &libyaml_local_output, &mode_stack, &map_mode_stack, &key_stack);
 
                 break;
             case YAML_MAPPING_START_EVENT:
                 TEST_PPRINT("MAP+\n");
 
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Map));
-                AddTag(&libyaml_local_output.back(), event->data.sequence_start.tag);
+                AddTag(event->data.sequence_start.tag, &libyaml_local_output.back());
 
                 if (!mode_stack.empty())
                 {
-                    PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
+                    FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
@@ -322,7 +322,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             case YAML_SEQUENCE_START_EVENT:
                 TEST_PPRINT("SQU+\n");
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
-                AddTag(&libyaml_local_output.back(), event->data.sequence_start.tag);
+                AddTag(event->data.sequence_start.tag, &libyaml_local_output.back());
 
                 if (!mode_stack.empty())
                 {
@@ -348,7 +348,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 TEST_PPRINT("SCL\n");
 
                 YAML::Node add_me(std::string((char*)event->data.scalar.value, event->data.scalar.length));
-                AddTag(&add_me, event->data.scalar.tag);
+                AddTag(event->data.scalar.tag, &add_me);
 
                 if (event->data.scalar.anchor)
                 {
@@ -367,7 +367,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                         {
                             anchor_map[temp_translator] = add_me;
 
-                            is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
+                            is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
                             if (libyaml_local_output.empty())
                             {
@@ -403,7 +403,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                             if (mode_stack.top() ==  mode_type::MAP_TYPE && !is_map_key)
                             {
-                                is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
+                                is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
                                 add_me = YAML::Node(YAML::NodeType::Null);
 
@@ -444,7 +444,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                     {
                         break;
                     }
-                    is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
+                    is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
                     if (event->data.scalar.length <= 0 && !RelevantTag(event->data.scalar.tag) && 
                             event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
@@ -480,7 +480,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                         break;
                     }
 
-                    is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
+                    is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
                     AddToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
                         &key_stack, &tracking_current_type, nullptr);
