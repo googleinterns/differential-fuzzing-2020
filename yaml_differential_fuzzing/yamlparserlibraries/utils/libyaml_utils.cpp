@@ -6,6 +6,14 @@
 // ---------------------------------------------------------------------------------
 namespace
 {
+enum class mode_type 
+{
+    MAP_TYPE = 0, 
+    KEY_TYPE = 1, 
+    VALUE_TYPE = 2, 
+    SEQUENCE_TYPE = 3, 
+    UNKNOWN_TYPE = 4
+};
 
 bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_character, const bool map_mode)
 {
@@ -41,7 +49,7 @@ void AddTag(YAML::Node* current_node, yaml_char_t* tag)
     {
         if (tag)
         {
-            std::string temp_tag_translator = ((char*)tag);
+            std::string temp_tag_translator = ((char*) tag);
 
             current_node->SetTag(temp_tag_translator);                    
         }
@@ -150,6 +158,16 @@ void RestartVariables (std::stack<YAML::Node>* key_stack,
     anchor_map->clear();
 }
 
+void WipeEventList(std::vector<yaml_event_t>* event_list)
+{
+    for (std::vector<yaml_event_t>::iterator it = event_list->begin();
+        it != event_list->end(); ++ it)
+    {
+        yaml_event_delete(&(*it));
+    }
+    event_list->clear();
+}
+
 std::unique_ptr<std::vector<yaml_event_t>> GetEvents
     (const uint8_t* input, size_t input_size, std::string* error_message_container)
 {
@@ -169,8 +187,6 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents
 
     yaml_parser_set_input_string(&parser, input, input_size);
     
-    int done = 0;
-
     while (true) 
     {
         yaml_event_type_t type;
@@ -205,16 +221,18 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents
     return std::move(event_list);
 }
 
-void WipeEventList(std::vector<yaml_event_t>* event_list)
+bool RelevantTag(yaml_char_t* check_tag)
 {
-    for (std::vector<yaml_event_t>::iterator it = event_list->begin();
-        it != event_list->end(); ++ it)
+    if (check_tag != nullptr)
     {
-        yaml_event_delete(&(*it));
+        std::string temp_tag_translator = ((char*) check_tag);
+
+        return temp_tag_translator != "!" && temp_tag_translator != "?";
     }
-    event_list->clear();
+    return false;
 }
-}
+
+} // anonymous namespace
 
 std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
     (const uint8_t* input, size_t input_size, std::string* error_message_container)
@@ -349,7 +367,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                         if(event->data.scalar.length != 0)
                         {
                             anchor_map[temp_translator] = add_me;
-                            
+
                             map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
                             if (libyaml_local_output.empty())
@@ -366,6 +384,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                         else
                         {
                             TEST_PPRINT("empty\n");
+
                             if (mode_stack.top() ==  mode_type::SEQUENCE_TYPE)
                             {
                                 TEST_PPRINT("sequence\n");
@@ -375,6 +394,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                                 {
                                     if (libyaml_local_output.back().IsSequence())
                                     {
+                                        TEST_PPRINT("insert\n");
                                         libyaml_local_output.back().push_back(add_me);
                                     }
                                 }
@@ -382,6 +402,17 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                                 break;
                             }
 
+                            if (mode_stack.top() ==  mode_type::MAP_TYPE && !map_mode)
+                            {
+                                map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+
+                                add_me = YAML::Node(YAML::NodeType::Null);
+
+                                AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
+                                    event->data.scalar.tag);
+                                
+                                break;
+                            }
                             mode_stack.pop();
 
                             if (!mode_stack.empty())
@@ -395,11 +426,13 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
 
                                 if (!libyaml_local_output.empty())
                                 {
+                                    TEST_PPRINT("pop\n");
                                     libyaml_local_output.pop_back();
                                 }
                             }
                             else
                             {
+                                TEST_PPRINT("insert\n");
                                 libyaml_local_output.push_back(YAML::Node());
                             }
                         }
@@ -414,7 +447,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                     }
                     map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
 
-                    if (event->data.scalar.length <= 0 && !event->data.scalar.tag && 
+                    if (event->data.scalar.length <= 0 && !RelevantTag(event->data.scalar.tag) && 
                             event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
                         TEST_PPRINT("Begin from nothing\n");
@@ -427,6 +460,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                     }            
                     else
                     {
+                        TEST_PPRINT("Add to node\n");
                         AddToNode(&libyaml_local_output.back(), &add_me, &key_stack, &tracking_current_type, 
                             event->data.scalar.tag);
                     }
@@ -467,6 +501,13 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
             default: 
                 break;
         }
+        // if (!libyaml_local_output.empty())
+        // {
+        //     std::cout << "------------------" << std::endl;
+        //     std::cout << libyaml_local_output.back() << std::endl;
+        //     std::cout << "------------------" << std::endl;
+        // }
+        TEST_PPRINT("---------\n");
     }
 
     WipeEventList(event_list.get());
