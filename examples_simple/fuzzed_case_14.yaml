@@ -1,22 +1,8 @@
-base: &base
-    name: Everymnese
-    name: Everyone has same name
-Afoo: &foo
-    <<: *base
-    age: 10
-
-bar: &bar
- #  <<: *base
-    age:e: &base
-    name: Everyonese
-    name: Everyone has same name
-Afoo: &foo
-    <<
-bar: &bar
-    <<:  2 has same name
-Afoo: &foo
-    <<: *base
-    age: 1
-bar: &bar
-    <<: *base
-    age: 20
+base: &1
+  name: Everymnese
+  name: Everyone has same name
+Afoo:
+  <<: *1
+  age: 10
+bar:
+  age:e: &2 ~

@@ -1,4 +1,4 @@
 top1p1: 
   &k1 key1: one
-top2: &node2 # comm1:
+top2: 
   &k1 [key1, bop]: one
