@@ -15,13 +15,13 @@ enum class mode_type
     UNKNOWN_TYPE = 4
 };
 
-bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_character, const bool map_mode)
+bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_type, const bool is_map_key)
 {
     if (add_to_me != nullptr)
     {
-        if (reference_character ==  mode_type::MAP_TYPE)
+        if (reference_type ==  mode_type::MAP_TYPE)
         {
-            if (map_mode)
+            if (is_map_key)
             {
                 *add_to_me =  mode_type::KEY_TYPE;
             }
@@ -29,9 +29,9 @@ bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_character,
             {
                 *add_to_me =  mode_type::VALUE_TYPE;
             }
-            return !map_mode;
+            return !is_map_key;
         }
-        else if (reference_character ==  mode_type::SEQUENCE_TYPE)
+        else if (reference_type ==  mode_type::SEQUENCE_TYPE)
         {
             *add_to_me =  mode_type::SEQUENCE_TYPE;
         }
@@ -40,7 +40,7 @@ bool PositionAnalysis(mode_type* add_to_me, const mode_type reference_character,
             *add_to_me =  mode_type::UNKNOWN_TYPE;
         }
     }
-    return map_mode;
+    return is_map_key;
 }
 
 void AddTag(YAML::Node* current_node, yaml_char_t* tag)
@@ -61,30 +61,30 @@ void AddTag(YAML::Node* current_node, yaml_char_t* tag)
 }
 
 void AddToNode
-    (YAML::Node* addToMe, YAML::Node* add_me, std::stack<YAML::Node>* key_stack, 
+    (YAML::Node* add_to_me, YAML::Node* add_me, std::stack<YAML::Node>* key_stack, 
     const mode_type* tracking_current_type, yaml_char_t* tag)
 {
     AddTag(add_me, tag);
-    
-    if (tracking_current_type != nullptr && addToMe != nullptr)
+
+    if (tracking_current_type != nullptr && add_to_me != nullptr)
     {
-        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE && addToMe->IsSequence())
+        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE && add_to_me->IsSequence())
         {
             TEST_PPRINT("squ type\n")
-            addToMe->push_back(*add_me);
+            add_to_me->push_back(*add_me);
         }
-        else if (*tracking_current_type ==  mode_type::KEY_TYPE && addToMe->IsMap())
+        else if (*tracking_current_type ==  mode_type::KEY_TYPE && add_to_me->IsMap())
         {
             TEST_PPRINT("key type\n")
             key_stack->push(*add_me);
-            (*addToMe)[*add_me];
+            (*add_to_me)[*add_me];
         }
-        else if (*tracking_current_type ==  mode_type::VALUE_TYPE && addToMe->IsMap())
+        else if (*tracking_current_type ==  mode_type::VALUE_TYPE && add_to_me->IsMap())
         {
             TEST_PPRINT("map type\n")
             if (!key_stack->empty())
             {
-                (*addToMe)[key_stack->top()] = *add_me;
+                (*add_to_me)[key_stack->top()] = *add_me;
                 key_stack->pop();
             }
         }
@@ -97,7 +97,7 @@ void AddToNode
 
 bool EndEventAddition
     (std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
-    std::stack<bool>* map_mode_stack, bool map_mode, std::stack<YAML::Node>* key_stack)
+    std::stack<bool>* map_mode_stack, bool is_map_key, std::stack<YAML::Node>* key_stack)
 {
     if (libyaml_local_output->size() > 1 && mode_stack->size() > 1)
     {
@@ -105,16 +105,16 @@ bool EndEventAddition
 
         if (mode_stack->top() == mode_type::MAP_TYPE && !map_mode_stack->empty())
         {
-            map_mode = map_mode_stack->top();
+            is_map_key = map_mode_stack->top();
             map_mode_stack->pop();
         }
         mode_type temp_position_info;
 
         if (mode_stack->empty())
         {
-            return map_mode;
+            return is_map_key;
         }
-        PositionAnalysis(&temp_position_info, (mode_stack->top()), !map_mode);
+        PositionAnalysis(&temp_position_info, (mode_stack->top()), !is_map_key);
 
         YAML::Node temp_node = libyaml_local_output->back();
 
@@ -122,13 +122,13 @@ bool EndEventAddition
 
         AddToNode(&libyaml_local_output->back(), &temp_node, key_stack, &temp_position_info, nullptr);
     }
-    return map_mode;
+    return is_map_key;
 }
 
 void RestartVariables (std::stack<YAML::Node>* key_stack,
     std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
     std::vector<YAML::Node>* libyaml_local_output, std::vector<YAML::Node>* libyaml_final_output,
-    bool* map_mode, std::map<std::string, YAML::Node>* anchor_map)
+    bool* is_map_key, std::map<std::string, YAML::Node>* anchor_map)
 {
     while (!key_stack->empty())
     {
@@ -153,7 +153,7 @@ void RestartVariables (std::stack<YAML::Node>* key_stack,
 
     libyaml_local_output->clear();
 
-    *map_mode = true;
+    *is_map_key = true;
 
     anchor_map->clear();
 }
@@ -249,7 +249,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
 
     std::stack<bool> map_mode_stack;
 
-    bool map_mode = true;
+    bool is_map_key = true;
     
     std::map<std::string, YAML::Node> anchor_map;
 
@@ -271,27 +271,27 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                 TEST_PPRINT("DOC-\n");
 
                 RestartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
-                    libyaml_final_output, &map_mode, &anchor_map);
+                    libyaml_final_output, &is_map_key, &anchor_map);
 
                 break;        
             case YAML_DOCUMENT_START_EVENT:
                 TEST_PPRINT("DOC+\n");
 
                 RestartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
-                    libyaml_final_output, &map_mode, &anchor_map);
+                    libyaml_final_output, &is_map_key, &anchor_map);
 
                 break;
 
             case YAML_MAPPING_END_EVENT:
                 TEST_PPRINT("MAP-\n");
 
-                map_mode = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
+                is_map_key = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, is_map_key, &key_stack);
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
                 TEST_PPRINT("SQU-\n");
 
-                map_mode = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, map_mode, &key_stack);
+                is_map_key = EndEventAddition(&libyaml_local_output, &mode_stack, &map_mode_stack, is_map_key, &key_stack);
 
                 break;
             case YAML_MAPPING_START_EVENT:
@@ -302,16 +302,16 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
 
                 if (!mode_stack.empty())
                 {
-                    PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
 
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
-                        map_mode_stack.push(!map_mode);
+                        map_mode_stack.push(!is_map_key);
                     }
                 }
 
                 mode_stack.push(mode_type::MAP_TYPE);
-                map_mode = true;
+                is_map_key = true;
 
                 if (event->data.mapping_start.anchor)
                 {
@@ -329,7 +329,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                 {
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
-                        map_mode_stack.push(!map_mode);
+                        map_mode_stack.push(!is_map_key);
                     }
                 }
 
@@ -368,7 +368,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                         {
                             anchor_map[temp_translator] = add_me;
 
-                            map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                            is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
 
                             if (libyaml_local_output.empty())
                             {
@@ -402,9 +402,9 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                                 break;
                             }
 
-                            if (mode_stack.top() ==  mode_type::MAP_TYPE && !map_mode)
+                            if (mode_stack.top() ==  mode_type::MAP_TYPE && !is_map_key)
                             {
-                                map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                                is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
 
                                 add_me = YAML::Node(YAML::NodeType::Null);
 
@@ -420,7 +420,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                                 if (mode_stack.top() ==  mode_type::MAP_TYPE)
                                 {
                                     TEST_PPRINT("map\n");
-                                    map_mode = map_mode_stack.top();
+                                    is_map_key = map_mode_stack.top();
                                     map_mode_stack.pop();
                                 }
 
@@ -445,7 +445,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                     {
                         break;
                     }
-                    map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
 
                     if (event->data.scalar.length <= 0 && !RelevantTag(event->data.scalar.tag) && 
                             event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
@@ -481,7 +481,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                         break;
                     }
 
-                    map_mode = PositionAnalysis(&tracking_current_type, mode_stack.top(), map_mode);
+                    is_map_key = PositionAnalysis(&tracking_current_type, mode_stack.top(), is_map_key);
 
                     AddToNode(&libyaml_local_output.back(), &anchor_map[temp_translator], 
                         &key_stack, &tracking_current_type, nullptr);
@@ -501,12 +501,6 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
             default: 
                 break;
         }
-        // if (!libyaml_local_output.empty())
-        // {
-        //     std::cout << "------------------" << std::endl;
-        //     std::cout << libyaml_local_output.back() << std::endl;
-        //     std::cout << "------------------" << std::endl;
-        // }
         TEST_PPRINT("---------\n");
     }
 
