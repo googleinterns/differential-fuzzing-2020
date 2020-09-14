@@ -394,7 +394,6 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                             if (libyaml_local_output.empty())
                             {
                                 libyaml_local_output.push_back(add_me);
-
                             }
                             else
                             {
