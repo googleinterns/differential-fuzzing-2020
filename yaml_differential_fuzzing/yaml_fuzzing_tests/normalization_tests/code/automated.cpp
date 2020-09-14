@@ -1,5 +1,7 @@
 #include "libyaml_parser.h"
 #include "yamlcpp_parser.h"
+#include "libyaml_parser.h"
+#include "utils/comparison_utils.h"
 
 #include <dirent.h>
 #include <sys/stat.h>
@@ -8,7 +10,74 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-bool runTest(const char* file_path)
+enum class comparison_type_results
+{
+    SAME = 0, 
+    DIFFERENT_ERROR = 1,
+    DIFFERENT_DATA = 2,
+    ERROR_IN_ONE = 3,
+};
+
+comparison_type_results CustomEquivalent(differential_parser::NormalizedOutput* compare_point_one, 
+    differential_parser::NormalizedOutput* compare_point_two)
+{
+    if (compare_point_two == nullptr)
+    {
+        if (!compare_point_one->getError()->empty())
+        {
+            return comparison_type_results::SAME;
+        }
+        else
+        {
+            return comparison_type_results::DIFFERENT_ERROR;
+        }
+    } 
+
+    if (!compare_point_one->getError()->empty() || !compare_point_two->getError()->empty())
+    {
+        if (*compare_point_one->getError() == *compare_point_two->getError())
+        {
+            return comparison_type_results::SAME;
+        }
+        else
+        {
+            return comparison_type_results::DIFFERENT_ERROR;
+        }
+    }
+    else
+    {
+        std::vector<YAML::Node>* data_one = 
+            static_cast<std::vector<YAML::Node>*>(compare_point_one->getData());
+
+        std::vector<YAML::Node>* data_two = 
+            static_cast<std::vector<YAML::Node>*>(compare_point_two->getData());
+
+        if (data_one && data_two)
+        {
+            if (compare_utils::CompareMultipleNodes(data_one, data_two))
+            {
+                return comparison_type_results::SAME;
+            }
+            else
+            {
+                return comparison_type_results::DIFFERENT_DATA;
+            }
+        }
+        else
+        {
+            if (data_one == data_two)
+            {
+                return comparison_type_results::SAME;
+            }
+            else
+            {
+                return comparison_type_results::DIFFERENT_DATA;
+            }
+        }
+    }
+}
+
+comparison_type_results runTest(const char* file_path)
 {
     FILE * file_descriptor = fopen(file_path, "rb");
 
@@ -46,18 +115,21 @@ bool runTest(const char* file_path)
         differential_parser::NormalizedOutput* libyaml_test_normalized_output = libyaml_case->normalize
             (libyaml_parsed_data, std::move(libyaml_error_string));
 
-        bool return_me = false;
+        comparison_type_results return_me = comparison_type_results::DIFFERENT_DATA;
         if (yamlcpp_test_normalized_output != nullptr)
         {
-            return_me = (yamlcpp_test_normalized_output->equivalent(libyaml_test_normalized_output));
-            delete yamlcpp_test_normalized_output;
+            return_me = CustomEquivalent(yamlcpp_test_normalized_output, libyaml_test_normalized_output);
         }
         else
         {
-            return_me = libyaml_test_normalized_output == nullptr;
+            if (libyaml_test_normalized_output == nullptr)
+            {
+                return_me = comparison_type_results::SAME;
+            }
         }
 
         if (libyaml_test_normalized_output != nullptr) delete libyaml_test_normalized_output;
+        if (yamlcpp_test_normalized_output != nullptr) delete yamlcpp_test_normalized_output;
 
         return return_me;
     }
@@ -65,7 +137,7 @@ bool runTest(const char* file_path)
     {
         std::cerr << "Failure reading file" << std::endl;
     }
-    return true;
+    return comparison_type_results::SAME;
 }
 
 // ---------------------------------------------------------------------------------
@@ -81,6 +153,9 @@ int main(int argc, char* args[])
 
     myfile.open("autoreport.txt");
 
+    std::vector<std::string> different_due_to_error;
+    std::vector<std::string> different_due_to_data;
+
     if ((dir = opendir (args[1])) != NULL) 
     {
         /* print all the files and directories within directory */
@@ -88,15 +163,42 @@ int main(int argc, char* args[])
         {
             if (ent->d_name[0] != '.')
             {
-                
-                if (!runTest(std::string(std::string(args[1]) + std::string(ent->d_name)).c_str()))
+                comparison_type_results test_result = runTest(std::string(std::string(args[1]) + std::string(ent->d_name)).c_str());
+                switch (test_result)
                 {
-                    std::cout << std::string(std::string(args[1]) + std::string(ent->d_name)) << std::endl;
-                    myfile << std::string(std::string(args[1]) + std::string(ent->d_name)) << std::endl;
+                case (comparison_type_results::DIFFERENT_ERROR):
+                    different_due_to_error.push_back(std::string(std::string(args[1]) + std::string(ent->d_name)));
+                    break;
+
+                case (comparison_type_results::DIFFERENT_DATA):
+                    different_due_to_data.push_back(std::string(std::string(args[1]) + std::string(ent->d_name)));
+                    break;
+                default:
+                    break;
                 }
             }
         }
         closedir (dir);
+    }
+
+    std::cout << "---------------- Data Difference:" << std::endl;
+    myfile << "---------------- Data Difference:" << std::endl;
+
+    while (!different_due_to_data.empty())
+    {
+        std::cout << different_due_to_data.back() << std::endl;
+        myfile << different_due_to_data.back() << std::endl;
+        different_due_to_data.pop_back();
+    }
+
+    std::cout << "---------------- Error Difference:" << std::endl;
+    myfile << "---------------- Error Difference:" << std::endl;
+
+    while (!different_due_to_error.empty())
+    {
+        std::cout << different_due_to_error.back() << std::endl;
+        myfile << different_due_to_error.back() << std::endl;
+        different_due_to_error.pop_back();
     }
     return 0;
 }

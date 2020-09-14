@@ -57,7 +57,7 @@ int main(int argc, char* args[])
 
         // yamlcpp_test_normalized_output->getData()
 
-        if (libyaml_test_normalized_output->equivalent(yamlcpp_test_normalized_output))
+        if (yamlcpp_test_normalized_output->equivalent(libyaml_test_normalized_output))
         {
             std::cout << "Cases equal!" << std::endl;
         }

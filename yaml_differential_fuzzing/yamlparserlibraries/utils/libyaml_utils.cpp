@@ -231,6 +231,17 @@ bool RelevantTag(yaml_char_t* check_tag)
     return false;
 }
 
+void InsertIntoAnchorMap(const std::string key, YAML::Node* insert_me, 
+    std::map<std::string, YAML::Node>* anchor_map)
+{
+    if (anchor_map->find(key) != anchor_map->end())
+    {
+        TEST_PPRINT("substitute\n");
+        anchor_map->erase(key);
+    }
+    (*anchor_map)[key] = *insert_me;
+}
+
 } // anonymous namespace
 
 std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input, 
@@ -315,7 +326,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 if (event->data.mapping_start.anchor)
                 {
                     TEST_PPRINT("ANCH-map+\n");
-                    anchor_map[std::string((char*)event->data.mapping_start.anchor)] = libyaml_local_output.back();
+                    InsertIntoAnchorMap(std::string((char*)event->data.mapping_start.anchor),
+                        &libyaml_local_output.back(), &anchor_map);
                 }
 
                 break;
@@ -338,7 +350,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 {
                     TEST_PPRINT("ANCH-squ+\n");
 
-                    anchor_map[std::string((char*)event->data.sequence_start.anchor)] = libyaml_local_output.back();
+                    InsertIntoAnchorMap(std::string((char*)event->data.sequence_start.anchor),
+                        &libyaml_local_output.back(), &anchor_map);
                 }
 
                 break;
@@ -347,7 +360,19 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             {
                 TEST_PPRINT("SCL\n");
 
-                YAML::Node add_me(std::string((char*)event->data.scalar.value, event->data.scalar.length));
+                std::string temp_scalar_string = std::string((char*) event->data.scalar.value, event->data.scalar.length);
+
+                YAML::Node add_me;
+                
+                if (temp_scalar_string == "~")
+                {
+                    add_me = YAML::Node(YAML::NodeType::Null);
+                }
+                else
+                {
+                    add_me =  YAML::Node(temp_scalar_string);
+                }
+
                 AddTag(event->data.scalar.tag, &add_me);
 
                 if (event->data.scalar.anchor)
@@ -365,7 +390,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                         if(event->data.scalar.length != 0)
                         {
-                            anchor_map[temp_translator] = add_me;
+                            InsertIntoAnchorMap(temp_translator,
+                                &add_me, &anchor_map);
 
                             is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 

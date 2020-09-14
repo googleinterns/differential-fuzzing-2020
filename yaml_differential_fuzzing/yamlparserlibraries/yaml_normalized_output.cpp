@@ -24,7 +24,7 @@ YamlNormalizedOutput::~YamlNormalizedOutput()
 
 bool YamlNormalizedOutput::equivalent(NormalizedOutput* compared_object)
 {
-    if (compared_object == nullptr) return false;
+    if (compared_object == nullptr) return !this->getError()->empty();
 
     if (!this->getError()->empty() || !compared_object->getError()->empty())
     {
