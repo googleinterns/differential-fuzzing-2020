@@ -55,7 +55,7 @@ void AddTag(const yaml_char_t* tag, YAML::Node* current_node)
 
             current_node->SetTag(temp_tag_translator);                    
         }
-        else if(current_node->Tag().empty())
+        else if (current_node->Tag().empty())
         {
             current_node->SetTag("?");
         }
@@ -78,7 +78,6 @@ void AddToNode(const mode_type* tracking_current_type, const yaml_char_t* tag, Y
         {
             TEST_PPRINT("key type\n")
             key_stack->push(*add_me);
-            // (*add_to_me)[*add_me];
         }
         else if (*tracking_current_type ==  mode_type::VALUE_TYPE && add_to_me->IsMap())
         {
@@ -110,10 +109,6 @@ bool EndEventAddition(bool is_map_key, std::vector<YAML::Node>* libyaml_local_ou
         }
         mode_type temp_position_info;
 
-        if (mode_stack->empty())
-        {
-            return is_map_key;
-        }
         FindModeType(mode_stack->top(), !is_map_key, &temp_position_info);
 
         YAML::Node temp_node = libyaml_local_output->back();
@@ -178,7 +173,7 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
 
     if (!yaml_parser_initialize(&parser)) 
     {
-        TEST_PPRINT("ERROR: Failed to initialize\n");
+        TEST_PPRINT("ERROR: Failed to initialize library parser\n");
 
         *error_message_container = std::string("ERROR");
 
@@ -197,7 +192,7 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
         {
             yaml_event_delete(&event);
 
-            TEST_PPRINT("ERROR: Bad parsing\n");
+            TEST_PPRINT("ERROR: Library unable to parse input\n");
 
             *error_message_container = std::string("ERROR");
 
@@ -221,7 +216,7 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
     return std::move(event_list);
 }
 
-bool RelevantTag(yaml_char_t* check_tag)
+bool IsExplicitTag(yaml_char_t* check_tag)
 {
     if (check_tag != nullptr)
     {
@@ -389,7 +384,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                     {
                         TEST_PPRINT("value\n");
 
-                        if(event->data.scalar.length != 0)
+                        if (event->data.scalar.length != 0)
                         {
                             InsertIntoAnchorMap(temp_translator,
                                 &add_me, &anchor_map);
@@ -473,7 +468,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                     }
                     is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
-                    if (event->data.scalar.length <= 0 && !RelevantTag(event->data.scalar.tag) && 
+                    if (event->data.scalar.length <= 0 && !IsExplicitTag(event->data.scalar.tag) && 
                             event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
                     {
                         TEST_PPRINT("Begin from nothing\n");
@@ -498,7 +493,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 std::string temp_translator = ((char*) event->data.alias.anchor);
                 
-                if(anchor_map.find(temp_translator) != anchor_map.end())
+                if (anchor_map.find(temp_translator) != anchor_map.end())
                 {
                     if (mode_stack.empty())
                     {
@@ -514,7 +509,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 {
                     WipeEventList(event_list.get());
 
-                    TEST_PPRINT("ERROR: Missing anchor\n");
+                    TEST_PPRINT("ERROR: Missing anchor causing fatal structure error\n");
 
                     *error_message_container = std::string("ERROR");
 
