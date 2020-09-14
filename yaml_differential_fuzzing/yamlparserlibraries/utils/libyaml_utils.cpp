@@ -34,13 +34,9 @@ bool FindModeType(const mode_type reference_type, const bool is_map_key, mode_ty
             }
             return !is_map_key;
         }
-        else if (reference_type ==  mode_type::SEQUENCE_TYPE)
-        {
-            *add_to_me =  mode_type::SEQUENCE_TYPE;
-        }
         else
         {
-            *add_to_me =  mode_type::UNKNOWN_TYPE;
+            *add_to_me =  reference_type;
         }
     }
     return is_map_key;
