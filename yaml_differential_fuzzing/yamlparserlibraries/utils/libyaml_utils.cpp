@@ -12,7 +12,8 @@ enum class mode_type
     KEY_TYPE = 1, 
     VALUE_TYPE = 2, 
     SEQUENCE_TYPE = 3, 
-    UNKNOWN_TYPE = 4
+    UNKNOWN_TYPE = 4,
+    EMPTY = 5
 };
 
 // Necessary for finding the current mode of the current state. Important sice
@@ -62,24 +63,24 @@ void AddTag(const yaml_char_t* tag, YAML::Node* current_node)
     }
 }
 
-void AddToNode(const mode_type* tracking_current_type, const yaml_char_t* tag, YAML::Node* add_to_me, YAML::Node* add_me, 
-    std::stack<YAML::Node>* key_stack)
+void AddToNode(const yaml_char_t* tag, YAML::Node* add_to_me, YAML::Node* add_me, 
+    std::stack<YAML::Node>* key_stack, const mode_type tracking_current_type = mode_type::EMPTY)
 {
     AddTag(tag, add_me);
 
-    if (tracking_current_type != nullptr && add_to_me != nullptr)
+    if (tracking_current_type != mode_type::EMPTY && add_to_me != nullptr)
     {
-        if (*tracking_current_type ==  mode_type::SEQUENCE_TYPE && add_to_me->IsSequence())
+        if (tracking_current_type ==  mode_type::SEQUENCE_TYPE && add_to_me->IsSequence())
         {
             TEST_PPRINT("squ type\n")
             add_to_me->push_back(*add_me);
         }
-        else if (*tracking_current_type ==  mode_type::KEY_TYPE && add_to_me->IsMap())
+        else if (tracking_current_type ==  mode_type::KEY_TYPE && add_to_me->IsMap())
         {
             TEST_PPRINT("key type\n")
             key_stack->push(*add_me);
         }
-        else if (*tracking_current_type ==  mode_type::VALUE_TYPE && add_to_me->IsMap())
+        else if (tracking_current_type ==  mode_type::VALUE_TYPE && add_to_me->IsMap())
         {
             TEST_PPRINT("map type\n")
             if (!key_stack->empty())
@@ -115,12 +116,12 @@ bool EndEventAddition(bool is_map_key, std::vector<YAML::Node>* libyaml_local_ou
 
         libyaml_local_output->pop_back();
 
-        AddToNode(&temp_position_info, nullptr, &libyaml_local_output->back(), &temp_node, key_stack);
+        AddToNode(nullptr, &libyaml_local_output->back(), &temp_node, key_stack, temp_position_info);
     }
     return is_map_key;
 }
 
-void RestartVariables(std::stack<YAML::Node>* key_stack,
+void BrushStateVariables(std::stack<YAML::Node>* key_stack,
     std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
     std::vector<YAML::Node>* libyaml_local_output, std::vector<YAML::Node>* libyaml_final_output,
     bool* is_map_key, std::map<std::string, YAML::Node>* anchor_map)
@@ -255,9 +256,12 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
     std::stack<bool> map_mode_stack;
 
-    bool is_map_key = true;
+    bool is_map_key;
     
     std::map<std::string, YAML::Node> anchor_map;
+
+    BrushStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+        libyaml_final_output, &is_map_key, &anchor_map);
 
     std::unique_ptr<std::vector<yaml_event_t>> event_list = 
         std::move(GetEvents(input, input_size, error_message_container));
@@ -276,14 +280,14 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             case YAML_DOCUMENT_END_EVENT:
                 TEST_PPRINT("DOC-\n");
 
-                RestartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                BrushStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     libyaml_final_output, &is_map_key, &anchor_map);
 
                 break;        
             case YAML_DOCUMENT_START_EVENT:
                 TEST_PPRINT("DOC+\n");
 
-                RestartVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                BrushStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     libyaml_final_output, &is_map_key, &anchor_map);
 
                 break;
@@ -397,8 +401,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                             }
                             else
                             {
-                                AddToNode(&tracking_current_type, event->data.scalar.tag, &libyaml_local_output.back(), 
-                                    &add_me, &key_stack);
+                                AddToNode(event->data.scalar.tag, &libyaml_local_output.back(), 
+                                    &add_me, &key_stack, tracking_current_type);
                             }
                         }
                         else
@@ -428,8 +432,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                                 add_me = YAML::Node(YAML::NodeType::Null);
 
-                                AddToNode(&tracking_current_type, event->data.scalar.tag, &libyaml_local_output.back(), 
-                                    &add_me, &key_stack);
+                                AddToNode(event->data.scalar.tag, &libyaml_local_output.back(), 
+                                    &add_me, &key_stack, tracking_current_type);
                                 
                                 break;
                             }
@@ -481,7 +485,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                     else
                     {
                         TEST_PPRINT("Add to node\n");
-                        AddToNode(&tracking_current_type, event->data.scalar.tag, &libyaml_local_output.back(), &add_me, &key_stack);
+                        AddToNode(event->data.scalar.tag, &libyaml_local_output.back(), &add_me, &key_stack, tracking_current_type);
                     }
                 }
                 break;
@@ -501,8 +505,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                     is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
-                    AddToNode(&tracking_current_type, nullptr, &libyaml_local_output.back(), 
-                        &anchor_map[temp_translator], &key_stack);
+                    AddToNode(nullptr, &libyaml_local_output.back(), 
+                        &anchor_map[temp_translator], &key_stack, tracking_current_type);
                 }
                 else
                 {
