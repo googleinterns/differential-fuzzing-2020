@@ -1,6 +1,0 @@
- - &a !!str abc
- - t 2
- - !!int &c 4
- - &d  abc
- - !!in2
- - !!int &c 4

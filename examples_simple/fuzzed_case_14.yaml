@@ -1,8 +1,0 @@
-base: &1
-  name: Everymnese
-  name: Everyone has same name
-Afoo:
-  <<: *1
-  age: 10
-bar:
-  age:e: &2 ~

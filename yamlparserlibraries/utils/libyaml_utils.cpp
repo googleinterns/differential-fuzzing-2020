@@ -419,7 +419,6 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml
                                         libyaml_local_output.back().push_back(add_me);
                                     }
                                 }
-
                                 break;
                             }
 

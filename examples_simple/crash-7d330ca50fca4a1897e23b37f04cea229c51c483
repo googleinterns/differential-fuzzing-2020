@@ -1,7 +1,0 @@
-top1: &node1
-  &nno key1: one
-top2: &node2ne
-p11:  
-  &k6 {4, 5}: baa
-122: *k6
-top13: av*l7
