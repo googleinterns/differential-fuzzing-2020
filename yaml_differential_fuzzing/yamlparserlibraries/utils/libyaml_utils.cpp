@@ -234,6 +234,151 @@ void InsertIntoAnchorMap(const std::string key, YAML::Node* insert_me,
     (*anchor_map)[key] = *insert_me;
 }
 
+// Parses case where we are in a scalar that is an anchor, but the
+// anchor itself is empty
+void ParseEmptyAnchorScalar(const std::vector<yaml_event_t>::iterator event, std::stack<YAML::Node>* key_stack,
+    std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
+    std::vector<YAML::Node>* libyaml_local_output,
+    bool* is_map_key, YAML::Node* add_me, mode_type* tracking_current_type)
+{
+    TEST_PPRINT("empty\n");
+
+    if (mode_stack->top() ==  mode_type::SEQUENCE_TYPE)
+    {
+        TEST_PPRINT("sequence\n");
+        *add_me = YAML::Node(YAML::NodeType::Null);
+
+        if (!libyaml_local_output->empty())
+        {
+            if (libyaml_local_output->back().IsSequence())
+            {
+                TEST_PPRINT("insert\n");
+                libyaml_local_output->back().push_back(*add_me);
+            }
+        }
+        return;
+    }
+
+    if (mode_stack->top() ==  mode_type::MAP_TYPE && !*is_map_key)
+    {
+        *is_map_key = FindModeType(mode_stack->top(), *is_map_key, tracking_current_type);
+
+        *add_me = YAML::Node(YAML::NodeType::Null);
+
+        AddToNode(event->data.scalar.tag, &libyaml_local_output->back(), 
+            add_me, key_stack, *tracking_current_type);
+        
+        return;
+    }
+    mode_stack->pop();
+
+    if (!mode_stack->empty())
+    {
+        if (mode_stack->top() ==  mode_type::MAP_TYPE)
+        {
+            TEST_PPRINT("map\n");
+            *is_map_key = map_mode_stack->top();
+            map_mode_stack->pop();
+        }
+
+        if (!libyaml_local_output->empty())
+        {
+            TEST_PPRINT("pop\n");
+            libyaml_local_output->pop_back();
+        }
+    }
+    else
+    {
+        TEST_PPRINT("insert\n");
+        libyaml_local_output->push_back(YAML::Node());
+    }
+}
+
+void ParseAnchorScalarContainingData(const std::vector<yaml_event_t>::iterator event, std::stack<YAML::Node>* key_stack,
+    std::stack<mode_type>* mode_stack, std::vector<YAML::Node>* libyaml_local_output,
+    bool* is_map_key, std::map<std::string, YAML::Node>* anchor_map, YAML::Node* add_me, 
+    mode_type* tracking_current_type, std::string* temp_translator)
+{
+    InsertIntoAnchorMap(*temp_translator, add_me, anchor_map);
+
+    *is_map_key = FindModeType(mode_stack->top(), *is_map_key, tracking_current_type);
+
+    if (libyaml_local_output->empty())
+    {
+        libyaml_local_output->push_back(*add_me);
+    }
+    else
+    {
+        AddToNode(event->data.scalar.tag, &libyaml_local_output->back(), 
+            add_me, key_stack, *tracking_current_type);
+    }
+}
+
+// handles cases where the scalar is an anchor
+void ParseAnchorScalar(const std::vector<yaml_event_t>::iterator event, std::stack<YAML::Node>* key_stack,
+    std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
+    std::vector<YAML::Node>* libyaml_local_output,
+    bool* is_map_key, std::map<std::string, YAML::Node>* anchor_map, YAML::Node* add_me, 
+    mode_type* tracking_current_type)
+{
+    TEST_PPRINT("ANCH-scl\n");
+
+    std::string temp_translator = ((char*) event->data.scalar.anchor);
+
+    if (mode_stack->empty())
+    {
+        return;
+    }
+
+    if (event->data.scalar.value)
+    {
+        TEST_PPRINT("value\n");
+
+        if (event->data.scalar.length != 0)
+        {
+            ParseAnchorScalarContainingData(event, key_stack, mode_stack, libyaml_local_output, 
+                is_map_key, anchor_map, add_me, tracking_current_type, &temp_translator);
+        }
+        else
+        {
+            ParseEmptyAnchorScalar(event, key_stack, mode_stack, map_mode_stack,
+                libyaml_local_output, is_map_key, add_me, tracking_current_type);
+        }
+    }
+}
+
+// Parses scalar case where we only have to deal with the scalar itself
+void ParseScalar(const std::vector<yaml_event_t>::iterator event, std::stack<YAML::Node>* key_stack,
+    std::stack<mode_type>* mode_stack,
+    std::vector<YAML::Node>* libyaml_local_output,
+    bool* is_map_key, YAML::Node* add_me, 
+    mode_type* tracking_current_type)
+{
+    TEST_PPRINT("normal\n");
+    if (mode_stack->empty())
+    {
+        return;
+    }
+    *is_map_key = FindModeType(mode_stack->top(), *is_map_key, tracking_current_type);
+
+    if (event->data.scalar.length <= 0 && !IsExplicitTag(event->data.scalar.tag) && 
+            event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
+    {
+        TEST_PPRINT("Begin from nothing\n");
+        *add_me = YAML::Node();
+    }
+
+    if (libyaml_local_output->empty())
+    {
+        libyaml_local_output->push_back(*add_me);
+    }            
+    else
+    {
+        TEST_PPRINT("Add to node\n");
+        AddToNode(event->data.scalar.tag, &libyaml_local_output->back(), add_me, key_stack, *tracking_current_type);
+    }
+}
+
 } // anonymous namespace
 
 std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input, 
@@ -379,116 +524,14 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 if (event->data.scalar.anchor)
                 {
-                    TEST_PPRINT("ANCH-scl\n");
-                    std::string temp_translator = ((char*)event->data.scalar.anchor);
-                    if (mode_stack.empty())
-                    {
-                        break;
-                    }
-
-                    if (event->data.scalar.value)
-                    {
-                        TEST_PPRINT("value\n");
-
-                        if (event->data.scalar.length != 0)
-                        {
-                            InsertIntoAnchorMap(temp_translator,
-                                &add_me, &anchor_map);
-
-                            is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
-
-                            if (libyaml_local_output.empty())
-                            {
-                                libyaml_local_output.push_back(add_me);
-                            }
-                            else
-                            {
-                                AddToNode(event->data.scalar.tag, &libyaml_local_output.back(), 
-                                    &add_me, &key_stack, tracking_current_type);
-                            }
-                        }
-                        else
-                        {
-                            TEST_PPRINT("empty\n");
-
-                            if (mode_stack.top() ==  mode_type::SEQUENCE_TYPE)
-                            {
-                                TEST_PPRINT("sequence\n");
-                                add_me = YAML::Node(YAML::NodeType::Null);
-
-                                if (!libyaml_local_output.empty())
-                                {
-                                    if (libyaml_local_output.back().IsSequence())
-                                    {
-                                        TEST_PPRINT("insert\n");
-                                        libyaml_local_output.back().push_back(add_me);
-                                    }
-                                }
-
-                                break;
-                            }
-
-                            if (mode_stack.top() ==  mode_type::MAP_TYPE && !is_map_key)
-                            {
-                                is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
-
-                                add_me = YAML::Node(YAML::NodeType::Null);
-
-                                AddToNode(event->data.scalar.tag, &libyaml_local_output.back(), 
-                                    &add_me, &key_stack, tracking_current_type);
-                                
-                                break;
-                            }
-                            mode_stack.pop();
-
-                            if (!mode_stack.empty())
-                            {
-                                if (mode_stack.top() ==  mode_type::MAP_TYPE)
-                                {
-                                    TEST_PPRINT("map\n");
-                                    is_map_key = map_mode_stack.top();
-                                    map_mode_stack.pop();
-                                }
-
-                                if (!libyaml_local_output.empty())
-                                {
-                                    TEST_PPRINT("pop\n");
-                                    libyaml_local_output.pop_back();
-                                }
-                            }
-                            else
-                            {
-                                TEST_PPRINT("insert\n");
-                                libyaml_local_output.push_back(YAML::Node());
-                            }
-                        }
-                    }
+                    ParseAnchorScalar(event, &key_stack, &mode_stack, &map_mode_stack,
+                        &libyaml_local_output, &is_map_key, &anchor_map, &add_me, 
+                        &tracking_current_type);
                 }
                 else
                 {
-                    TEST_PPRINT("normal\n");
-                    if (mode_stack.empty())
-                    {
-                        break;
-                    }
-                    is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
-
-                    if (event->data.scalar.length <= 0 && !IsExplicitTag(event->data.scalar.tag) && 
-                            event->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
-                    {
-                        TEST_PPRINT("Begin from nothing\n");
-                        add_me = YAML::Node();
-                    }
-
-                    if (libyaml_local_output.empty())
-                    {
-                        libyaml_local_output.push_back(add_me);
-                    }            
-                    else
-                    {
-                        TEST_PPRINT("Add to node\n");
-                        AddToNode(event->data.scalar.tag, &libyaml_local_output.back(), &add_me, &key_stack, tracking_current_type);
-                    }
+                    ParseScalar(event, &key_stack, &mode_stack, &libyaml_local_output,
+                        &is_map_key, &add_me, &tracking_current_type);
                 }
                 break;
             }
