@@ -8,12 +8,12 @@ namespace
 {
 enum class mode_type 
 {
-    MAP_TYPE = 0, 
+    EMPTY = 0, 
     KEY_TYPE = 1, 
     VALUE_TYPE = 2, 
     SEQUENCE_TYPE = 3, 
     UNKNOWN_TYPE = 4,
-    EMPTY = 5
+    MAP_TYPE = 5
 };
 
 // Necessary for finding the current mode of the current state. Important sice
@@ -37,6 +37,7 @@ bool FindModeType(const mode_type reference_type, const bool is_map_key, mode_ty
         else
         {
             *add_to_me =  reference_type;
+            return is_map_key;
         }
     }
     return is_map_key;
@@ -108,16 +109,16 @@ bool EndEventAddition(bool is_map_key, std::vector<YAML::Node>* libyaml_local_ou
 
         FindModeType(mode_stack->top(), !is_map_key, &temp_position_info);
 
-        YAML::Node temp_node = libyaml_local_output->back();
+        YAML::Node temp_local_output_back = libyaml_local_output->back();
 
         libyaml_local_output->pop_back();
 
-        AddToNode(nullptr, &libyaml_local_output->back(), &temp_node, key_stack, temp_position_info);
+        AddToNode(nullptr, &libyaml_local_output->back(), &temp_local_output_back, key_stack, temp_position_info);
     }
     return is_map_key;
 }
 
-void BrushStateVariables(std::stack<YAML::Node>* key_stack,
+void ResetStateVariables(std::stack<YAML::Node>* key_stack,
     std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
     std::vector<YAML::Node>* libyaml_local_output, std::vector<YAML::Node>* libyaml_final_output,
     bool* is_map_key, std::map<std::string, YAML::Node>* anchor_map)
@@ -208,8 +209,6 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
 
     yaml_parser_delete(&parser);
 
-    fflush(stdout);
-
     return std::move(event_list);
 }
 
@@ -256,7 +255,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
     
     std::map<std::string, YAML::Node> anchor_map;
 
-    BrushStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+    ResetStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
         libyaml_final_output, &is_map_key, &anchor_map);
 
     std::unique_ptr<std::vector<yaml_event_t>> event_list = 
@@ -283,14 +282,14 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             case YAML_DOCUMENT_END_EVENT:
                 TEST_PPRINT("DOC-\n");
 
-                BrushStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                ResetStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     libyaml_final_output, &is_map_key, &anchor_map);
 
                 break;        
             case YAML_DOCUMENT_START_EVENT:
                 TEST_PPRINT("DOC+\n");
 
-                BrushStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
+                ResetStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
                     libyaml_final_output, &is_map_key, &anchor_map);
 
                 break;
@@ -532,8 +531,6 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
     }
 
     WipeEventList(event_list.get());
-
-    fflush(stdout);
 
     return libyaml_final_output;
 }

@@ -116,6 +116,10 @@ int main()
     InternalComparisonMechanismTest((uint8_t*) "Bob", (uint8_t*) "Bob","", "");
     InternalComparisonMechanismTest((uint8_t*) "[]", (uint8_t*) "[]","", "");
     InternalComparisonMechanismTest((uint8_t*) "[&a a: b, *a]", (uint8_t*) "[&a a: b, *a]","", "");
+    std::cout << "--------- Error + Empty Test ---------" << std::endl;
+    std::cout << "----Expected output:" << std::endl;
+    std::cout << "- Cases equal" << std::endl;
+    std::cout << "- Equivalent" << std::endl;
     InternalComparisonMechanismTest((uint8_t*) "[1, 2", (uint8_t*) "[1, 2","", "");
 
     // Same data, but 1 error
@@ -128,6 +132,10 @@ int main()
     InternalComparisonMechanismTest((uint8_t*) "Bob", (uint8_t*) "Bob","Oops", "");
     InternalComparisonMechanismTest((uint8_t*) "[]", (uint8_t*) "[]","", "Oops");
     InternalComparisonMechanismTest((uint8_t*) "[&a a: b, *a]", (uint8_t*) "[&a a: b, *a]","Oops", "");
+    std::cout << "--------- Error + Empty Test ---------" << std::endl;
+    std::cout << "----Expected output:" << std::endl;
+    std::cout << "- Cases equal" << std::endl;
+    std::cout << "- Equivalent" << std::endl;
     InternalComparisonMechanismTest((uint8_t*) "[1, 2", (uint8_t*) "[1, 2","", "Oops");
 
     // Same data, but contain different error
@@ -140,6 +148,10 @@ int main()
     InternalComparisonMechanismTest((uint8_t*) "Bob", (uint8_t*) "Bob","Oops",  "Woops");
     InternalComparisonMechanismTest((uint8_t*) "[]", (uint8_t*) "[]", "Woops", "Oops");
     InternalComparisonMechanismTest((uint8_t*) "[&a a: b, *a]", (uint8_t*) "[&a a: b, *a]","Oops",  "Woops");
+        std::cout << "--------- Error + Empty Test ---------" << std::endl;
+    std::cout << "----Expected output:" << std::endl;
+    std::cout << "- Cases equal" << std::endl;
+    std::cout << "- Equivalent" << std::endl;
     InternalComparisonMechanismTest((uint8_t*) "[1, 2", (uint8_t*) "[1, 2", "Woops", "Oops");
 
     // Same data, but contain same error
@@ -152,6 +164,10 @@ int main()
     InternalComparisonMechanismTest((uint8_t*) "Bob", (uint8_t*) "Bob","Oops",  "Oops");
     InternalComparisonMechanismTest((uint8_t*) "[]", (uint8_t*) "[]", "Oops", "Oops");
     InternalComparisonMechanismTest((uint8_t*) "[&a a: b, *a]", (uint8_t*) "[&a a: b, *a]","Oops",  "Oops");
+    std::cout << "--------- Error + Empty Test ---------" << std::endl;
+    std::cout << "----Expected output:" << std::endl;
+    std::cout << "- Cases equal" << std::endl;
+    std::cout << "- Equivalent" << std::endl;
     InternalComparisonMechanismTest((uint8_t*) "[1, 2", (uint8_t*) "[1, 2", "Oops", "Oops");
 
     // Different data, and same error:
