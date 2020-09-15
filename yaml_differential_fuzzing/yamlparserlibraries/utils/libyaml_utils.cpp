@@ -209,7 +209,7 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
 
     yaml_parser_delete(&parser);
 
-    return std::move(event_list);
+    return event_list;
 }
 
 bool IsExplicitTag(yaml_char_t* check_tag)
@@ -258,8 +258,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
     ResetStateVariables(&key_stack, &mode_stack, &map_mode_stack, &libyaml_local_output,
         libyaml_final_output, &is_map_key, &anchor_map);
 
-    std::unique_ptr<std::vector<yaml_event_t>> event_list = 
-        std::move(GetEvents(input, input_size, error_message_container));
+    std::unique_ptr<std::vector<yaml_event_t>> event_list = GetEvents(input, input_size, 
+        error_message_container);
     
     if (!error_message_container->empty())
     {
