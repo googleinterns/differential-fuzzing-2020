@@ -310,7 +310,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 TEST_PPRINT("MAP+\n");
 
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Map));
-                AddTag(event->data.sequence_start.tag, &libyaml_local_output.back());
+                AddTag(event->data.mapping_start.tag, &libyaml_local_output.back());
 
                 if (!mode_stack.empty())
                 {
