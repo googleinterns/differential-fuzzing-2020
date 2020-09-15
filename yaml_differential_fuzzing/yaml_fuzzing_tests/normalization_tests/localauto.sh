@@ -1,6 +1,6 @@
 bash buildbase.sh
 
-bash buildyamlfuzzparsers.sh 
+bash buildyamlfuzzparsersauto.sh 
 
 source ./paths_and_variables.sh
 

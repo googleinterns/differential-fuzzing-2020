@@ -25,6 +25,17 @@ namespace compare_utils
 // --------------------------- emitter based comparison ----------------------------
 // ---------------------------------------------------------------------------------
 
+bool CheckForEmpty(std::vector<YAML::Node>*  compare_me)
+{
+    if (compare_me == nullptr) return true;
+
+    // if (compare_me->size() == 1)
+    // {
+    //     return !compare_me->back().IsDefined();
+    // }
+    return compare_me->empty();
+}
+
 bool CompareMultipleNodes(std::vector<YAML::Node>* compare_me_one, 
     std::vector<YAML::Node>* compare_me_two)
 {

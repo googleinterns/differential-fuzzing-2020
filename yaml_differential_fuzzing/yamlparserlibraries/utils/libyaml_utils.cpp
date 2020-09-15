@@ -189,7 +189,7 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
         {
             yaml_event_delete(&event);
 
-            TEST_PPRINT("ERROR: Library unable to parse input\n");
+            TEST_PPRINT("ERROR: Libyaml library unable to parse input\n");
 
             *error_message_container = std::string("ERROR");
 
@@ -262,6 +262,13 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
     std::unique_ptr<std::vector<yaml_event_t>> event_list = 
         std::move(GetEvents(input, input_size, error_message_container));
     
+    if (!error_message_container->empty())
+    {
+        delete libyaml_final_output;
+
+        return nullptr;
+    }
+
     for (std::vector<yaml_event_t>::iterator event = event_list.get()->begin();
         event != event_list.get()->end(); ++ event) 
     {

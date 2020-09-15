@@ -24,7 +24,17 @@ YamlNormalizedOutput::~YamlNormalizedOutput()
 
 bool YamlNormalizedOutput::equivalent(NormalizedOutput* compared_object)
 {
-    if (compared_object == nullptr) return !this->getError()->empty();
+    std::vector<YAML::Node>* data_one = this->data;
+
+    std::vector<YAML::Node>* data_two = 
+        dynamic_cast<yaml_normalization::YamlNormalizedOutput*>(compared_object)->data;
+
+    if (compare_utils::CheckForEmpty(data_one) && compare_utils::CheckForEmpty(data_two))
+    {
+        return true;
+    }
+
+    // if (compared_object == nullptr) return !this->getError()->empty();
 
     if (!this->getError()->empty() || !compared_object->getError()->empty())
     {
@@ -32,11 +42,6 @@ bool YamlNormalizedOutput::equivalent(NormalizedOutput* compared_object)
     }
     else
     {
-        std::vector<YAML::Node>* data_one = this->data;
-
-        std::vector<YAML::Node>* data_two = 
-            dynamic_cast<yaml_normalization::YamlNormalizedOutput*>(compared_object)->data;
-
         if (data_one && data_two)
         {
             return compare_utils::CompareMultipleNodes(data_one, data_two);

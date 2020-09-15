@@ -21,17 +21,16 @@ enum class comparison_type_results
 comparison_type_results CustomEquivalent(differential_parser::NormalizedOutput* compare_point_one, 
     differential_parser::NormalizedOutput* compare_point_two)
 {
-    if (compare_point_two == nullptr)
+    std::vector<YAML::Node>* data_one = 
+        static_cast<std::vector<YAML::Node>*>(compare_point_one->getData());
+
+    std::vector<YAML::Node>* data_two = 
+        static_cast<std::vector<YAML::Node>*>(compare_point_two->getData());
+
+    if (compare_utils::CheckForEmpty(data_one) && compare_utils::CheckForEmpty(data_two))
     {
-        if (!compare_point_one->getError()->empty())
-        {
-            return comparison_type_results::SAME;
-        }
-        else
-        {
-            return comparison_type_results::DIFFERENT_ERROR;
-        }
-    } 
+        return comparison_type_results::SAME;
+    }
 
     if (!compare_point_one->getError()->empty() || !compare_point_two->getError()->empty())
     {
@@ -46,12 +45,6 @@ comparison_type_results CustomEquivalent(differential_parser::NormalizedOutput* 
     }
     else
     {
-        std::vector<YAML::Node>* data_one = 
-            static_cast<std::vector<YAML::Node>*>(compare_point_one->getData());
-
-        std::vector<YAML::Node>* data_two = 
-            static_cast<std::vector<YAML::Node>*>(compare_point_two->getData());
-
         if (data_one && data_two)
         {
             if (compare_utils::CompareMultipleNodes(data_one, data_two))
@@ -63,18 +56,8 @@ comparison_type_results CustomEquivalent(differential_parser::NormalizedOutput* 
                 return comparison_type_results::DIFFERENT_DATA;
             }
         }
-        else
-        {
-            if (data_one == data_two)
-            {
-                return comparison_type_results::SAME;
-            }
-            else
-            {
-                return comparison_type_results::DIFFERENT_DATA;
-            }
-        }
     }
+    return comparison_type_results::DIFFERENT_DATA;
 }
 
 comparison_type_results runTest(const char* file_path)
@@ -119,6 +102,12 @@ comparison_type_results runTest(const char* file_path)
         if (yamlcpp_test_normalized_output != nullptr)
         {
             return_me = CustomEquivalent(yamlcpp_test_normalized_output, libyaml_test_normalized_output);
+            
+            if (yamlcpp_test_normalized_output->equivalent(libyaml_test_normalized_output)
+                && return_me != comparison_type_results::SAME)
+            {
+                std::cerr << "Comparison discrepancy with:\n" << file_path << std::endl;
+            }
         }
         else
         {

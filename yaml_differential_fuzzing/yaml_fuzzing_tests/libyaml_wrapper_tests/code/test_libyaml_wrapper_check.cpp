@@ -201,6 +201,10 @@ int main()
     InternalComparisonMechanismTest((uint8_t*) "[]", (uint8_t*) "{}", "Oops", "Oops");
     InternalComparisonMechanismTest((uint8_t*) "[&a a: b, *a]", (uint8_t*) "[&a e: b, *a]","Oops",  "Oops");
     InternalComparisonMechanismTest((uint8_t*) "[1, 2", (uint8_t*) "{fork: now}", "Oops", "Oops");
+
+    std::cout << "---------------- Just errors ---------------" << std::endl;
+    InternalComparisonMechanismTest((uint8_t*) "[1, 2", (uint8_t*) "[fork, spoon", "Oops", "Oops");
+    InternalComparisonMechanismTest((uint8_t*) "[1, 2", (uint8_t*) "[fork, spoon", "waps", "Oops");
     
     return 0;
 }

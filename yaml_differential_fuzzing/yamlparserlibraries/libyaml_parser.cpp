@@ -25,9 +25,9 @@ yaml_normalization::YamlNormalizedOutput* LibyamlParser::normalize
 {
     if (std::vector<YAML::Node>* casted_input = static_cast<std::vector<YAML::Node>*>(input))
     {
-        return new yaml_normalization::YamlNormalizedOutput(casted_input, std::move(error_code));
+        return new yaml_normalization::YamlNormalizedOutput(static_cast<std::vector<YAML::Node>*>(input), std::move(error_code));
     }
-    return nullptr;
+    return new yaml_normalization::YamlNormalizedOutput(new std::vector<YAML::Node>(), std::move(error_code));
 }
 
 

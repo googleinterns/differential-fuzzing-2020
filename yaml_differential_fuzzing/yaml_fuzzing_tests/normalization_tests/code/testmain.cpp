@@ -38,6 +38,20 @@ int main(int argc, char* args[])
         differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = yamlcpp_case->normalize
             (yamlcpp_parsed_data, std::move(yamlcpp_error_string));
 
+        if (!yamlcpp_test_normalized_output->getError()->empty())
+        {
+            std::cout << "----- Error present" << std::endl;
+        }
+
+        std::vector<YAML::Node>* yamlcpp_data = 
+            static_cast<std::vector<YAML::Node>*>((yamlcpp_test_normalized_output)->getData());
+
+        if (!yamlcpp_data->empty())
+        {
+            std::cout << "----- Size:"<< yamlcpp_data->size() << std::endl;
+            std::cout << yamlcpp_data->back() << std::endl;
+        }
+
         std::cout << "----------- libyaml tests -----------" << std::endl;
 
         std::vector<YAML::Node>* libyaml_test_normalized_output_data;
@@ -53,7 +67,20 @@ int main(int argc, char* args[])
         differential_parser::NormalizedOutput* libyaml_test_normalized_output = libyaml_case->normalize
             (libyaml_parsed_data, std::move(libyaml_error_string));
 
-        std::cout << "----------- compare -----------" << std::endl;
+        if (!libyaml_test_normalized_output->getError()->empty())
+        {
+            std::cout << "----- Error present" << std::endl;
+        }
+
+        std::vector<YAML::Node>* libyaml_data = 
+            static_cast<std::vector<YAML::Node>*>((libyaml_test_normalized_output)->getData());
+
+        if( !libyaml_data->empty())
+        {
+            std::cout << "----- Size:"<< libyaml_data->size() << std::endl;
+            std::cout << libyaml_data->back() << std::endl;
+        }
+        std::cout << "----------- compare manual -----------" << std::endl;
 
         // yamlcpp_test_normalized_output->getData()
 
