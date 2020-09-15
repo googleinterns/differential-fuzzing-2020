@@ -80,11 +80,12 @@ void AddToNode(const yaml_char_t* tag, YAML::Node* add_to_me, YAML::Node* add_me
         else if (tracking_current_type ==  mode_type::VALUE_TYPE && add_to_me->IsMap())
         {
             TEST_PPRINT("map type\n")
-            if (!key_stack->empty())
-            {
-                (*add_to_me)[key_stack->top()] = *add_me;
-                key_stack->pop();
-            }
+
+            bool no_key_associated_with_value = !key_stack->empty();
+            assert(no_key_associated_with_value);
+
+            (*add_to_me)[key_stack->top()] = *add_me;
+            key_stack->pop();
         }
         else
         {
