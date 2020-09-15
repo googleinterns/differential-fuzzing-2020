@@ -498,7 +498,10 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 std::string temp_translator = ((char*) event->data.alias.anchor);
                 
-                if (anchor_map.find(temp_translator) != anchor_map.end())
+                std::map<std::string, YAML::Node>::iterator search_iterator =
+                    anchor_map.find(temp_translator);
+
+                if (search_iterator != anchor_map.end())
                 {
                     if (mode_stack.empty())
                     {
@@ -508,7 +511,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                     is_map_key = FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
                     AddToNode(nullptr, &libyaml_local_output.back(), 
-                        &anchor_map[temp_translator], &key_stack, tracking_current_type);
+                        &(search_iterator->second), &key_stack, tracking_current_type);
                 }
                 else
                 {
