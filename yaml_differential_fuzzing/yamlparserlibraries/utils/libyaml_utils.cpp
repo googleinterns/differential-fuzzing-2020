@@ -16,7 +16,7 @@ enum class mode_type
     MAP_TYPE = 5
 };
 
-// Necessary for finding the current mode of the current state. Important sice
+// Necessary for finding the current mode of the current state. Important since
 // libyaml does not tell you if a certain part of a map is a key or a value
 bool FindModeType(const mode_type reference_type, const bool is_map_key, mode_type* add_to_me)
 {
@@ -236,7 +236,7 @@ void InsertIntoAnchorMap(const std::string key, YAML::Node* insert_me,
 }
 
 // Parses case where we are in a scalar that is an anchor, but the
-// anchor itself is empty
+// value of the anchor is empty
 void ParseEmptyAnchorScalar(const std::vector<yaml_event_t>::iterator event, std::stack<YAML::Node>* key_stack,
     std::stack<mode_type>* mode_stack, std::stack<bool>* map_mode_stack,
     std::vector<YAML::Node>* libyaml_local_output,

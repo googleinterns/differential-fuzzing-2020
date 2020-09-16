@@ -1,9 +1,0 @@
-- !!str
--
-  !!nul : a
-  b: tr
--
-  !!null : a
-  b: !!str
-- !!t6p : !!!str
-- !!st6r : !
