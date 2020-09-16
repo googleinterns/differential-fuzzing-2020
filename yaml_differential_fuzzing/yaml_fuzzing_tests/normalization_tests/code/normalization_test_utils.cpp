@@ -1,5 +1,11 @@
 #include "normalization_test_utils.h"
 
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <fstream>
+
+
 bool compareStringsCustom(const std::string compare_me_one, 
     const std::string compare_me_two, std::string& buffer)
 {
@@ -24,5 +30,18 @@ bool compareStringsCustom(const std::string compare_me_one,
     else
     {
         return true;
+    }
+}
+
+void PrintNodes(std::vector<YAML::Node>* print_me)
+{
+    for (std::vector<YAML::Node>::iterator iterator = print_me->begin(); 
+        iterator != print_me->end(); iterator++)
+    {
+        std::stringstream stream_node;
+
+        iterator->SetStyle(YAML::EmitterStyle::Block);
+
+        std::cout << *iterator << std::endl;
     }
 }

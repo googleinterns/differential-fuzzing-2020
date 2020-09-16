@@ -16,4 +16,6 @@
 
 bool compareStringsCustom(const std::string compareMeOne, const std::string compareMeTwo, std::string& buffer);
 
+void PrintNodes(std::vector<YAML::Node>* print_me);
+
 #endif

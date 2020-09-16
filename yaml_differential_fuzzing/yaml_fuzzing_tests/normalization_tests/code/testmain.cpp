@@ -49,7 +49,7 @@ int main(int argc, char* args[])
         if (!yamlcpp_data->empty())
         {
             std::cout << "----- Size:"<< yamlcpp_data->size() << std::endl;
-            std::cout << yamlcpp_data->back() << std::endl;
+            PrintNodes(yamlcpp_data);
         }
 
         std::cout << "----------- libyaml tests -----------" << std::endl;
@@ -75,10 +75,10 @@ int main(int argc, char* args[])
         std::vector<YAML::Node>* libyaml_data = 
             static_cast<std::vector<YAML::Node>*>((libyaml_test_normalized_output)->getData());
 
-        if( !libyaml_data->empty())
+        if (!libyaml_data->empty())
         {
             std::cout << "----- Size:"<< libyaml_data->size() << std::endl;
-            std::cout << libyaml_data->back() << std::endl;
+            PrintNodes(libyaml_data);
         }
         std::cout << "----------- compare manual -----------" << std::endl;
 
