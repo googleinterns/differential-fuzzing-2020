@@ -152,8 +152,9 @@ int main(int argc, char* args[])
         {
             if (ent->d_name[0] != '.')
             {
+                std::cerr << std::string(std::string(args[1]) + std::string(ent->d_name)) << std::endl;
                 comparison_type_results test_result = runTest(std::string(std::string(args[1]) + std::string(ent->d_name)).c_str());
-
+                
                 switch (test_result)
                 {
                 case (comparison_type_results::DIFFERENT_ERROR):

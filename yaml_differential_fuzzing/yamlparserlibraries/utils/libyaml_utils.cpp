@@ -12,8 +12,8 @@ enum class mode_type
     KEY_TYPE = 1, 
     VALUE_TYPE = 2, 
     SEQUENCE_TYPE = 3, 
-    UNKNOWN_TYPE = 4,
-    MAP_TYPE = 5
+    MAP_TYPE = 4,
+    UNKNOWN_TYPE = 5,
 };
 
 // Necessary for finding the current mode of the current state. Important since
@@ -89,7 +89,9 @@ void AddToNode(const yaml_char_t* tag, YAML::Node* add_to_me, YAML::Node* add_me
         }
         else
         {
-            TEST_PPRINT("? type\n")
+            bool failed_as_expected = false;
+            std::cout << "ERRRRRRRROOOOOOOOOOOOOOOORRRRRRRRRRRRR" << std::endl;
+            // assert(failed_as_expected);
         }
     }
 }
@@ -97,7 +99,7 @@ void AddToNode(const yaml_char_t* tag, YAML::Node* add_to_me, YAML::Node* add_me
 bool EndEventAddition(bool is_map_key, std::vector<YAML::Node>* libyaml_local_output, std::stack<mode_type>* mode_stack, 
     std::stack<bool>* map_mode_stack, std::stack<YAML::Node>* key_stack)
 {
-    if (libyaml_local_output->size() > 1 && mode_stack->size() > 1)
+    if (libyaml_local_output->size() > 1)
     {
         mode_stack->pop();
 
@@ -185,8 +187,6 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
     {
         yaml_event_type_t type;
 
-        type = event.type;
-
         if (!yaml_parser_parse(&parser, &event))
         {
             yaml_event_delete(&event);
@@ -199,6 +199,8 @@ std::unique_ptr<std::vector<yaml_event_t>> GetEvents(const uint8_t* input,
 
             break;
         }
+
+        type = event.type;
 
         event_list.get()->push_back(event);
 
@@ -275,6 +277,7 @@ void ParseEmptyAnchorScalar(const std::vector<yaml_event_t>::iterator event, std
 
     if (!mode_stack->empty())
     {
+        // Handle '&anchor: value' cases 
         if (mode_stack->top() ==  mode_type::MAP_TYPE)
         {
             TEST_PPRINT("map\n");
@@ -282,6 +285,8 @@ void ParseEmptyAnchorScalar(const std::vector<yaml_event_t>::iterator event, std
             map_mode_stack->pop();
         }
 
+        // Handle case of anchor with empty value in a sequence, or
+        // when there is a dangling empty scalar
         if (!libyaml_local_output->empty())
         {
             TEST_PPRINT("pop\n");
@@ -290,6 +295,7 @@ void ParseEmptyAnchorScalar(const std::vector<yaml_event_t>::iterator event, std
     }
     else
     {
+        // Inserts the empty node
         TEST_PPRINT("insert\n");
         libyaml_local_output->push_back(YAML::Node());
     }
@@ -349,11 +355,9 @@ void ParseAnchorScalar(const std::vector<yaml_event_t>::iterator event, std::sta
 }
 
 // Parses scalar case where we only have to deal with the scalar itself
-void ParseScalar(const std::vector<yaml_event_t>::iterator event, std::stack<YAML::Node>* key_stack,
-    std::stack<mode_type>* mode_stack,
-    std::vector<YAML::Node>* libyaml_local_output,
-    bool* is_map_key, YAML::Node* add_me, 
-    mode_type* tracking_current_type)
+void ParseNormalScalar(const std::vector<yaml_event_t>::iterator event, std::stack<YAML::Node>* key_stack,
+    std::stack<mode_type>* mode_stack, std::vector<YAML::Node>* libyaml_local_output,
+    bool* is_map_key, YAML::Node* add_me, mode_type* tracking_current_type)
 {
     TEST_PPRINT("normal\n");
     if (mode_stack->empty())
@@ -458,15 +462,16 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Map));
                 AddTag(event->data.mapping_start.tag, &libyaml_local_output.back());
 
-                if (!mode_stack.empty())
-                {
+                // Safeguard against all previous modes popped from anchors
+                // if (!mode_stack.empty())
+                // {
                     FindModeType(mode_stack.top(), is_map_key, &tracking_current_type);
 
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
                         map_mode_stack.push(!is_map_key);
                     }
-                }
+                // }
 
                 mode_stack.push(mode_type::MAP_TYPE);
                 is_map_key = true;
@@ -484,13 +489,13 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
                 AddTag(event->data.sequence_start.tag, &libyaml_local_output.back());
 
-                if (!mode_stack.empty())
-                {
+                // if (!mode_stack.empty())
+                // {
                     if (mode_stack.top() ==  mode_type::MAP_TYPE)
                     {
                         map_mode_stack.push(!is_map_key);
                     }
-                }
+                // }
 
                 mode_stack.push(mode_type::SEQUENCE_TYPE);
 
@@ -531,7 +536,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 }
                 else
                 {
-                    ParseScalar(event, &key_stack, &mode_stack, &libyaml_local_output,
+                    ParseNormalScalar(event, &key_stack, &mode_stack, &libyaml_local_output,
                         &is_map_key, &add_me, &tracking_current_type);
                 }
                 break;
@@ -572,6 +577,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 break;
             }
             default: 
+                TEST_PPRINT("default\n");
                 break;
         }
         TEST_PPRINT("---------\n");
