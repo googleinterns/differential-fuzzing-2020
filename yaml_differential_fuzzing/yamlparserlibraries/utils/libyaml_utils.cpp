@@ -271,11 +271,8 @@ function_status ParseEmptyAnchorScalar(const std::vector<yaml_event_t>::iterator
 
         if (!libyaml_local_output->empty())
         {
-            if (libyaml_local_output->back().IsSequence())
-            {
-                TEST_PPRINT("insert\n");
-                libyaml_local_output->back().push_back(*add_me);
-            }
+            TEST_PPRINT("insert\n");
+            libyaml_local_output->back().push_back(*add_me);
         }
         return function_status::SUCCESS;
     }
@@ -465,6 +462,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 break;
 
             case YAML_MAPPING_END_EVENT:
+                // - Update is_map_key to add information
+                // - Removes info from map_mode_stack relative to the mapping event
                 TEST_PPRINT("MAP-\n");
 
                 function_status addition_to_node_success_map;
@@ -487,6 +486,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
+                // - Update is_map_key to add information
+                // - Removes info from map_mode_stack relative to the mapping event
                 TEST_PPRINT("SQU-\n");
 
                 function_status addition_to_node_success_sequence;
@@ -509,6 +510,9 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 break;
             case YAML_MAPPING_START_EVENT:
+                // - Update is_map_key to add information to use in the future to add
+                // cases
+                // - Saves info to map_mode_stack if relevant
                 TEST_PPRINT("MAP+\n");
 
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Map));
@@ -537,6 +541,9 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
+                // - Update is_map_key to add information to use in the future to add
+                // cases
+                // - Saves info to map_mode_stack if relevant
                 TEST_PPRINT("SQU+\n");
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
                 AddTag(event->data.sequence_start.tag, &libyaml_local_output.back());
@@ -563,6 +570,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
             case YAML_SCALAR_EVENT:
             {
+                // - Use is_map_key and update if necessary
+                // - Saves info to map_mode_stack if relevant, and may use it to add info
                 TEST_PPRINT("SCL\n");
 
                 std::string temp_scalar_string = std::string((char*) event->data.scalar.value, event->data.scalar.length);
@@ -612,6 +621,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             }
             case YAML_ALIAS_EVENT:
             {
+                // - Use is_map_key and update if necessary
+                // - Saves info to map_mode_stack if relevant, and may use it to add info
                 TEST_PPRINT("ALI\n");
 
                 std::string temp_translator = ((char*) event->data.alias.anchor);
