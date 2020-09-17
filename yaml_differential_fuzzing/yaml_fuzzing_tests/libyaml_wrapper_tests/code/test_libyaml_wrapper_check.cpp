@@ -8,7 +8,7 @@
 void SmokeTest(const uint8_t* data)
 {
     size_t size = strlen((const char*)data);
-    libyaml_differential_parser::LibyamlParser* temp_instance =
+    libyaml_differential_parser::LibyamlParser* temp_instance = 
         libyaml_differential_parser::LibyamlParser::GetStaticInstance();
 
     std::cout << "----- Simple Test -----" << std::endl;
@@ -20,8 +20,8 @@ void SmokeTest(const uint8_t* data)
 
     void* parsed_data = temp_instance->parse(data, size, error_string.get());
     
-    differential_parser::NormalizedOutput* test_normalized_output = temp_instance->normalize
-            (parsed_data, std::move(error_string));
+    differential_parser::NormalizedOutput* test_normalized_output = 
+        temp_instance->normalize(parsed_data, std::move(error_string));
     
     if (test_normalized_output != nullptr)
     {

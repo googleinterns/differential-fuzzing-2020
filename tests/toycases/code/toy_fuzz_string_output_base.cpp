@@ -73,8 +73,8 @@ differential_parser::NormalizedOutput* ToyFuzzGenericStringParser::normalize
     (void* input,  std::unique_ptr<std::string> error_code)
 {
     *(std::string*)input = *(std::string*)input + this->normalizer_modifier;
-    differential_parser::NormalizedOutput* returnMe = new
-        toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, std::move(error_code));
+    differential_parser::NormalizedOutput* returnMe = 
+        new toy_generic_string_helper::ToyFuzzGenericStringOutput((std::string*)input, std::move(error_code));
     
     return returnMe;
 }

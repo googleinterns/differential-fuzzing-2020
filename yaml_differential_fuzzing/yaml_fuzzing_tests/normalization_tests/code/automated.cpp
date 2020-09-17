@@ -82,8 +82,8 @@ comparison_type_results runTest(const char* file_path)
 
         void* yamlcpp_parsed_data = yamlcpp_case->parse((uint8_t*) buffer, file_stat.st_size, yamlcpp_error_string.get());
 
-        differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = yamlcpp_case->normalize
-            (yamlcpp_parsed_data, std::move(yamlcpp_error_string));
+        differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = 
+            yamlcpp_case->normalize(yamlcpp_parsed_data, std::move(yamlcpp_error_string));
 
         std::vector<YAML::Node>* libyaml_test_normalized_output_data;
 

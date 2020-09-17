@@ -35,8 +35,8 @@ int main(int argc, char* args[])
 
         void* yamlcpp_parsed_data = yamlcpp_case->parse((uint8_t*) buffer, file_stat.st_size, yamlcpp_error_string.get());
 
-        differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = yamlcpp_case->normalize
-            (yamlcpp_parsed_data, std::move(yamlcpp_error_string));
+        differential_parser::NormalizedOutput* yamlcpp_test_normalized_output = 
+            yamlcpp_case->normalize(yamlcpp_parsed_data, std::move(yamlcpp_error_string));
 
         if (!yamlcpp_test_normalized_output->getError()->empty())
         {
@@ -64,8 +64,8 @@ int main(int argc, char* args[])
 
         void* libyaml_parsed_data = libyaml_case->parse((uint8_t*) buffer, file_stat.st_size, libyaml_error_string.get());
 
-        differential_parser::NormalizedOutput* libyaml_test_normalized_output = libyaml_case->normalize
-            (libyaml_parsed_data, std::move(libyaml_error_string));
+        differential_parser::NormalizedOutput* libyaml_test_normalized_output = 
+            libyaml_case->normalize(libyaml_parsed_data, std::move(libyaml_error_string));
 
         if (!libyaml_test_normalized_output->getError()->empty())
         {
@@ -81,8 +81,6 @@ int main(int argc, char* args[])
             PrintNodes(libyaml_data);
         }
         std::cout << "----------- compare manual -----------" << std::endl;
-
-        // yamlcpp_test_normalized_output->getData()
 
         if (yamlcpp_test_normalized_output->equivalent(libyaml_test_normalized_output))
         {

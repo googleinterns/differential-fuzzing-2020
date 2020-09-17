@@ -6,7 +6,7 @@
 #include <fstream>
 
 
-bool compareStringsCustom(const std::string compare_me_one, 
+bool compareBufferCustom(const std::string compare_me_one, 
     const std::string compare_me_two, std::string& buffer)
 {
     std::string::const_iterator ptrOne = compare_me_one.begin();
