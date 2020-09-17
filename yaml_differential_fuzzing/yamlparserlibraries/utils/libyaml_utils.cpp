@@ -350,7 +350,7 @@ function_status ParseAnchorScalar(const std::vector<yaml_event_t>::iterator even
 
     if (mode_stack->empty())
     {
-        return function_status::SUCCESS;
+        return function_status::FAIL;
     }
 
     if (event->data.scalar.value)
@@ -379,7 +379,7 @@ function_status ParseNormalScalar(const std::vector<yaml_event_t>::iterator even
     TEST_PPRINT("normal\n");
     if (mode_stack->empty())
     {
-        return function_status::SUCCESS;;
+        return function_status::FAIL;
     }
     *is_map_key = FindModeType(mode_stack->top(), *is_map_key, tracking_current_type);
 
@@ -670,6 +670,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 }
                 break;
             }
+            case YAML_NO_EVENT:
+                TEST_PPRINT("NO EVENT\n");
             default: 
                 TEST_PPRINT("default\n");
                 break;
