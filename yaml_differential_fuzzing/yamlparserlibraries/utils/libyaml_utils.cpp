@@ -277,6 +277,7 @@ function_status ParseEmptyAnchorScalar(const std::vector<yaml_event_t>::iterator
         return function_status::SUCCESS;
     }
 
+    // Check if this is an anchor in the value position of a map
     if (mode_stack->top() ==  mode_type::MAP_TYPE && !*is_map_key)
     {
         *is_map_key = FindModeType(mode_stack->top(), *is_map_key, tracking_current_type);
@@ -462,8 +463,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
                 break;
 
             case YAML_MAPPING_END_EVENT:
-                // - Update is_map_key to add information
-                // - Removes info from map_mode_stack relative to the mapping event
+                // - Update is_map_key, and then use it to add information during event
+                // - Removes info from map_mode_stack about the current map being used
                 TEST_PPRINT("MAP-\n");
 
                 function_status addition_to_node_success_map;
@@ -486,8 +487,10 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 break;
             case YAML_SEQUENCE_END_EVENT:
-                // - Update is_map_key to add information
-                // - Removes info from map_mode_stack relative to the mapping event
+                // - Update is_map_key, and then use it to add information during event, and
+                // to be used in the future by other cases
+                // - Removes info from map_mode_stack relative to a possible previous
+                // mapping event
                 TEST_PPRINT("SQU-\n");
 
                 function_status addition_to_node_success_sequence;
@@ -510,9 +513,10 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 break;
             case YAML_MAPPING_START_EVENT:
-                // - Update is_map_key to add information to use in the future to add
-                // cases
-                // - Saves info to map_mode_stack if relevant
+                // - Is is_map_key to add information, save it if previously using
+                // map and information requires saving. Updates with info relative
+                // to the new map
+                // - Updates map_mode_stack about possible previous map information
                 TEST_PPRINT("MAP+\n");
 
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Map));
@@ -541,9 +545,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 break;
             case YAML_SEQUENCE_START_EVENT:
-                // - Update is_map_key to add information to use in the future to add
-                // cases
-                // - Saves info to map_mode_stack if relevant
+                // - Saves current state of is_map_key into map_mode_stack if previous
+                // case was a map, and information about it is required saving
                 TEST_PPRINT("SQU+\n");
                 libyaml_local_output.push_back(YAML::Node(YAML::NodeType::Sequence));
                 AddTag(event->data.sequence_start.tag, &libyaml_local_output.back());
@@ -570,8 +573,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
             case YAML_SCALAR_EVENT:
             {
-                // - Use is_map_key and update if necessary
-                // - Saves info to map_mode_stack if relevant, and may use it to add info
+                // - Use is_map_key and updated if necessary
+                // - map_mode_stack updated by removing information depending on the event
                 TEST_PPRINT("SCL\n");
 
                 std::string temp_scalar_string = std::string((char*) event->data.scalar.value, event->data.scalar.length);
@@ -621,14 +624,13 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             }
             case YAML_ALIAS_EVENT:
             {
-                // - Use is_map_key and update if necessary
-                // - Saves info to map_mode_stack if relevant, and may use it to add info
+                // - Updated to reflect state after the event is_map_key
                 TEST_PPRINT("ALI\n");
 
-                std::string temp_translator = ((char*) event->data.alias.anchor);
+                std::string temp_anchor_key_translator = ((char*) event->data.alias.anchor);
                 
                 std::map<std::string, YAML::Node>::iterator search_iterator =
-                    anchor_map.find(temp_translator);
+                    anchor_map.find(temp_anchor_key_translator);
 
                 if (search_iterator != anchor_map.end())
                 {

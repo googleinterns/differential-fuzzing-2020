@@ -28,11 +28,6 @@ namespace compare_utils
 bool CheckForEmpty(std::vector<YAML::Node>*  compare_me)
 {
     if (compare_me == nullptr) return true;
-
-    // if (compare_me->size() == 1)
-    // {
-    //     return !compare_me->back().IsDefined();
-    // }
     return compare_me->empty();
 }
 
