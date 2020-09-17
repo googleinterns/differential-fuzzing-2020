@@ -6,5 +6,5 @@ clang++ "$YAML_LIBRARY_PATHS"libyaml/src/.libs/libyaml.a "$YAML_LIBRARY_PATHS"ya
 "$YAML_PARSER_PATHS"utils/libyaml_utils.cpp \
 ./code/normalization_test_utils.cpp differential_fuzzer.o \
 -I "$YAML_LIBRARY_PATHS"yaml-cpp/include -I "$YAML_LIBRARY_PATHS"libyaml/ \
--I ../../../differential_fuzzing_lib -I ./../../yamlparserlibraries -I ../../ \
+-I "$DIFFERENTIAL_FUZZER_PATH"differential_fuzzing_lib -I ./../../yamlparserlibraries -I ../../ \
 -g -fsanitize=address,fuzzer -DDEBUG_MODE
