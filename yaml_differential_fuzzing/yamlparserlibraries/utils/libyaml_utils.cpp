@@ -513,7 +513,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
                 break;
             case YAML_MAPPING_START_EVENT:
-                // - Is is_map_key to add information, save it if previously using
+                // - Update is_map_key to add information, save it if previously using
                 // map and information requires saving. Updates with info relative
                 // to the new map
                 // - Updates map_mode_stack about possible previous map information
@@ -573,7 +573,7 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
 
             case YAML_SCALAR_EVENT:
             {
-                // - Use is_map_key and updated if necessary
+                // - Use is_map_key and update if necessary
                 // - map_mode_stack updated by removing information depending on the event
                 TEST_PPRINT("SCL\n");
 
@@ -624,7 +624,8 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             }
             case YAML_ALIAS_EVENT:
             {
-                // - Updated to reflect state after the event is_map_key
+                // - Update is_map_key to reflect state after the event. May use is_map_key to
+                // define mode type being used
                 TEST_PPRINT("ALI\n");
 
                 std::string temp_anchor_key_translator = ((char*) event->data.alias.anchor);
