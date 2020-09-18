@@ -52,14 +52,6 @@ int main(int argc, char* args[])
             PrintNodes(yamlcpp_data);
         }
 
-        std::vector<YAML::Node>* yamlcpp_data = 
-            static_cast<std::vector<YAML::Node>*>((yamlcpp_test_normalized_output)->getData());
-
-        if (!yamlcpp_data->empty())
-        {
-            std::cout << "----- Size:"<< yamlcpp_data->size() << std::endl;
-            PrintNodes(yamlcpp_data);
-        }
         std::cout << "----------- libyaml tests -----------" << std::endl;
 
         std::vector<YAML::Node>* libyaml_test_normalized_output_data;
@@ -98,6 +90,7 @@ int main(int argc, char* args[])
         {
             std::cout << "Cases different!" << std::endl;
         }
+
         delete yamlcpp_test_normalized_output;
         delete libyaml_test_normalized_output;
     }
