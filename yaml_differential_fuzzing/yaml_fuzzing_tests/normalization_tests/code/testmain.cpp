@@ -52,19 +52,13 @@ int main(int argc, char* args[])
             PrintNodes(yamlcpp_data);
         }
 
-        if (!yamlcpp_test_normalized_output->getError()->empty())
-        {
-            std::cout << "----- Error present" << std::endl;
-        }
-
         std::vector<YAML::Node>* yamlcpp_data = 
             static_cast<std::vector<YAML::Node>*>((yamlcpp_test_normalized_output)->getData());
 
-
-        if( !yamlcpp_data->empty())
+        if (!yamlcpp_data->empty())
         {
             std::cout << "----- Size:"<< yamlcpp_data->size() << std::endl;
-            std::cout << yamlcpp_data->back() << std::endl;
+            PrintNodes(yamlcpp_data);
         }
         std::cout << "----------- libyaml tests -----------" << std::endl;
 
@@ -106,6 +100,10 @@ int main(int argc, char* args[])
         }
         delete yamlcpp_test_normalized_output;
         delete libyaml_test_normalized_output;
+    }
+    else
+    {
+        std::cerr << "Failure reading file" << std::endl;
     }
     
     return 0;
