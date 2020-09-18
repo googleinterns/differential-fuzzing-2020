@@ -1,4 +1,4 @@
-export YAML_LIBRARY_PATHS="../../../../libraries/"
+export YAML_LIBRARY_PATHS="../library_set_up/"
 
 export YAML_PARSER_PATHS="../yamlparserlibraries/"
 
