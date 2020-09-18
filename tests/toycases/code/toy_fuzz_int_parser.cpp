@@ -74,8 +74,8 @@ void* ToyIntParser::parse(const uint8_t* input, size_t input_size, std::string* 
     return (void*)toy_output;
 }
 
-differential_parser::NormalizedOutput* ToyIntParser::normalize
-    (void* input,std::unique_ptr<std::string> error_code)
+differential_parser::NormalizedOutput* ToyIntParser::normalize(void* input,
+    std::unique_ptr<std::string> error_code)
 {
     differential_parser::NormalizedOutput* returnMe = new
         ToyIntParserOutput((int*)input, std::move(error_code));

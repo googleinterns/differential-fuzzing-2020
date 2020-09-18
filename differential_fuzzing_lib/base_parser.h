@@ -24,5 +24,4 @@ class Parser
 };
 } // namespace differential_parser
 
-
 #endif
