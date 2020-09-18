@@ -673,8 +673,6 @@ std::vector<YAML::Node>* libyaml_parsing::ParseLibyaml(const uint8_t* input,
             }
             case YAML_NO_EVENT:
                 TEST_PPRINT("NO EVENT\n");
-            default: 
-                TEST_PPRINT("default\n");
                 break;
         }
         TEST_PPRINT("---------\n");
