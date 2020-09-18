@@ -1,0 +1,1 @@
+rm *.o yaml_fuzzer
