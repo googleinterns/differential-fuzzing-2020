@@ -22,8 +22,7 @@ void differential_fuzzer::parser::DeleteAssociatedParserName(AssociatedParserNam
     }
 }
 
-void differential_fuzzer::parser::DeleteEquivalenceNormalizedOutputs
-    (EquivalenceNormalizedOutputs* delete_me)
+void differential_fuzzer::parser::DeleteEquivalenceNormalizedOutputs(EquivalenceNormalizedOutputs* delete_me)
 {
     while (delete_me != nullptr)
     {

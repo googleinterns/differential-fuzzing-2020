@@ -1,0 +1,1 @@
+rm *.o libyaml_wrapper_check libyaml_parser_test
