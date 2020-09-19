@@ -1,3 +1,3 @@
-export YAML_LIBRARY_PATHS="../../yaml_differential_fuzzing/library_set_up/"
+export YAML_LIBRARY_PATHS="./../../../libraries/"
 
 export DIFFERENTIAL_FUZZER_PATH="../../"
