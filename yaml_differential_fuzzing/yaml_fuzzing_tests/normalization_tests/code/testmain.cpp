@@ -15,6 +15,11 @@
 // ---------------------------------------------------------------------------------
 int main(int argc, char* args[])
 {
+    std::vector<YAML::Node>* casted_input = static_cast<std::vector<YAML::Node>*>(nullptr);
+    if (casted_input == nullptr)
+    {
+        std::cout << "Nice" << std::endl;
+    }
     FILE * file_descriptor = fopen(args[1], "rb");
 
     struct stat file_stat;
@@ -85,6 +90,14 @@ int main(int argc, char* args[])
         if (yamlcpp_test_normalized_output->equivalent(libyaml_test_normalized_output))
         {
             std::cout << "Cases equal!" << std::endl;
+            differential_parser::Parser* array_of_parsers[2] = { (differential_parser::Parser*)(libyaml_differential_parser::LibyamlParser::GetStaticInstance()),
+                (differential_parser::Parser*)(yamlcpp_differential_parser::YamlCppParser::GetStaticInstance())};
+
+            bool fuzzers_are_equal = 
+                differential_fuzzer::fuzzer::DifferentiallyFuzz(array_of_parsers, 2, (uint8_t*) buffer, file_stat.st_size);
+
+            assert(fuzzers_are_equal);
+
         }
         else
         {
